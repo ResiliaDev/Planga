@@ -8,7 +8,7 @@ defmodule PlangeWeb.UserSocket do
   transport :websocket, Phoenix.Transports.WebSocket
   # transport :longpoll, Phoenix.Transports.LongPoll
 
-  channel "chat", PlangeWeb.ChatChannel
+  channel "chat:*", PlangeWeb.ChatChannel
 
 
   # Socket params are passed from the client and can

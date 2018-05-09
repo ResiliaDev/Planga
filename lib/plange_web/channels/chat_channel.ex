@@ -1,7 +1,7 @@
 defmodule PlangeWeb.ChatChannel do
   use PlangeWeb, :channel
 
-  def join("chat", payload, socket) do
+  def join("chat:lobby", payload, socket) do
     if authorized?(payload) do
       {:ok, socket}
     else
@@ -19,6 +19,11 @@ defmodule PlangeWeb.ChatChannel do
   # broadcast to everyone in the current topic (chat:lobby).
   def handle_in("shout", payload, socket) do
     broadcast socket, "shout", payload
+    {:noreply, socket}
+  end
+
+  def handle_in("new_message", payload, socket) do
+    broadcast! socket, "new_message", payload
     {:noreply, socket}
   end
 
