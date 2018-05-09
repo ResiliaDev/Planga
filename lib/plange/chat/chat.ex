@@ -241,6 +241,7 @@ defmodule Plange.Chat do
       {:error, %Ecto.Changeset{}}
 
   """
+
   def create_conversation(attrs \\ %{}) do
     %Conversation{}
     |> Conversation.changeset(attrs)
@@ -498,5 +499,19 @@ defmodule Plange.Chat do
     conv
     |> App.changeset(attrs)
     |> Repo.insert_or_update()
+  end
+
+  def get_conversation_by_remote_id!(remote_id) do
+    query = [remote_id: remote_id]
+    Repo.get_by!(Conversation, query, [])
+  end
+
+  def create_message(conversation_id, username, message) do
+    Repo.insert!(
+      %Message{
+        content: message,
+        conversation_id: conversation_id,
+      })
+
   end
 end
