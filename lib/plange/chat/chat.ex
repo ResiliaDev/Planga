@@ -485,4 +485,18 @@ defmodule Plange.Chat do
   def change_app(%App{} = app) do
     App.changeset(app, %{})
   end
+
+  # ACTUAL CODE
+
+  def get_or_create_user(%User{} = user, attrs) do
+    user
+    |> App.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
+  def get_or_create_conversation(%Conversation{} = conv, attrs) do
+    conv
+    |> App.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
 end
