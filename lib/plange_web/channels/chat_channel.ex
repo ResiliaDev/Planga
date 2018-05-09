@@ -27,7 +27,7 @@ defmodule PlangeWeb.ChatChannel do
      messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.channel_id)
      json_hash = messages
      |> Enum.map(fn message ->
-       %{"name" => "TODO", "message" => message.content}
+       %{"name" => message.sender.name, "message" => message.content}
      end)
      |> IO.inspect(tag: "messages")
      push socket, "messages_so_far", %{messages: json_hash}
@@ -47,12 +47,12 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   def handle_in("new_message", payload, socket) do
+    # TODO: Checking if user is allowed to be part of conversation.
     conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
-    # conversation_id = Plange.Chat.get_conversation!(channel_id: socket.assigns.channel_id)
-    IO.inspect("TEST")
+    user = Plange.Chat.get_user_by_name("asdf", payload["name"])
     IO.inspect("Creating message in #{inspect conversation} sent by #{inspect payload["name"]}")
 
-    Plange.Chat.create_message(conversation.id, payload["name"], payload["message"])
+    Plange.Chat.create_good_message(conversation.id, payload["name"], payload["message"])
     
     # |> Plange.Chat.create_message(conversation_id, payload)
 
