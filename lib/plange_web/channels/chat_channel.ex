@@ -1,7 +1,8 @@
 defmodule PlangeWeb.ChatChannel do
   use PlangeWeb, :channel
 
-  def join("chat:lobby", payload, socket) do
+  def join("chat:" <> channel_id, payload, socket) do
+    IO.puts("Channel id: #{channel_id}")
     if authorized?(payload) do
       {:ok, socket}
     else
