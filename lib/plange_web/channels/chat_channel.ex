@@ -28,8 +28,8 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   def handle_in("new_message", payload, socket) do
-    conversation_id = Plange.Chat.get_conversation!(channel_id: socket.assigns.channel_id)
-    IO.inspect("Creating message in #{inspect conversation_id} sent by #{inspect payload.sender}")
+    # conversation_id = Plange.Chat.get_conversation!(channel_id: socket.assigns.channel_id)
+    # IO.inspect("Creating message in #{inspect conversation_id} sent by #{inspect payload.sender}")
 
     
     # |> Plange.Chat.create_message(conversation_id, payload)
