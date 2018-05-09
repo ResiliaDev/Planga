@@ -4,8 +4,12 @@ defmodule Plange.Chat.User do
 
 
   schema "users" do
+    belongs_to :app, Plange.Chat.App
     field :name, :string
     field :remote_id, :string
+
+    has_many :sent_messages, Plange.Chat.Message
+    many_to_many :conversations, Plange.Chat.Conversation, join_through: "conversations_users"
 
     timestamps()
   end

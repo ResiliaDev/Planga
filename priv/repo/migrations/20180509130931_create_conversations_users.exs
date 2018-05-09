@@ -3,8 +3,8 @@ defmodule Plange.Repo.Migrations.CreateConversationsUsers do
 
   def change do
     create table(:conversations_users) do
-      add :conversation_id, :integer
-      add :user_id, :integer
+      add :conversation_id, references: "conversations"
+      add :user_id, references: "users"
 
       timestamps()
     end

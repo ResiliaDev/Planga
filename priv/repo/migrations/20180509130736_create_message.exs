@@ -3,9 +3,9 @@ defmodule Plange.Repo.Migrations.CreateMessage do
 
   def change do
     create table(:message) do
-      add :sender_id, :integer
+      add :sender_id, references: "users"
+      add :conversation_id, references: "conversations"
       add :content, :string
-      add :channel_id, :integer
 
       timestamps()
     end

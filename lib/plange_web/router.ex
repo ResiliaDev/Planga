@@ -11,6 +11,12 @@ defmodule PlangeWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    resources "/apps", AppController, except: [:new, :edit]
+    resources "/users", UserController, except: [:new, :edit]
+    resources "/message", MessageController, except: [:new, :edit]
+    resources "/conversations", ConversationController, except: [:new, :edit]
+    resources "/conversations_users", ConversationUsersController, except: [:new, :edit]
+
   end
 
   scope "/", PlangeWeb do

@@ -250,4 +250,66 @@ defmodule Plange.ChatTest do
       assert %Ecto.Changeset{} = Chat.change_conversation_users(conversation_users)
     end
   end
+
+  describe "apps" do
+    alias Plange.Chat.App
+
+    @valid_attrs %{name: "some name", secret_api_key: "some secret_api_key"}
+    @update_attrs %{name: "some updated name", secret_api_key: "some updated secret_api_key"}
+    @invalid_attrs %{name: nil, secret_api_key: nil}
+
+    def app_fixture(attrs \\ %{}) do
+      {:ok, app} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Chat.create_app()
+
+      app
+    end
+
+    test "list_apps/0 returns all apps" do
+      app = app_fixture()
+      assert Chat.list_apps() == [app]
+    end
+
+    test "get_app!/1 returns the app with given id" do
+      app = app_fixture()
+      assert Chat.get_app!(app.id) == app
+    end
+
+    test "create_app/1 with valid data creates a app" do
+      assert {:ok, %App{} = app} = Chat.create_app(@valid_attrs)
+      assert app.name == "some name"
+      assert app.secret_api_key == "some secret_api_key"
+    end
+
+    test "create_app/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Chat.create_app(@invalid_attrs)
+    end
+
+    test "update_app/2 with valid data updates the app" do
+      app = app_fixture()
+      assert {:ok, app} = Chat.update_app(app, @update_attrs)
+      assert %App{} = app
+      assert app.name == "some updated name"
+      assert app.secret_api_key == "some updated secret_api_key"
+    end
+
+    test "update_app/2 with invalid data returns error changeset" do
+      app = app_fixture()
+      assert {:error, %Ecto.Changeset{}} = Chat.update_app(app, @invalid_attrs)
+      assert app == Chat.get_app!(app.id)
+    end
+
+    test "delete_app/1 deletes the app" do
+      app = app_fixture()
+      assert {:ok, %App{}} = Chat.delete_app(app)
+      assert_raise Ecto.NoResultsError, fn -> Chat.get_app!(app.id) end
+    end
+
+    test "change_app/1 returns a app changeset" do
+      app = app_fixture()
+      assert %Ecto.Changeset{} = Chat.change_app(app)
+    end
+  end
 end

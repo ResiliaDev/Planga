@@ -4,9 +4,9 @@ defmodule Plange.Chat.Message do
 
 
   schema "message" do
-    field :channel_id, :integer
+    belongs_to :sender, Plange.Chat.User
+    belongs_to :conversation, Plange.Chat.Conversation
     field :content, :string
-    field :sender_id, :integer
 
     timestamps()
   end
