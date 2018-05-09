@@ -514,4 +514,8 @@ defmodule Plange.Chat do
       })
 
   end
+
+  def get_messages_by_conversation_id(conversation_id) do
+    Repo.all(Message, where: [conversation_id: conversation_id])
+  end
 end

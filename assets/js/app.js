@@ -38,6 +38,14 @@ channel.on('new_message', payload => {
     list.prop({scrollTop: list.prop("scrollHeight")});
 });
 
+channel.on('messages_so_far', payload => {
+    console.log("Payload", payload)
+    payload.messages.forEach(message => {
+        list.append(`<b>${message.name || 'Anonymous'}:</b> ${message.message}<br>`);
+        list.prop({scrollTop: list.prop("scrollHeight")});
+    });
+});
+
 channel.join()
     .receive("ok", resp => { console.log("Joined successfully", resp) })
     .receive("error", resp => { console.log("Unable to join", resp) })

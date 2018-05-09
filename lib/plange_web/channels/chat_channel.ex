@@ -8,10 +8,29 @@ defmodule PlangeWeb.ChatChannel do
         socket
         |> assign(:channel_id, channel_id)
         |> IO.inspect
+
+      send(self, :after_join)
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+
+  def handle_info(:after_join, socket) do
+    send_previous_messages(socket)
+    {:noreply, socket}
+  end
+
+
+  def send_previous_messages(socket) do
+     # conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
+     messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.channel_id)
+     json_hash = messages
+     |> Enum.map(fn message ->
+       %{"name" => "TODO", "message" => message.content}
+     end)
+     |> IO.inspect(tag: "messages")
+     push socket, "messages_so_far", %{messages: json_hash}
   end
 
   # Channels can be used in a request/response fashion
