@@ -25,7 +25,6 @@ defmodule PlangeWeb.ChatChannel do
 
 
   def send_previous_messages(socket) do
-     # conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
      messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.channel_id)
      json_hash =
        messages
@@ -48,15 +47,9 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   def handle_in("new_message", payload, socket) do
-    # TODO: Checking if user is allowed to be part of conversation.
     conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
     user_id = socket.assigns.user_id
-    # user = Plange.Chat.get_user_by_name("TODO", payload["name"])
-    IO.inspect("Creating message in #{inspect conversation} sent by #{inspect user_id}")
-
     message = Plange.Chat.create_good_message(conversation.id, user_id, payload["message"])
-
-    # |> Plange.Chat.create_message(conversation_id, payload)
 
     broadcast! socket, "new_message", message_dict(message)
     {:noreply, socket}
@@ -65,9 +58,6 @@ defmodule PlangeWeb.ChatChannel do
   # Add authorization logic here as required.
   defp attempt_authorization(payload) do
     IO.inspect({:payload, payload})
-    # Check if app exists
-    # app = Plange.Chat.get_app!(payload["app_id"])
-    # Check if user exists in app
     user = Plange.Chat.get_user_by_remote_id!(payload["app_id"], payload["remote_user_id"])
   end
 

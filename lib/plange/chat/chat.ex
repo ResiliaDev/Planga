@@ -2,11 +2,45 @@ defmodule Plange.Chat do
   @moduledoc """
   The Chat context.
   """
+  import Ecto.Query, warn: false
+  alias Plange.Repo
+  alias Plange.Chat.{User, Message, Conversation, App}
+
+  def get_user_by_remote_id!(app_id, remote_id) do
+    Repo.get_by!(User, [app_id: app_id, remote_id: remote_id] )
+  end
+
+  def get_messages_by_conversation_id(conversation_id) do
+    Repo.all(Message |> preload(:sender), where: [conversation_id: conversation_id])
+  end
+
+  def get_conversation_by_remote_id!(remote_id) do
+    query = [remote_id: remote_id]
+    Repo.get_by!(Conversation, query, [])
+  end
+
+  def create_good_message(conversation_id, user_id, message) do
+    Repo.insert!(
+      %Message{
+        content: message,
+        conversation_id: conversation_id,
+        sender_id: user_id
+      })
+      |> Repo.preload(:sender)
+  end
+
+end
+
+
+defmodule Plange.ChatOld do
+  @moduledoc """
+  The Chat context.
+  """
 
   import Ecto.Query, warn: false
   alias Plange.Repo
 
-  alias Plange.Chat.User
+  alias Plange.Chat.{User, Message, Conversation, App}
 
   @doc """
   Returns the list of users.
@@ -102,8 +136,6 @@ defmodule Plange.Chat do
     User.changeset(user, %{})
   end
 
-  alias Plange.Chat.Message
-
   @doc """
   Returns the list of message.
 
@@ -197,8 +229,6 @@ defmodule Plange.Chat do
   def change_message(%Message{} = message) do
     Message.changeset(message, %{})
   end
-
-  alias Plange.Chat.Conversation
 
   @doc """
   Returns the list of conversations.
@@ -294,104 +324,6 @@ defmodule Plange.Chat do
   def change_conversation(%Conversation{} = conversation) do
     Conversation.changeset(conversation, %{})
   end
-
-  alias Plange.Chat.ConversationUsers
-
-  @doc """
-  Returns the list of conversations_users.
-
-  ## Examples
-
-      iex> list_conversations_users()
-      [%ConversationUsers{}, ...]
-
-  """
-  def list_conversations_users do
-    Repo.all(ConversationUsers)
-  end
-
-  @doc """
-  Gets a single conversation_users.
-
-  Raises `Ecto.NoResultsError` if the Conversation users does not exist.
-
-  ## Examples
-
-      iex> get_conversation_users!(123)
-      %ConversationUsers{}
-
-      iex> get_conversation_users!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_conversation_users!(id), do: Repo.get!(ConversationUsers, id)
-
-  @doc """
-  Creates a conversation_users.
-
-  ## Examples
-
-      iex> create_conversation_users(%{field: value})
-      {:ok, %ConversationUsers{}}
-
-      iex> create_conversation_users(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_conversation_users(attrs \\ %{}) do
-    %ConversationUsers{}
-    |> ConversationUsers.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a conversation_users.
-
-  ## Examples
-
-      iex> update_conversation_users(conversation_users, %{field: new_value})
-      {:ok, %ConversationUsers{}}
-
-      iex> update_conversation_users(conversation_users, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_conversation_users(%ConversationUsers{} = conversation_users, attrs) do
-    conversation_users
-    |> ConversationUsers.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a ConversationUsers.
-
-  ## Examples
-
-      iex> delete_conversation_users(conversation_users)
-      {:ok, %ConversationUsers{}}
-
-      iex> delete_conversation_users(conversation_users)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_conversation_users(%ConversationUsers{} = conversation_users) do
-    Repo.delete(conversation_users)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking conversation_users changes.
-
-  ## Examples
-
-      iex> change_conversation_users(conversation_users)
-      %Ecto.Changeset{source: %ConversationUsers{}}
-
-  """
-  def change_conversation_users(%ConversationUsers{} = conversation_users) do
-    ConversationUsers.changeset(conversation_users, %{})
-  end
-
-  alias Plange.Chat.App
 
   @doc """
   Returns the list of apps.
@@ -528,5 +460,4 @@ defmodule Plange.Chat do
   def get_user_by_remote_id!(app_id, remote_id) do
     Repo.get_by!(User, [app_id: app_id, remote_id: remote_id] )
   end
-
 end
