@@ -506,14 +506,14 @@ defmodule Plange.Chat do
     Repo.get_by!(Conversation, query, [])
   end
 
-  def create_good_message(conversation_id, username, message) do
+  def create_good_message(conversation_id, user_id, message) do
     Repo.insert!(
       %Message{
         content: message,
         conversation_id: conversation_id,
-        sender_id: get_user_by_name('TODO', username).id
+        sender_id: user_id
       })
-
+    |> Repo.preload(:sender)
   end
 
   def get_messages_by_conversation_id(conversation_id) do
@@ -525,7 +525,7 @@ defmodule Plange.Chat do
     Repo.get_by!(User, [name: username] )
   end
 
-  def get_user_by_remote_id(app_id, remote_id) do
+  def get_user_by_remote_id!(app_id, remote_id) do
     Repo.get_by!(User, [app_id: app_id, remote_id: remote_id] )
   end
 

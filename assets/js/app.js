@@ -30,7 +30,7 @@ let channel = socket.channel("chat:"+channel_id, {app_id: app_id, remote_user_id
 
 message.on('keypress', event => {
     if (event.keyCode == 13) {
-        channel.push('new_message', { name: name.val(), message: message.val() });
+        channel.push('new_message', { message: message.val() });
         message.val('');
     }
 });

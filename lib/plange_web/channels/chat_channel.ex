@@ -6,7 +6,7 @@ defmodule PlangeWeb.ChatChannel do
     with user <- attempt_authorization(payload) do
       socket =
         socket
-        |> assign(:user, user)
+        |> assign(:user_id, user.id)
         |> assign(:channel_id, channel_id)
         |> IO.inspect
 
@@ -27,11 +27,10 @@ defmodule PlangeWeb.ChatChannel do
   def send_previous_messages(socket) do
      # conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
      messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.channel_id)
-     json_hash = messages
-     |> Enum.map(fn message ->
-       %{"name" => message.sender.name, "message" => message.content}
-     end)
-     |> IO.inspect(tag: "messages")
+     json_hash =
+       messages
+       |> Enum.map(&message_dict/1)
+       |> IO.inspect(tag: "messages")
      push socket, "messages_so_far", %{messages: json_hash}
   end
 
@@ -51,14 +50,15 @@ defmodule PlangeWeb.ChatChannel do
   def handle_in("new_message", payload, socket) do
     # TODO: Checking if user is allowed to be part of conversation.
     conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
-    user = Plange.Chat.get_user_by_name("TODO", payload["name"])
-    IO.inspect("Creating message in #{inspect conversation} sent by #{inspect payload["name"]}")
+    user_id = socket.assigns.user_id
+    # user = Plange.Chat.get_user_by_name("TODO", payload["name"])
+    IO.inspect("Creating message in #{inspect conversation} sent by #{inspect user_id}")
 
-    Plange.Chat.create_good_message(conversation.id, payload["name"], payload["message"])
- 
+    message = Plange.Chat.create_good_message(conversation.id, user_id, payload["message"])
+
     # |> Plange.Chat.create_message(conversation_id, payload)
 
-    broadcast! socket, "new_message", payload
+    broadcast! socket, "new_message", message_dict(message)
     {:noreply, socket}
   end
 
@@ -68,8 +68,10 @@ defmodule PlangeWeb.ChatChannel do
     # Check if app exists
     # app = Plange.Chat.get_app!(payload["app_id"])
     # Check if user exists in app
-    user = Plange.Chat.get_user_by_remote_id(payload["app_id"], payload["remote_user_id"])
-    IO.inspect(user)
-    true
+    user = Plange.Chat.get_user_by_remote_id!(payload["app_id"], payload["remote_user_id"])
+  end
+
+  defp message_dict(message) do
+    %{"name" => message.sender.name, "message" => message.content}
   end
 end
