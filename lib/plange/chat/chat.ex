@@ -520,7 +520,13 @@ defmodule Plange.Chat do
     Repo.all(Message |> preload(:sender), where: [conversation_id: conversation_id])
   end
 
+  @deprecated
   def get_user_by_name(app_id, username) do
     Repo.get_by!(User, [name: username] )
   end
+
+  def get_user_by_remote_id(app_id, remote_id) do
+    Repo.get_by!(User, [app_id: app_id, remote_id: remote_id] )
+  end
+
 end

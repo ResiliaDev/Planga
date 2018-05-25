@@ -3,16 +3,18 @@ defmodule PlangeWeb.ChatChannel do
 
   def join("chat:" <> channel_id, payload, socket) do
     IO.puts("Channel id: #{channel_id}")
-    if authorized?(payload) do
+    with user <- attempt_authorization(payload) do
       socket =
         socket
+        |> assign(:user, user)
         |> assign(:channel_id, channel_id)
         |> IO.inspect
 
       send(self, :after_join)
       {:ok, socket}
     else
-      {:error, %{reason: "unauthorized"}}
+      _ ->
+        {:error, %{reason: "unauthorized"}}
     end
   end
 
@@ -49,11 +51,11 @@ defmodule PlangeWeb.ChatChannel do
   def handle_in("new_message", payload, socket) do
     # TODO: Checking if user is allowed to be part of conversation.
     conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
-    user = Plange.Chat.get_user_by_name("asdf", payload["name"])
+    user = Plange.Chat.get_user_by_name("TODO", payload["name"])
     IO.inspect("Creating message in #{inspect conversation} sent by #{inspect payload["name"]}")
 
     Plange.Chat.create_good_message(conversation.id, payload["name"], payload["message"])
-    
+ 
     # |> Plange.Chat.create_message(conversation_id, payload)
 
     broadcast! socket, "new_message", payload
@@ -61,7 +63,13 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   # Add authorization logic here as required.
-  defp authorized?(_payload) do
+  defp attempt_authorization(payload) do
+    IO.inspect({:payload, payload})
+    # Check if app exists
+    # app = Plange.Chat.get_app!(payload["app_id"])
+    # Check if user exists in app
+    user = Plange.Chat.get_user_by_remote_id(payload["app_id"], payload["remote_user_id"])
+    IO.inspect(user)
     true
   end
 end

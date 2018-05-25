@@ -8,6 +8,5 @@ defmodule Plange.Repo.Migrations.CreateConversations do
 
       timestamps()
     end
-
   end
 end

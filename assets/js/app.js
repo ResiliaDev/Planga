@@ -20,11 +20,13 @@ import "phoenix_html"
 
 import socket from "./socket"
 
+let app_id = '1';
 let channel_id = "asdf"
-let channel = socket.channel("chat:"+channel_id, {});
 let list    = $('#message-list');
 let message = $('#message');
 let name    = $('#name');
+let remote_user_id = '1234';
+let channel = socket.channel("chat:"+channel_id, {app_id: app_id, remote_user_id: remote_user_id});
 
 message.on('keypress', event => {
     if (event.keyCode == 13) {
@@ -34,13 +36,15 @@ message.on('keypress', event => {
 });
 
 channel.on('new_message', payload => {
+    console.log("New Message", payload)
     list.append(`<b>${payload.name || 'Anonymous'}:</b> ${payload.message}<br>`);
     list.prop({scrollTop: list.prop("scrollHeight")});
 });
 
 channel.on('messages_so_far', payload => {
-    console.log("Payload", payload)
+    console.log("Messages So Far Payload", payload)
     payload.messages.forEach(message => {
+        list.innerHTML='';
         list.append(`<b>${message.name || 'Anonymous'}:</b> ${message.message}<br>`);
         list.prop({scrollTop: list.prop("scrollHeight")});
     });
