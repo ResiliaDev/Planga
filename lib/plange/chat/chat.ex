@@ -6,8 +6,14 @@ defmodule Plange.Chat do
   alias Plange.Repo
   alias Plange.Chat.{User, Message, Conversation, App}
 
-  def get_user_by_remote_id!(app_id, remote_id) do
-    Repo.get_by!(User, [app_id: app_id, remote_id: remote_id] )
+  def check_user_hmac(app_id, remote_user_id, base64_hmac) do
+    app = Repo.get!(App, app_id)
+    local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, remote_user_id)
+    local_computed_hmac == Base.decode64!(base64_hmac)
+  end
+
+  def get_user_by_remote_id!(app_id, remote_user_id) do
+    Repo.get_by!(User, [app_id: app_id, remote_id: remote_user_id] )
   end
 
   def get_messages_by_conversation_id(conversation_id) do
@@ -28,7 +34,6 @@ defmodule Plange.Chat do
       })
       |> Repo.preload(:sender)
   end
-
 end
 
 

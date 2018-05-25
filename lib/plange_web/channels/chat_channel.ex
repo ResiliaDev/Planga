@@ -3,14 +3,14 @@ defmodule PlangeWeb.ChatChannel do
 
   def join("chat:" <> channel_id, payload, socket) do
     IO.puts("Channel id: #{channel_id}")
-    with user <- attempt_authorization(payload) do
+    with user = %Plange.Chat.User{} <- attempt_authorization(payload) do
       socket =
         socket
         |> assign(:user_id, user.id)
         |> assign(:channel_id, channel_id)
         |> IO.inspect
 
-      send(self, :after_join)
+      send(self(), :after_join)
       {:ok, socket}
     else
       _ ->
@@ -58,7 +58,15 @@ defmodule PlangeWeb.ChatChannel do
   # Add authorization logic here as required.
   defp attempt_authorization(payload) do
     IO.inspect({:payload, payload})
-    user = Plange.Chat.get_user_by_remote_id!(payload["app_id"], payload["remote_user_id"])
+    # TODO check HMAC of user
+    app_id = payload["app_id"]
+    remote_user_id = payload["remote_user_id"]
+    user_id_hmac = payload["remote_user_id_hmac"]
+    if Plange.Chat.check_user_hmac(app_id, remote_user_id, user_id_hmac) do
+      Plange.Chat.get_user_by_remote_id!(payload["app_id"], payload["remote_user_id"])
+    else
+      nil
+    end
   end
 
   defp message_dict(message) do
