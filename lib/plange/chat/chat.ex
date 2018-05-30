@@ -12,6 +12,12 @@ defmodule Plange.Chat do
     local_computed_hmac == Base.decode64!(base64_hmac)
   end
 
+  def check_conversation_hmac(app_id, conversation_id, base64_hmac) do
+    app = Repo.get!(App, app_id)
+    local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, conversation_id)
+    local_computed_hmac == Base.decode64!(base64_hmac)
+  end
+
   def get_user_by_remote_id!(app_id, remote_user_id) do
     Repo.get_by!(User, [app_id: app_id, remote_id: remote_user_id] )
   end

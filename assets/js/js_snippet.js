@@ -24,7 +24,7 @@ class Plange {
         this.app_id = options.app_id;
     }
 
-    createCommuncationSection (chat_container_elem, channel_id, channel_id_hmac) {
+    createCommuncationSection (chat_container_elem, conversation_id, conversation_id_hmac) {
         let container = $(chat_container_elem);
         console.log(container);
         container.html(
@@ -41,11 +41,11 @@ class Plange {
         );
         let messages_list_elem    = $('.plange--chat-messages', container);
         console.log(messages_list_elem);
-        let channel = socket.channel("chat:"+channel_id, {
+        let channel = socket.channel("chat:"+conversation_id, {
             app_id: this.app_id,
             remote_user_id: this.current_user_id,
             remote_user_id_hmac: this.current_user_hmac,
-            channel_id_hmac: channel_id_hmac
+            conversation_id_hmac: conversation_id_hmac
         });
 
         channel.on('new_message', payload => {
@@ -90,7 +90,8 @@ window.Plange = Plange;
 // Usage Example:
 $(function(){
     let app_id = '1';
-    let channel_id = "asdf";
+    let conversation_id = "asdf";
+    let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
     let messages_list_elem    = $('#plange-example');
     let message = $('#message');
     // let name    = $('#name');
@@ -98,7 +99,7 @@ $(function(){
     let remote_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
     let plange = new Plange({app_id: '1', current_user_id: '1234', current_user_hmac: remote_user_id_hmac});
-    plange.createCommuncationSection($(messages_list_elem), "asdf");
+    plange.createCommuncationSection($(messages_list_elem), conversation_id, conversation_id_hmac);
 
 });
 

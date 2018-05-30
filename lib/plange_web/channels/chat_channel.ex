@@ -1,13 +1,13 @@
 defmodule PlangeWeb.ChatChannel do
   use PlangeWeb, :channel
 
-  def join("chat:" <> channel_id, payload, socket) do
-    IO.puts("Channel id: #{channel_id}")
-    with user = %Plange.Chat.User{} <- attempt_authorization(payload) do
+  def join("chat:" <> conversation_id, payload, socket) do
+    IO.puts("Channel id: #{conversation_id}")
+    with user = %Plange.Chat.User{} <- attempt_authorization(payload, conversation_id) do
       socket =
         socket
         |> assign(:user_id, user.id)
-        |> assign(:channel_id, channel_id)
+        |> assign(:conversation_id, conversation_id)
         |> IO.inspect
 
       send(self(), :after_join)
@@ -25,7 +25,7 @@ defmodule PlangeWeb.ChatChannel do
 
 
   def send_previous_messages(socket) do
-     messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.channel_id)
+     messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.conversation_id)
      json_hash =
        messages
        |> Enum.map(&message_dict/1)
@@ -47,7 +47,7 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   def handle_in("new_message", payload, socket) do
-    conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.channel_id)
+    conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.conversation_id)
     user_id = socket.assigns.user_id
     message = Plange.Chat.create_good_message(conversation.id, user_id, payload["message"])
 
@@ -56,18 +56,19 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   # Add authorization logic here as required.
-  defp attempt_authorization(payload) do
+  defp attempt_authorization(payload = %{"app_id" => app_id,
+                              "remote_user_id" => remote_user_id,
+                              "remote_user_id_hmac" => remote_user_id_hmac,
+                              "conversation_id_hmac" => conversation_id_hmac,
+                             }, conversation_id) do
     IO.inspect({:payload, payload})
-    # TODO check HMAC of user
-    app_id = payload["app_id"]
-    remote_user_id = payload["remote_user_id"]
-    user_id_hmac = payload["remote_user_id_hmac"]
-    if Plange.Chat.check_user_hmac(app_id, remote_user_id, user_id_hmac) do
+    with true <- Plange.Chat.check_user_hmac(app_id, remote_user_id, remote_user_id_hmac),
+         true <- Plange.Chat.check_conversation_hmac(app_id, conversation_id, conversation_id_hmac) do
       Plange.Chat.get_user_by_remote_id!(payload["app_id"], payload["remote_user_id"])
-    else
-      nil
+    else _ -> nil
     end
   end
+  defp attempt_authorization(_payload), do: false
 
   defp message_dict(message) do
     %{"name" => message.sender.name, "message" => message.content}
