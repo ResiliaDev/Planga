@@ -36,6 +36,8 @@ class Plange {
     }
 
     createCommuncationSection (chat_container_elem, channel_id) {
+        let container = $(chat_container_elem);
+        container.html("<div></div>");
         let list    = $(chat_container_elem);
         let channel = socket.channel("chat:"+channel_id, {
             app_id: this.app_id,
