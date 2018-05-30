@@ -24,26 +24,14 @@ defmodule PlangeWeb.ChatChannel do
   end
 
 
-  def send_previous_messages(socket) do
-     messages = Plange.Chat.get_messages_by_conversation_id(socket.assigns.conversation_id)
-     json_hash =
-       messages
-       |> Enum.map(&message_dict/1)
-       |> IO.inspect(tag: "messages")
-     push socket, "messages_so_far", %{messages: json_hash}
-  end
-
-  # Channels can be used in a request/response fashion
-  # by sending replies to requests from the client
-  def handle_in("ping", payload, socket) do
-    {:reply, {:ok, payload}, socket}
-  end
-
-  # It is also common to receive messages from the client and
-  # broadcast to everyone in the current topic (chat:lobby).
-  def handle_in("shout", payload, socket) do
-    broadcast socket, "shout", payload
-    {:noreply, socket}
+  def send_previous_messages(socket, sent_before_datetime \\ nil) do
+    conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.conversation_id)
+    messages = Plange.Chat.get_messages_by_conversation_id(conversation.id, sent_before_datetime)
+    json_hash =
+      messages
+      |> Enum.map(&message_dict/1)
+      |> IO.inspect(tag: "messages")
+    push socket, "messages_so_far", %{messages: json_hash}
   end
 
   def handle_in("new_message", payload, socket) do
@@ -52,6 +40,16 @@ defmodule PlangeWeb.ChatChannel do
     message = Plange.Chat.create_good_message(conversation.id, user_id, payload["message"])
 
     broadcast! socket, "new_message", message_dict(message)
+    {:noreply, socket}
+  end
+
+  def handle_in("load_old_messages", %{"sent_before" => sent_before}, socket) do
+    case NaiveDateTime.from_iso8601(sent_before) do
+      {:ok, sent_before_datetime} ->
+        send_previous_messages(socket, sent_before_datetime)
+      _ ->
+        nil
+    end
     {:noreply, socket}
   end
 
