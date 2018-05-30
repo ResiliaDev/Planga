@@ -71,6 +71,6 @@ defmodule PlangeWeb.ChatChannel do
   defp attempt_authorization(_payload), do: false
 
   defp message_dict(message) do
-    %{"name" => message.sender.name, "message" => message.content}
+    %{"name" => message.sender.name, "content" => message.content, "sent_at" => message.inserted_at}
   end
 end

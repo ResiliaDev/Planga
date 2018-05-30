@@ -1,12 +1,12 @@
 import socket from "./socket";
 
 
-let addMessage = (messages_list_elem, author_name, message) => {
+let addMessage = (messages_list_elem, author_name, content, sent_at) => {
     $(messages_list_elem).append(
-        `<dl class='plange--chat-message'>
+        `<dl class='plange--chat-message' data-message-sent-at='${sent_at}'>
     <dt class='plange--chat-author-wrapper'>
         <span class='plange--chat-author-name'>${author_name}</span><span class='plange--chat-message-separator'>: </span></dt>
-    <dd class='plange--chat-message-content' >${message}</dd>
+    <dd class='plange--chat-message-content' >${content}</dd>
 </dl>`
     );
     $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
@@ -51,7 +51,7 @@ class Plange {
         channel.on('new_message', payload => {
             console.log("Plange: New Message", payload);
             let author_name = payload.name || "Anonymous";
-            addMessage(messages_list_elem, author_name, payload.message);
+            addMessage(messages_list_elem, author_name, payload.content, payload.sent_at);
         });
 
         channel.on('messages_so_far', payload => {
@@ -59,7 +59,7 @@ class Plange {
             messages_list_elem.innerHTML = '';
             payload.messages.forEach(message => {
                 let author_name = message.name || "Anonymous";
-                addMessage($(messages_list_elem), author_name, message.message);
+                addMessage($(messages_list_elem), author_name, message.content, message.sent_at);
                 console.log(message);
             });
         });
