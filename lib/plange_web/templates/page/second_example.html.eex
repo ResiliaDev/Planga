@@ -17,9 +17,9 @@
      let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
      let messages_list_elem    = $('#plange-example');
      let message = $('#message');
-     let current_user_id = '5678';
+     let current_user_id = '4567';
      let current_user_name = 'rene';
-     let remote_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
+     let remote_user_id_hmac = "fg64+ddT23JDe9ANfLxcmEe/HQQIvqSPV0URlSxmgIE="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
      let plange = new Plange({
          app_id: '1',

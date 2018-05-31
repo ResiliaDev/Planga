@@ -1,6 +1,5 @@
 /* This file is for your main application css. */
 
-
 .plange--chat-container {
     margin-bottom: 50px;
 }
@@ -16,8 +15,8 @@
     margin-bottom: 5px;
 }
 
-.plange--chat-current-user-message {
-    color: red;
+.plange--chat-current-user-message  .plange--chat-author-wrapper {
+    color: green;
 }
 
 

@@ -18,8 +18,14 @@ defmodule Plange.Chat do
     local_computed_hmac == Base.decode64!(base64_hmac)
   end
 
-  def get_user_by_remote_id!(app_id, remote_user_id) do
-    Repo.get_by!(User, [app_id: app_id, remote_id: remote_user_id] )
+  def get_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
+    app = Repo.get!(App, app_id)
+    {:ok, user} = Repo.insert(%User{app_id: app.id, remote_id: remote_user_id, name: user_name}, on_conflict: :nothing)
+    if(user.id != nil) do
+      user
+    else
+      Repo.get_by!(User, [app_id: app.id, remote_id: remote_user_id])
+    end
   end
 
   def get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
@@ -27,18 +33,25 @@ defmodule Plange.Chat do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :inserted_at], limit: 10)
       |> preload(:sender)
       |> Repo.all()
-    #   Repo.all(Message |> preload(:sender), where: conversation_id == conversation_id and inserted_at < sent_before_datetime)
     else
       from(m in Message, where: m.conversation_id == ^conversation_id, limit: 20, order_by: [desc: :inserted_at])
       |> preload(:sender)
       |> Repo.all()
-    #   Repo.all(Message |> preload(:sender), where: conversation_id == conversation_id)
     end
   end
 
-  def get_conversation_by_remote_id!(remote_id) do
-    query = [remote_id: remote_id]
-    Repo.get_by!(Conversation, query, [])
+  def get_conversation_by_remote_id!(app_id, remote_id) do
+    # query = [remote_id: remote_id]
+    app = Repo.get!(App, app_id)
+    {:ok, conversation} = Repo.insert(%Conversation{app_id: app.id, remote_id: remote_id}, on_conflict: :nothing)
+    IO.inspect({"CONVERSATION: ", conversation, conversation.id})
+    if(conversation.id != nil) do
+      IO.inspect({"CONVERSATION2: ", conversation, conversation.id})
+      conversation
+    else
+      IO.inspect({"CONVERSATION3: ", conversation})
+      Repo.get_by!(Conversation, app_id: app.id, remote_id: remote_id)
+    end
   end
 
   def create_good_message(conversation_id, user_id, message) do

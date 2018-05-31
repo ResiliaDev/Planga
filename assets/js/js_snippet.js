@@ -61,7 +61,7 @@ class Plange {
         );
         let messages_list_elem    = $('.plange--chat-messages', container);
         // console.log(messages_list_elem);
-        let channel = socket.channel("chat:"+conversation_id, {
+        let channel = socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), {
             app_id: this.app_id,
             remote_user_id: this.current_user_id,
             remote_user_id_hmac: this.current_user_hmac,
@@ -100,6 +100,8 @@ class Plange {
 
         channel.join()
             .receive("ok", resp => {
+                $('.plange--new-message-field').prop('disabled', false);
+                $('.plange--new-message-submit-button').prop('disabled', false);
                 console.log("Joined Plange communication successfully.", resp);
             })
             .receive("error", resp => {
@@ -121,4 +123,4 @@ class Plange {
 }
 // Export to outside world
 window.Plange = Plange;
-
+export default Plange;

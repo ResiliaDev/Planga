@@ -9,6 +9,5 @@ defmodule Plange.Repo.Migrations.CreateMessage do
 
       timestamps()
     end
-
   end
 end

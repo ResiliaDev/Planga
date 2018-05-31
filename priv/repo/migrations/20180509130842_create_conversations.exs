@@ -8,5 +8,6 @@ defmodule Plange.Repo.Migrations.CreateConversations do
 
       timestamps()
     end
+    create index(:conversations, [:app_id, :remote_id], unique: true)
   end
 end

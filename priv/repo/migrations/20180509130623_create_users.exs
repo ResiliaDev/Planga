@@ -9,6 +9,7 @@ defmodule Plange.Repo.Migrations.CreateUsers do
 
       timestamps()
     end
+    create index(:users, [:app_id, :remote_id], unique: true)
 
   end
 end
