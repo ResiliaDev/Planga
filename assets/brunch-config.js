@@ -2,9 +2,13 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-        joinTo: {
-            "js/app.js": /^js\/(?!js_snippet.js)/,
-            "js/js_snippet.js": /^js\/(js_snippet|socket)|^node_modules\/phoenix/
+        // joinTo: {
+        //     "js/app.js": /^js\/(?!js_snippet.js)/,
+        //     "js/js_snippet.js": /^js\/(js_snippet|socket)|^node_modules\/phoenix/
+        // }
+        entryPoints: {
+            'js/app.js': 'js/app.js',
+            'js/js_snippet.js': 'js/js_snippet.js',
         }
 
       // To use a separate vendor.js bundle, specify two files path

@@ -29,7 +29,7 @@ defmodule Plange.Chat do
       |> Repo.all()
     #   Repo.all(Message |> preload(:sender), where: conversation_id == conversation_id and inserted_at < sent_before_datetime)
     else
-      from(m in Message, where: m.conversation_id == ^conversation_id, limit: 2, order_by: [desc: :inserted_at])
+      from(m in Message, where: m.conversation_id == ^conversation_id, limit: 20, order_by: [desc: :inserted_at])
       |> preload(:sender)
       |> Repo.all()
     #   Repo.all(Message |> preload(:sender), where: conversation_id == conversation_id)

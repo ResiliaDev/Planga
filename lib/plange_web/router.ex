@@ -23,6 +23,8 @@ defmodule PlangeWeb.Router do
   scope "/", PlangeWeb do
     pipe_through :browser # Use the default browser stack
 
+    get "/example", PageController, :example
+    get "/example2", PageController, :example2
     get "/", PageController, :index
   end
 

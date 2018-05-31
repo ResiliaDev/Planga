@@ -16,6 +16,11 @@
     margin-bottom: 5px;
 }
 
+.plange--chat-current-user-message {
+    color: red;
+}
+
+
 .plange--chat-author-wrapper {
     display: inline-block;
 }
