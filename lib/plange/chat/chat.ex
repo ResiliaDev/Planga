@@ -80,6 +80,15 @@ defmodule Plange.Chat do
       })
       |> Repo.preload(:sender)
   end
+
+  def idempotently_add_user_to_conversation(conversation_id, user_id) do
+    IO.inspect("TODO", label: :idempotently_add_user_to_conversation)
+    # Repo.get!(User, user_id)
+    # |> Repo.preload(:conversations)
+    # |> Ecto.Changeset.change()
+    # |> Ecto.Changeset.put_assoc(:conversations, [conversation_id])
+    # |> Repo.update!
+  end
 end
 
 

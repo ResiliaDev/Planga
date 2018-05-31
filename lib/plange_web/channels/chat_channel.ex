@@ -6,7 +6,7 @@ defmodule PlangeWeb.ChatChannel do
       qualified_conversation_id
       |> String.split("#")
       |> Enum.map(&Base.decode64!/1)
-    IO.inspect({"Joined Channel", qualified_conversation_id, app_id, remote_conversation_id})
+    IO.inspect({"Attempting to join channel", qualified_conversation_id, app_id, remote_conversation_id})
     with {user = %Plange.Chat.User{}, conversation_id} <- attempt_authorization(payload, app_id, remote_conversation_id) do
       socket =
         socket
@@ -19,6 +19,8 @@ defmodule PlangeWeb.ChatChannel do
       if payload["remote_user_name_hmac"] do
         Plange.Chat.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
       end
+
+      Plange.Chat.idempotently_add_user_to_conversation(conversation_id, user.id)
 
       send(self(), :after_join)
       {:ok, socket}
