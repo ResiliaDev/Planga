@@ -49,16 +49,16 @@ config :logger, :console, format: "[$level] $message\n"
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-# config :plange, Plange.Repo,
-#   adapter: Ecto.Adapters.Postgres,
-#   username: "postgres",
-#   password: "postgres",
-#   database: "plange_dev",
-#   hostname: "localhost",
-#   pool_size: 10
-
-
 config :plange, Plange.Repo,
-  adapter: Sqlite.Ecto2,
-  database: "plange_db.sqlite3"
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "plange_dev",
+  hostname: "localhost",
+  pool_size: 10
+
+
+# config :plange, Plange.Repo,
+#   adapter: Sqlite.Ecto2,
+#   database: "plange_db.sqlite3"
 
