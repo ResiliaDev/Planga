@@ -16,6 +16,10 @@ defmodule PlangeWeb.ChatChannel do
         |> assign(:conversation_id, conversation_id)
         |> IO.inspect
 
+      if payload["remote_user_name_hmac"] do
+        Plange.Chat.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
+      end
+
       send(self(), :after_join)
       {:ok, socket}
     else
@@ -71,13 +75,15 @@ defmodule PlangeWeb.ChatChannel do
                               "remote_user_id" => remote_user_id,
                               "remote_user_id_hmac" => remote_user_id_hmac,
                               "conversation_id_hmac" => conversation_id_hmac,
+                              "remote_user_name" => remote_user_name,
                              }, app_id, remote_conversation_id) do
     IO.inspect({:payload, payload})
     with true <- Plange.Chat.check_user_hmac(app_id, remote_user_id, remote_user_id_hmac),
          true <- Plange.Chat.check_conversation_hmac(app_id, remote_conversation_id, conversation_id_hmac) do
 
-      user = Plange.Chat.get_user_by_remote_id!(app_id, remote_user_id)
+      user = Plange.Chat.get_user_by_remote_id!(app_id, remote_user_id, remote_user_name)
       conversation = Plange.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
+      IO.inspect({user, conversation})
       {user, conversation.id}
     else _ -> nil
     end

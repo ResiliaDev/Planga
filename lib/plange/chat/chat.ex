@@ -12,6 +12,23 @@ defmodule Plange.Chat do
     local_computed_hmac == Base.decode64!(base64_hmac)
   end
 
+  def update_user_name_if_hmac_correct(app_id, user_id, remote_user_name_hmac, remote_user_name) do
+    if check_user_name_hmac(app_id, remote_user_name, remote_user_name_hmac) do
+      user = Repo.get!(User, user_id)
+      user
+      |> Ecto.Changeset.change(name: remote_user_name)
+      |> Repo.update()
+    end
+    {:error, :invalid_hmac}
+  end
+
+
+  def check_user_name_hmac(app_id, user_name, base64_hmac) do
+    app = Repo.get!(App, app_id)
+    local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, user_name)
+    local_computed_hmac == Base.decode64!(base64_hmac)
+  end
+
   def check_conversation_hmac(app_id, conversation_id, base64_hmac) do
     app = Repo.get!(App, app_id)
     local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, conversation_id)

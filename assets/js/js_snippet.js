@@ -38,8 +38,9 @@ let callWithBottomFixedVscroll = (elem, func) => {
 
 class Plange {
     constructor(options) {
-        this.current_user_hmac = options.current_user_hmac;
+        this.current_user_id_hmac = options.current_user_id_hmac;
         this.current_user_name = options.current_user_name;
+        this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
         this.current_user_id = options.current_user_id;
         this.app_id = options.app_id;
     }
@@ -61,12 +62,16 @@ class Plange {
         );
         let messages_list_elem    = $('.plange--chat-messages', container);
         // console.log(messages_list_elem);
-        let channel = socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), {
+        let opts = {
             app_id: this.app_id,
             remote_user_id: this.current_user_id,
-            remote_user_id_hmac: this.current_user_hmac,
+            remote_user_id_hmac: this.current_user_id_hmac,
+            remote_user_name: this.current_user_name,
+            remote_user_name_hmac: this.current_user_name_hmac,
             conversation_id_hmac: conversation_id_hmac
-        });
+        };
+        console.log(opts);
+        let channel = socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), opts);
 
         channel.on('new_message', payload => {
             console.log("Plange: New Message", payload);
@@ -77,7 +82,7 @@ class Plange {
         let loading_new_messages = false;
         channel.on('messages_so_far', payload => {
             loading_new_messages = false;
-            // console.log("Plange: Messages So Far Payload", payload); 
+            // console.log("Plange: Messages So Far Payload", payload);
             callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";

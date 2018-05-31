@@ -19,13 +19,13 @@
      let message = $('#message');
      let current_user_id = '1234';
      let current_user_name = 'wm';
-     let remote_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
+     let current_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
      let plange = new Plange({
          app_id: '1',
-         current_user_name: current_user_name,
          current_user_id: current_user_id,
-         current_user_hmac: remote_user_id_hmac
+         current_user_id_hmac: current_user_id_hmac,
+         current_user_name: current_user_name,
      });
      plange.createCommuncationSection($(messages_list_elem), conversation_id, conversation_id_hmac);
  });
