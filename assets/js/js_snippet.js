@@ -4,11 +4,20 @@ import socket from "./socket";
 let addMessage = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
     $(messages_list_elem).append(message_html(author_name, content, sent_at, current_user_name));
     $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
+    if(author_name !== current_user_name){
+        sendNotification(`${author_name}: ${content}`);
+    }
 };
 
 
 let addMessageTop = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
     $(messages_list_elem).prepend(message_html(author_name, content, sent_at, current_user_name));
+};
+
+let sendNotification = (message) => {
+    if(Notification.permission === 'granted') {
+        new Notification(message);
+    }
 };
 
 
@@ -43,6 +52,14 @@ class Plange {
         this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
         this.current_user_id = options.current_user_id;
         this.app_id = options.app_id;
+
+        if("Notification" in window){
+            Notification.requestPermission(permission => {
+                if(permission === "granted"){
+                    new Notification("Chat Notifications are now enabled!");
+                }
+            });
+        }
     }
 
     createCommuncationSection (chat_container_elem, conversation_id, conversation_id_hmac) {
