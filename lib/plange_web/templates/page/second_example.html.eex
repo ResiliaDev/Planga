@@ -11,12 +11,11 @@
 <!-- </div> -->
 <script type="text/javascript" >
  // Usage Example:
- $(function(){
+     window.onload = function(){
      let app_id = '1';
      let conversation_id = "asdf";
      let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
-     let messages_list_elem    = $('#plange-example');
-     let message = $('#message');
+     let messages_list_elem    = document.getElementById('plange-example');
      let current_user_id = '4567';
      let current_user_name = 'rene2';
      let current_user_name_hmac = 'egXsb74vmAGMzwolWVSuL+QI7xhCCMmjiLt/7ZoZddk=';
@@ -28,7 +27,8 @@
          current_user_id_hmac: current_user_id_hmac,
          current_user_name: current_user_name,
          current_user_name_hmac: current_user_name_hmac,
+         debug: true,
      });
-     plange.createCommuncationSection($(messages_list_elem), conversation_id, conversation_id_hmac);
- });
+     plange.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
+ }
 </script>

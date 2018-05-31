@@ -1,4 +1,5 @@
 import socket from "./socket";
+import $ from 'jquery';
 
 
 let addMessage = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
@@ -23,7 +24,6 @@ let sendNotification = (message) => {
 
 
 let message_html = (author_name, content, sent_at, current_user_name) => {
-    console.log('names', author_name, current_user_name);
     let current_user_class = author_name == current_user_name ? 'plange--chat-current-user-message' : '';
     return `
     <div class='plange--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
@@ -52,6 +52,7 @@ class Plange {
         this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
         this.current_user_id = options.current_user_id;
         this.app_id = options.app_id;
+        this.debug = options.debug || false;
 
         if("Notification" in window){
             Notification.requestPermission(permission => {
@@ -87,11 +88,12 @@ class Plange {
             remote_user_name_hmac: this.current_user_name_hmac,
             conversation_id_hmac: conversation_id_hmac
         };
-        console.log(opts);
+        // console.log(opts);
         let channel = socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), opts);
 
         channel.on('new_message', payload => {
-            console.log("Plange: New Message", payload);
+            if(this.debug)
+                console.log("Plange: New Message", payload);
             let author_name = payload.name || "Anonymous";
             addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
         });
@@ -104,7 +106,8 @@ class Plange {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
                     addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, this.current_user_name);
-                    // console.log(message);
+                    if(this.debug)
+                        console.log("Loading older message: ", message);
                 });
             });
         });
@@ -124,10 +127,12 @@ class Plange {
             .receive("ok", resp => {
                 $('.plange--new-message-field').prop('disabled', false);
                 $('.plange--new-message-submit-button').prop('disabled', false);
-                console.log("Joined Plange communication successfully.", resp);
+                if(this.debug)
+                    console.log("Joined Plange communication successfully.", resp);
             })
             .receive("error", resp => {
-                console.log("Unable to join Plange communication: ", resp);
+                if(this.debug)
+                    console.log("Unable to join Plange communication: ", resp);
                 $('.plange--new-message-field').attr('placeholder', 'Unable to join chat communication. Reason: ' + resp.reason);
             });
 

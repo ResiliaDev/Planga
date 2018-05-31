@@ -11,12 +11,11 @@
 <!-- </div> -->
 <script type="text/javascript" >
  // Usage Example:
- $(function(){
+ window.onload = function(){
      let app_id = '1';
      let conversation_id = "asdf";
      let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
-     let messages_list_elem    = $('#plange-example');
-     let message = $('#message');
+     let messages_list_elem    = document.getElementById('plange-example');
      let current_user_id = '1234';
      let current_user_name = 'wm';
      let current_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
@@ -27,6 +26,6 @@
          current_user_id_hmac: current_user_id_hmac,
          current_user_name: current_user_name,
      });
-     plange.createCommuncationSection($(messages_list_elem), conversation_id, conversation_id_hmac);
- });
+     plange.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
+ };
 </script>
