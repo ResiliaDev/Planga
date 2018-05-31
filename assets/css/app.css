@@ -22,10 +22,13 @@
 
 .plange--chat-author-wrapper {
     display: inline-block;
+    min-width: 50px;
+    font-weight: bold;
 }
 
 .plange--chat-message-content {
     display: inline-block;
+    margin-left: 0px;
 }
 
 .plange--new-message-field-wrapper {

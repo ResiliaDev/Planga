@@ -13,24 +13,26 @@
     </head>
 
     <body>
-        <div class="container">
-            <header class="header">
-                <nav role="navigation">
-                    <ul class="nav nav-pills pull-right">
-                        <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-                    </ul>
-                </nav>
-                <span class="logo"></span>
-            </header>
+        <header class="ui menu">
+            <a class="header item" href="/">
+                Plange
+            </a>
+            <a class="item" href="/example">
+                Chat1
+            </a>
+            <a class="item" href="/example2">
+                Chat2
+            </a>
+        </header>
 
-            <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-            <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+        <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+        <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
-            <main role="main">
-                <%= render @view_module, @view_template, assigns %>
-            </main>
+        <main role="main" class="ui container">
+            <%= render @view_module, @view_template, assigns %>
+        </main>
 
-        </div> <!-- /container -->
-        <script src="<%= static_path(@conn, "/js/js_snippet.js") %>" type="text/javascript"></script>
+            </div> <!-- /container -->
+            <script src="<%= static_path(@conn, "/js/js_snippet.js") %>" type="text/javascript"></script>
     </body>
 </html>
