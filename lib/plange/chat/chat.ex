@@ -4,7 +4,7 @@ defmodule Plange.Chat do
   """
   import Ecto.Query, warn: false
   alias Plange.Repo
-  alias Plange.Chat.{User, Message, Conversation, App}
+  alias Plange.Chat.{User, Message, Conversation, App, ConversationUser}
 
   def check_user_hmac(app_id, remote_user_id, base64_hmac) do
     app = Repo.get!(App, app_id)
@@ -83,6 +83,7 @@ defmodule Plange.Chat do
 
   def idempotently_add_user_to_conversation(conversation_id, user_id) do
     IO.inspect("TODO", label: :idempotently_add_user_to_conversation)
+    Repo.insert!(%ConversationUser{user_id: user_id, conversation_id: conversation_id})
     # Repo.get!(User, user_id)
     # |> Repo.preload(:conversations)
     # |> Ecto.Changeset.change()

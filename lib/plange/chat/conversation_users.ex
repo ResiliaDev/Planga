@@ -1,4 +1,4 @@
-defmodule Plange.Chat.ConversationUsers do
+defmodule Plange.Chat.ConversationUser do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,8 +11,8 @@ defmodule Plange.Chat.ConversationUsers do
   end
 
   @doc false
-  def changeset(conversation_users, attrs) do
-    conversation_users
+  def changeset(conversation_user, attrs) do
+    conversation_user
     |> cast(attrs, [:conversation_id, :user_id])
     |> validate_required([:conversation_id, :user_id])
   end

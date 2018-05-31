@@ -7,6 +7,8 @@ defmodule Plange.Repo.Migrations.CreateConversationsUsers do
 
       add :conversation_id, references("conversations")
       add :user_id, references("users")
+
+      timestamps()
     end
 
     create unique_index(:conversations_users, [:conversation_id, :user_id])
