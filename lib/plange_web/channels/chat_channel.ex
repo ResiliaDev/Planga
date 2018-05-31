@@ -7,12 +7,13 @@ defmodule PlangeWeb.ChatChannel do
       |> String.split("#")
       |> Enum.map(&Base.decode64!/1)
     IO.inspect({"Joined Channel", qualified_conversation_id, app_id, remote_conversation_id})
-    with user = %Plange.Chat.User{} <- attempt_authorization(payload, app_id, remote_conversation_id) do
+    with {user = %Plange.Chat.User{}, conversation_id} <- attempt_authorization(payload, app_id, remote_conversation_id) do
       socket =
         socket
         |> assign(:user_id, user.id)
         |> assign(:app_id, app_id)
         |> assign(:remote_conversation_id, remote_conversation_id)
+        |> assign(:conversation_id, conversation_id)
         |> IO.inspect
 
       send(self(), :after_join)
@@ -23,6 +24,10 @@ defmodule PlangeWeb.ChatChannel do
     end
   end
 
+  def join(_, _, socket) do
+    {:error, %{reason: "Improper channel format"}}
+  end
+
   def handle_info(:after_join, socket) do
     send_previous_messages(socket)
     {:noreply, socket}
@@ -30,9 +35,10 @@ defmodule PlangeWeb.ChatChannel do
 
 
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
-    conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.app_id, socket.assigns.remote_conversation_id)
-    IO.inspect({"CONVERSATION:", conversation})
-    messages = Plange.Chat.get_messages_by_conversation_id(conversation.id, sent_before_datetime)
+    # conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.app_id, socket.assigns.remote_conversation_id)
+    # IO.inspect({"CONVERSATION:", conversation})
+    conversation_id = socket.assigns.conversation_id
+    messages = Plange.Chat.get_messages_by_conversation_id(conversation_id, sent_before_datetime)
     json_hash =
       messages
       |> Enum.map(&message_dict/1)
@@ -41,9 +47,10 @@ defmodule PlangeWeb.ChatChannel do
   end
 
   def handle_in("new_message", payload, socket) do
-    conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.app_id, socket.assigns.remote_conversation_id)
+    # conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.app_id, socket.assigns.remote_conversation_id)
+    conversation_id = socket.assigns.conversation_id
     user_id = socket.assigns.user_id
-    message = Plange.Chat.create_good_message(conversation.id, user_id, payload["message"])
+    message = Plange.Chat.create_good_message(conversation_id, user_id, payload["message"])
 
     broadcast! socket, "new_message", message_dict(message)
     {:noreply, socket}
@@ -64,11 +71,14 @@ defmodule PlangeWeb.ChatChannel do
                               "remote_user_id" => remote_user_id,
                               "remote_user_id_hmac" => remote_user_id_hmac,
                               "conversation_id_hmac" => conversation_id_hmac,
-                             }, app_id, conversation_id) do
+                             }, app_id, remote_conversation_id) do
     IO.inspect({:payload, payload})
     with true <- Plange.Chat.check_user_hmac(app_id, remote_user_id, remote_user_id_hmac),
-         true <- Plange.Chat.check_conversation_hmac(app_id, conversation_id, conversation_id_hmac) do
-      Plange.Chat.get_user_by_remote_id!(app_id, remote_user_id)
+         true <- Plange.Chat.check_conversation_hmac(app_id, remote_conversation_id, conversation_id_hmac) do
+
+      user = Plange.Chat.get_user_by_remote_id!(app_id, remote_user_id)
+      conversation = Plange.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
+      {user, conversation.id}
     else _ -> nil
     end
   end
