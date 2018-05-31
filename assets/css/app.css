@@ -24,6 +24,7 @@
     display: inline-block;
     min-width: 50px;
     font-weight: bold;
+    text-align: right;
 }
 
 .plange--chat-message-content {
