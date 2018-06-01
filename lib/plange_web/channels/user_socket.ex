@@ -6,7 +6,7 @@ defmodule PlangeWeb.UserSocket do
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
-  # transport :longpoll, Phoenix.Transports.LongPoll
+  transport :longpoll, Phoenix.Transports.LongPoll
 
   channel "chat:*", PlangeWeb.ChatChannel
 

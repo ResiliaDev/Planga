@@ -1,5 +1,5 @@
 // import socket from "./socket";
-import {Socket} from 'phoenix';
+import {Socket, LongPoll} from 'phoenix';
 import $ from 'jquery';
 
 
@@ -58,7 +58,7 @@ class Plange {
         console.log(this.socket_location);
 
 
-        this.socket = new Socket(this.socket_location, {params: {}});
+        this.socket = new Socket(this.socket_location, {params: {}, transport: LongPoll});
         this.socket.connect();
 
         if("Notification" in window){
