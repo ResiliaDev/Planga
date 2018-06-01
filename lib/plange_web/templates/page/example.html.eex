@@ -25,6 +25,7 @@
          current_user_id: current_user_id,
          current_user_id_hmac: current_user_id_hmac,
          current_user_name: current_user_name,
+         socket_location: "/socket",
      });
      plange.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
  };

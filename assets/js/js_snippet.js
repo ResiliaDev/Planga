@@ -1,4 +1,5 @@
-import socket from "./socket";
+// import socket from "./socket";
+import {Socket} from 'phoenix';
 import $ from 'jquery';
 
 
@@ -53,6 +54,12 @@ class Plange {
         this.current_user_id = options.current_user_id;
         this.app_id = options.app_id;
         this.debug = options.debug || false;
+        this.socket_location = options.socket_location || "http://plange.io/socket";
+        console.log(this.socket_location);
+
+
+        this.socket = new Socket(this.socket_location, {params: {}});
+        this.socket.connect();
 
         if("Notification" in window){
             Notification.requestPermission(permission => {
@@ -89,7 +96,7 @@ class Plange {
             conversation_id_hmac: conversation_id_hmac
         };
         // console.log(opts);
-        let channel = socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), opts);
+        let channel = this.socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), opts);
 
         channel.on('new_message', payload => {
             if(this.debug)
