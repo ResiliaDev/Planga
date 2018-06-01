@@ -43,6 +43,8 @@ defmodule Plange.Mixfile do
       {:cowboy, "~> 1.0"},
       {:sqlite_ecto2, "~> 2.2"},
       {:corsica, "~> 1.0"},
+
+      {:distillery, "~> 1.5", runtime: false},
     ]
   end
 
