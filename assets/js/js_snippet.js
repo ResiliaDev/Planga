@@ -4,16 +4,16 @@ import $ from 'jquery';
 
 
 let addMessage = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
-    $(messages_list_elem).append(message_html(author_name, content, sent_at, current_user_name));
+    $(messages_list_elem).append(messageHTML(author_name, content, sent_at, current_user_name));
     $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
     if(author_name !== current_user_name){
-        sendNotification(`${author_name}: ${content}`);
+        sendNotification(notificationHTML(author_name, content, sent_at, current_user_name));
     }
 };
 
 
 let addMessageTop = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
-    $(messages_list_elem).prepend(message_html(author_name, content, sent_at, current_user_name));
+    $(messages_list_elem).prepend(messageHTML(author_name, content, sent_at, current_user_name));
 };
 
 let sendNotification = (message) => {
@@ -24,27 +24,44 @@ let sendNotification = (message) => {
 
 
 
-let message_html = (author_name, content, sent_at, current_user_name) => {
+let messageHTML = (author_name, content, sent_at, current_user_name) => {
     let current_user_class = author_name == current_user_name ? 'plange--chat-current-user-message' : '';
     return `
     <div class='plange--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
-            <dt class='plange--chat-author-wrapper'>
-            <span class='plange--chat-author-name'>${author_name}</span><span class='plange--chat-message-separator'>: </span></dt>
-            <dd class='plange--chat-message-content' >${content}</dd>
+            <div class='plange--chat-message-sent-at-wrapper'>
+                <span class='plange--chat-message-sent-at' title='${styledDateTime(sent_at)}'>${styledTime(sent_at)}</span>
+            </div>
+            <div class='plange--chat-author-wrapper'>
+                <span class='plange--chat-author-name'>${author_name}</span><span class='plange--chat-message-separator'>: </span>
+            </div>
+            <div class='plange--chat-message-content' >${content}</div>
     </div>
     `;
+};
+
+let styledTime = (sent_at) => {
+    return new Date(sent_at).toLocaleTimeString();
+};
+
+let styledDateTime = (sent_at) => {
+    return new Date(sent_at).toLocaleString();
+};
+
+
+let notificationHTML = (author_name, content, sent_at, current_user_name) => {
+    return `${author_name}: ${content}`;
 };
 
 let sendMessage = (message_field, channel) => {
     channel.push('new_message', { message: message_field.val() });
     message_field.val('');
-}
+};
 
 let callWithBottomFixedVscroll = (elem, func) => {
     let current_scroll_pos = $(elem).prop('scrollHeight') - $(elem).scrollTop();
     func();
     $(elem).prop({scrollTop: $(elem).prop('scrollHeight') - current_scroll_pos});
-}
+};
 
 class Plange {
     constructor(options) {

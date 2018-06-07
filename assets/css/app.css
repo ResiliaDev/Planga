@@ -5,20 +5,36 @@
 }
 .plange--chat-messages {
     height: 400px;
-    padding: 10px;
     overflow-y: scroll;
     border: 1px solid #777;
 }
 
 
 .plange--chat-message {
-    margin-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2.5px;
+    padding-bottom: 2.5px;
+    transition-duration: .3s;
+}
+
+
+.plange--chat-message:hover {
+    background-color: rgba(0,0,0,0.08);
 }
 
 .plange--chat-current-user-message  .plange--chat-author-wrapper {
     color: green;
 }
 
+.plange--chat-message-sent-at-wrapper {
+    display: inline-block;
+    font-size: 0.8em;
+    opacity: 0.5;
+    float: right;
+
+    cursor: help;
+}
 
 .plange--chat-author-wrapper {
     display: inline-block;

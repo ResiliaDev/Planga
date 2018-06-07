@@ -90,6 +90,7 @@ defmodule PlangeWeb.ChatChannel do
     else _ -> nil
     end
   end
+
   defp attempt_authorization(_payload, _, _), do: false
 
   defp message_dict(message) do
