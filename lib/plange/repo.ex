@@ -1,7 +1,8 @@
 defmodule Plange.Repo do
   use Ecto.Repo,
-    otp_app: :plange
+    otp_app: :plange,
     # adapter: Sqlite.Ecto2
+    adapter: EctoMnesia.Adapter
 
 
   @doc """

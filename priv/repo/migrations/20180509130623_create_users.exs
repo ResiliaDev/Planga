@@ -5,7 +5,7 @@ defmodule Plange.Repo.Migrations.CreateUsers do
     create table(:users) do
       add :name, :string
       add :remote_id, :string
-      add :app_id, references("apps")
+      add :app_id, :integer #references("apps")
 
       timestamps()
     end
