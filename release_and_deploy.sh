@@ -8,10 +8,10 @@ echo "Creating release for version ${relnum}..."
 # MIX_ENV=prod mix do phoenix.digest, release --env=prod --upgrade
 echo "Done!"
 echo "Continuing to upload release to server..."
-rsync -hvrPt --ignore-existing ./_build/prod/rel/plange/releases/${relnum}/plange.tar.gz kristinskruiderij.dev:/var/www/plange/releases/${relnum}/
+rsync -hvrPt --ignore-existing ./_build/prod/rel/planga/releases/${relnum}/planga.tar.gz kristinskruiderij.dev:/var/www/planga/releases/${relnum}/
 echo "Done!"
 echo "Attempting to upgrade application through SSH."
 echo "Enter your sudo-password to hot-upgrade the application to ${relnum}."
-ssh kristinskruiderij.dev -t "sudo /var/www/plange/bin/plange upgrade ${relnum}"
+ssh kristinskruiderij.dev -t "sudo /var/www/planga/bin/planga upgrade ${relnum}"
 echo "Done!"
 echo "Deploy finished!"

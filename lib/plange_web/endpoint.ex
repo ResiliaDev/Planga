@@ -1,5 +1,5 @@
 defmodule PlangeWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :plange
+  use Phoenix.Endpoint, otp_app: :planga
 
   socket "/socket", PlangeWeb.UserSocket
 
@@ -8,7 +8,7 @@ defmodule PlangeWeb.Endpoint do
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
-    at: "/", from: :plange, gzip: false,
+    at: "/", from: :planga, gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
@@ -34,7 +34,7 @@ defmodule PlangeWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
-    key: "_plange_key",
+    key: "_planga_key",
     signing_salt: "4EI9Ly//"
 
   plug PlangeWeb.Router

@@ -89,8 +89,8 @@ $(function(){
     let remote_user_id = '1234';
     let remote_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
-    let plange = new Plange({app_id: '1', current_user_id: '1234', current_user_hmac: remote_user_id_hmac});
-    plange.createCommuncationSection($("#message-list"), "asdf");
+    let planga = new Plange({app_id: '1', current_user_id: '1234', current_user_hmac: remote_user_id_hmac});
+    planga.createCommuncationSection($("#message-list"), "asdf");
 
 });
 

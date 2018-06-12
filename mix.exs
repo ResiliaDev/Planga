@@ -3,7 +3,7 @@ defmodule Plange.Mixfile do
 
   def project do
     [
-      app: :plange,
+      app: :planga,
       version: "0.1.0",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),

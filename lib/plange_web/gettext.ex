@@ -20,5 +20,5 @@ defmodule PlangeWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :plange
+  use Gettext, otp_app: :planga
 end

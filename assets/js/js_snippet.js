@@ -25,16 +25,16 @@ let sendNotification = (message) => {
 
 
 let messageHTML = (author_name, content, sent_at, current_user_name) => {
-    let current_user_class = author_name == current_user_name ? 'plange--chat-current-user-message' : '';
+    let current_user_class = author_name == current_user_name ? 'planga--chat-current-user-message' : '';
     return `
-    <div class='plange--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
-            <div class='plange--chat-message-sent-at-wrapper'>
-                <span class='plange--chat-message-sent-at' title='${styledDateTime(sent_at)}'>${styledTime(sent_at)}</span>
+    <div class='planga--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
+            <div class='planga--chat-message-sent-at-wrapper'>
+                <span class='planga--chat-message-sent-at' title='${styledDateTime(sent_at)}'>${styledTime(sent_at)}</span>
             </div>
-            <div class='plange--chat-author-wrapper'>
-                <span class='plange--chat-author-name'>${author_name}</span><span class='plange--chat-message-separator'>: </span>
+            <div class='planga--chat-author-wrapper'>
+                <span class='planga--chat-author-name'>${author_name}</span><span class='planga--chat-message-separator'>: </span>
             </div>
-            <div class='plange--chat-message-content' >${content}</div>
+            <div class='planga--chat-message-content' >${content}</div>
     </div>
     `;
 };
@@ -71,7 +71,7 @@ class Plange {
         this.current_user_id = options.current_user_id;
         this.app_id = options.app_id;
         this.debug = options.debug || false;
-        this.socket_location = options.socket_location || "http://plange.io/socket";
+        this.socket_location = options.socket_location || "http://planga.io/socket";
         console.log(this.socket_location);
 
 
@@ -91,18 +91,18 @@ class Plange {
         let container = $(chat_container_elem);
         // console.log(container);
         container.html(
-            `<div class='plange--chat-container'>
-                <dl class='plange--chat-messages'>
+            `<div class='planga--chat-container'>
+                <dl class='planga--chat-messages'>
                 </dl>
-                <div class='plange--new-message-form'>
-                    <div class='plange--new-message-field-wrapper'>
-                        <input type='text' placeholder='${this.current_user_name}: Type your message here' name='plange--new-message-field' class='plange--new-message-field'/>
+                <div class='planga--new-message-form'>
+                    <div class='planga--new-message-field-wrapper'>
+                        <input type='text' placeholder='${this.current_user_name}: Type your message here' name='planga--new-message-field' class='planga--new-message-field'/>
                     </div>
-                    <button class='plange--new-message-submit-button'>Send</button>
+                    <button class='planga--new-message-submit-button'>Send</button>
                 </div>
             </div>`
         );
-        let messages_list_elem    = $('.plange--chat-messages', container);
+        let messages_list_elem    = $('.planga--chat-messages', container);
         // console.log(messages_list_elem);
         let opts = {
             app_id: this.app_id,
@@ -140,33 +140,33 @@ class Plange {
             // console.log($(messages_list_elem).scrollTop(), $(messages_list_elem).innerHeight());
             if($(messages_list_elem).scrollTop() < 50 && !loading_new_messages) {
                 loading_new_messages = true;
-                channel.push('load_old_messages', { sent_before: $('.plange--chat-message:first', messages_list_elem).data('message-sent-at') });
+                channel.push('load_old_messages', { sent_before: $('.planga--chat-message:first', messages_list_elem).data('message-sent-at') });
             };
         });
 
-        $('.plange--new-message-field').prop('disabled', true);
-        $('.plange--new-message-submit-button').prop('disabled', true);
+        $('.planga--new-message-field').prop('disabled', true);
+        $('.planga--new-message-submit-button').prop('disabled', true);
 
         channel.join()
             .receive("ok", resp => {
-                $('.plange--new-message-field').prop('disabled', false);
-                $('.plange--new-message-submit-button').prop('disabled', false);
+                $('.planga--new-message-field').prop('disabled', false);
+                $('.planga--new-message-submit-button').prop('disabled', false);
                 if(this.debug)
                     console.log("Joined Plange communication successfully.", resp);
             })
             .receive("error", resp => {
                 if(this.debug)
                     console.log("Unable to join Plange communication: ", resp);
-                $('.plange--new-message-field').attr('placeholder', 'Unable to join chat communication. Reason: ' + resp.reason);
+                $('.planga--new-message-field').attr('placeholder', 'Unable to join chat communication. Reason: ' + resp.reason);
             });
 
-        let message_field = $('.plange--new-message-field', container);
+        let message_field = $('.planga--new-message-field', container);
         message_field.on('keypress', event => {
             if (event.keyCode == 13) {
                 sendMessage(message_field, channel);
             }
         });
-        let message_button = $('.plange--new-message-submit-button', container);
+        let message_button = $('.planga--new-message-submit-button', container);
         message_button.on('click', event => {
             sendMessage(message_field, channel);
         });

@@ -1,16 +1,16 @@
 /* This file is for your main application css. */
 
-.plange--chat-container {
+.planga--chat-container {
     margin-bottom: 50px;
 }
-.plange--chat-messages {
+.planga--chat-messages {
     height: 400px;
     overflow-y: scroll;
     border: 1px solid #777;
 }
 
 
-.plange--chat-message {
+.planga--chat-message {
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 2.5px;
@@ -19,15 +19,15 @@
 }
 
 
-.plange--chat-message:hover {
+.planga--chat-message:hover {
     background-color: rgba(0,0,0,0.08);
 }
 
-.plange--chat-current-user-message  .plange--chat-author-wrapper {
+.planga--chat-current-user-message  .planga--chat-author-wrapper {
     color: green;
 }
 
-.plange--chat-message-sent-at-wrapper {
+.planga--chat-message-sent-at-wrapper {
     display: inline-block;
     font-size: 0.8em;
     opacity: 0.5;
@@ -36,35 +36,35 @@
     cursor: help;
 }
 
-.plange--chat-author-wrapper {
+.planga--chat-author-wrapper {
     display: inline-block;
     min-width: 50px;
     font-weight: bold;
     text-align: right;
 }
 
-.plange--chat-message-content {
+.planga--chat-message-content {
     display: inline-block;
     margin-left: 0px;
 }
 
-.plange--new-message-field-wrapper {
+.planga--new-message-field-wrapper {
     width: 85%;
     float: left;
 }
 
-.plange--new-message-form {
+.planga--new-message-form {
     min-height: 33px;
 }
 
-.plange--new-message-field {
+.planga--new-message-field {
     width: 100%;
     height: 30px;
     box-sizing: border-box;
 }
 
 
-.plange--new-message-submit-button {
+.planga--new-message-submit-button {
     float: right;
     height: 33px;
     padding: 0px;

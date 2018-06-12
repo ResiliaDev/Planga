@@ -6,11 +6,11 @@
 use Mix.Config
 
 # General application configuration
-config :plange,
+config :planga,
   ecto_repos: [Plange.Repo]
 
 # Configures the endpoint
-config :plange, PlangeWeb.Endpoint,
+config :planga, PlangeWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "dgTIYvEjoRnW2skBhpjBpxCeR0TqB51dcAl0+CTWfpm9eKAThxdLSv4N2hVxWif7",
   render_errors: [view: PlangeWeb.ErrorView, accepts: ~w(html json)],

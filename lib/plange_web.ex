@@ -28,7 +28,7 @@ defmodule PlangeWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/plange_web/templates",
+      use Phoenix.View, root: "lib/planga_web/templates",
                         namespace: PlangeWeb
 
       # Import convenience functions from controllers

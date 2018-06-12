@@ -44,8 +44,8 @@ end
 # when running `mix release`, the first release in the file
 # will be used by default
 
-release :plange do
-  set version: current_version(:plange)
+release :planga do
+  set version: current_version(:planga)
   set applications: [
     :runtime_tools
   ]

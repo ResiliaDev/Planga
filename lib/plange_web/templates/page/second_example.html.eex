@@ -1,4 +1,4 @@
-<div id='plange-example' class='row'>
+<div id='planga-example' class='row'>
 </div>
 
 <!-- <div class='row form-group'> -->
@@ -15,13 +15,13 @@
      let app_id = '1';
      let conversation_id = "asdf";
      let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
-     let messages_list_elem    = document.getElementById('plange-example');
+     let messages_list_elem    = document.getElementById('planga-example');
      let current_user_id = '4567';
      let current_user_name = 'rene2';
      let current_user_name_hmac = 'egXsb74vmAGMzwolWVSuL+QI7xhCCMmjiLt/7ZoZddk=';
      let current_user_id_hmac = "fg64+ddT23JDe9ANfLxcmEe/HQQIvqSPV0URlSxmgIE="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
-     let plange = new Plange({
+     let planga = new Plange({
          app_id: '1',
          current_user_id: current_user_id,
          current_user_id_hmac: current_user_id_hmac,
@@ -30,6 +30,6 @@
          socket_location: "/socket",
          debug: true,
      });
-     plange.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
+     planga.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
  }
 </script>
