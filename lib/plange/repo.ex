@@ -1,4 +1,4 @@
-defmodule Plange.Repo do
+defmodule Planga.Repo do
   use Ecto.Repo,
     otp_app: :planga,
     # adapter: Sqlite.Ecto2

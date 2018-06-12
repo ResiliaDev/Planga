@@ -1,8 +1,8 @@
-defmodule PlangeWeb.MessageControllerTest do
-  use PlangeWeb.ConnCase
+defmodule PlangaWeb.MessageControllerTest do
+  use PlangaWeb.ConnCase
 
-  alias Plange.Chat
-  alias Plange.Chat.Message
+  alias Planga.Chat
+  alias Planga.Chat.Message
 
   @create_attrs %{channel_id: 42, content: "some content", sender_id: 42}
   @update_attrs %{channel_id: 43, content: "some updated content", sender_id: 43}

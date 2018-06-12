@@ -1,6 +1,6 @@
-defmodule PlangeWeb.AppView do
-  use PlangeWeb, :view
-  alias PlangeWeb.AppView
+defmodule PlangaWeb.AppView do
+  use PlangaWeb, :view
+  alias PlangaWeb.AppView
 
   def render("index.json", %{apps: apps}) do
     %{data: render_many(apps, AppView, "app.json")}

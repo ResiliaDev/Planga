@@ -1,4 +1,4 @@
-defmodule Plange.Chat.ConversationUser do
+defmodule Planga.Chat.ConversationUser do
   use Ecto.Schema
   import Ecto.Changeset
 

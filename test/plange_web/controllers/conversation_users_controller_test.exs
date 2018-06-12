@@ -1,8 +1,8 @@
-defmodule PlangeWeb.ConversationUsersControllerTest do
-  use PlangeWeb.ConnCase
+defmodule PlangaWeb.ConversationUsersControllerTest do
+  use PlangaWeb.ConnCase
 
-  alias Plange.Chat
-  alias Plange.Chat.ConversationUsers
+  alias Planga.Chat
+  alias Planga.Chat.ConversationUsers
 
   @create_attrs %{conversation_id: 42, user_id: 42}
   @update_attrs %{conversation_id: 43, user_id: 43}

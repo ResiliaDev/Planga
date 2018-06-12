@@ -1,10 +1,10 @@
-defmodule Plange.ChatTest do
-  use Plange.DataCase
+defmodule Planga.ChatTest do
+  use Planga.DataCase
 
-  alias Plange.Chat
+  alias Planga.Chat
 
   describe "users" do
-    alias Plange.Chat.User
+    alias Planga.Chat.User
 
     @valid_attrs %{name: "some name", remote_id: "some remote_id"}
     @update_attrs %{name: "some updated name", remote_id: "some updated remote_id"}
@@ -66,7 +66,7 @@ defmodule Plange.ChatTest do
   end
 
   describe "message" do
-    alias Plange.Chat.Message
+    alias Planga.Chat.Message
 
     @valid_attrs %{channel_id: 42, content: "some content", sender_id: 42}
     @update_attrs %{channel_id: 43, content: "some updated content", sender_id: 43}
@@ -130,7 +130,7 @@ defmodule Plange.ChatTest do
   end
 
   describe "conversations" do
-    alias Plange.Chat.Conversation
+    alias Planga.Chat.Conversation
 
     @valid_attrs %{remote_id: "some remote_id"}
     @update_attrs %{remote_id: "some updated remote_id"}
@@ -190,7 +190,7 @@ defmodule Plange.ChatTest do
   end
 
   describe "conversations_users" do
-    alias Plange.Chat.ConversationUsers
+    alias Planga.Chat.ConversationUsers
 
     @valid_attrs %{conversation_id: 42, user_id: 42}
     @update_attrs %{conversation_id: 43, user_id: 43}
@@ -252,7 +252,7 @@ defmodule Plange.ChatTest do
   end
 
   describe "apps" do
-    alias Plange.Chat.App
+    alias Planga.Chat.App
 
     @valid_attrs %{name: "some name", secret_api_key: "some secret_api_key"}
     @update_attrs %{name: "some updated name", secret_api_key: "some updated secret_api_key"}

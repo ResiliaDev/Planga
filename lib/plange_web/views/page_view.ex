@@ -1,3 +1,3 @@
-defmodule PlangeWeb.PageView do
-  use PlangeWeb, :view
+defmodule PlangaWeb.PageView do
+  use PlangaWeb, :view
 end

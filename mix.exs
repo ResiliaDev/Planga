@@ -1,4 +1,4 @@
-defmodule Plange.Mixfile do
+defmodule Planga.Mixfile do
   use Mix.Project
 
   def project do
@@ -19,7 +19,7 @@ defmodule Plange.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Plange.Application, []},
+      mod: {Planga.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

@@ -1,10 +1,10 @@
-defmodule PlangeWeb.AppController do
-  # use PlangeWeb, :controller
+defmodule PlangaWeb.AppController do
+  # use PlangaWeb, :controller
 
-  # alias Plange.Chat
-  # alias Plange.Chat.App
+  # alias Planga.Chat
+  # alias Planga.Chat.App
 
-  # action_fallback PlangeWeb.FallbackController
+  # action_fallback PlangaWeb.FallbackController
 
   # def index(conn, _params) do
   #   apps = Chat.list_apps()

@@ -1,5 +1,5 @@
-defmodule PlangeWeb.PageControllerTest do
-  use PlangeWeb.ConnCase
+defmodule PlangaWeb.PageControllerTest do
+  use PlangaWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"

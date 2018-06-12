@@ -1,5 +1,5 @@
-defmodule PlangeWeb.PageController do
-  use PlangeWeb, :controller
+defmodule PlangaWeb.PageController do
+  use PlangaWeb, :controller
 
   def index(conn, _params) do
     render conn, "index.html"

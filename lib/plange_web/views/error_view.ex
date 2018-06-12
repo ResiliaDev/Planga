@@ -1,5 +1,5 @@
-defmodule PlangeWeb.ErrorView do
-  use PlangeWeb, :view
+defmodule PlangaWeb.ErrorView do
+  use PlangaWeb, :view
 
   # If you want to customize a particular status code
   # for a certain format, you may uncomment below.

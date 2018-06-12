@@ -5,22 +5,22 @@
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     Repo.insert!(%Plange.SomeSchema{})
+#     Repo.insert!(%Planga.SomeSchema{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-alias Plange.Repo
+alias Planga.Repo
 import Ecto.Changeset
 
-app = Repo.insert!(%Plange.Chat.App{name: "tokener", secret_api_key: "topsecret"})
-# wm = Repo.insert!(%Plange.Chat.User{name: "wm", remote_id: "1234", app_id: app.id})
-# rene = Repo.insert!(%Plange.Chat.User{name: "rene", remote_id: "4567", app_id: app.id})
+app = Repo.insert!(%Planga.Chat.App{name: "tokener", secret_api_key: "topsecret"})
+# wm = Repo.insert!(%Planga.Chat.User{name: "wm", remote_id: "1234", app_id: app.id})
+# rene = Repo.insert!(%Planga.Chat.User{name: "rene", remote_id: "4567", app_id: app.id})
 
 # IO.inspect app
 # IO.inspect wm
 # IO.inspect rene
 
-# conv = Repo.insert!(%Plange.Chat.Conversation{remote_id: "asdf", app_id: app.id})
+# conv = Repo.insert!(%Planga.Chat.Conversation{remote_id: "asdf", app_id: app.id})
 
 
 # wm

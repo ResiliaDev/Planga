@@ -1,8 +1,8 @@
-defmodule PlangeWeb.UserControllerTest do
-  use PlangeWeb.ConnCase
+defmodule PlangaWeb.UserControllerTest do
+  use PlangaWeb.ConnCase
 
-  alias Plange.Chat
-  alias Plange.Chat.User
+  alias Planga.Chat
+  alias Planga.Chat.User
 
   @create_attrs %{name: "some name", remote_id: "some remote_id"}
   @update_attrs %{name: "some updated name", remote_id: "some updated remote_id"}

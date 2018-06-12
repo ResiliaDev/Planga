@@ -1,4 +1,4 @@
-# Plange
+# Planga
 
 To start your Phoenix server:
 

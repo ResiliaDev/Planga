@@ -1,4 +1,4 @@
-defmodule Plange.Repo.Migrations.CreateMessage do
+defmodule Planga.Repo.Migrations.CreateMessage do
   use Ecto.Migration
 
   def change do

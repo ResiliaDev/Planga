@@ -1,6 +1,6 @@
-defmodule PlangeWeb.UserView do
-  use PlangeWeb, :view
-  alias PlangeWeb.UserView
+defmodule PlangaWeb.UserView do
+  use PlangaWeb, :view
+  alias PlangaWeb.UserView
 
   def render("index.json", %{users: users}) do
     %{data: render_many(users, UserView, "user.json")}

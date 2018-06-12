@@ -1,8 +1,8 @@
-defmodule PlangeWeb.ConversationControllerTest do
-  use PlangeWeb.ConnCase
+defmodule PlangaWeb.ConversationControllerTest do
+  use PlangaWeb.ConnCase
 
-  alias Plange.Chat
-  alias Plange.Chat.Conversation
+  alias Planga.Chat
+  alias Planga.Chat.Conversation
 
   @create_attrs %{remote_id: "some remote_id"}
   @update_attrs %{remote_id: "some updated remote_id"}

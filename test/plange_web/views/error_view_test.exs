@@ -1,16 +1,16 @@
-defmodule PlangeWeb.ErrorViewTest do
-  use PlangeWeb.ConnCase, async: true
+defmodule PlangaWeb.ErrorViewTest do
+  use PlangaWeb.ConnCase, async: true
 
   # Bring render/3 and render_to_string/3 for testing custom views
   import Phoenix.View
 
   test "renders 404.html" do
-    assert render_to_string(PlangeWeb.ErrorView, "404.html", []) ==
+    assert render_to_string(PlangaWeb.ErrorView, "404.html", []) ==
            "Not Found"
   end
 
   test "renders 500.html" do
-    assert render_to_string(PlangeWeb.ErrorView, "500.html", []) ==
+    assert render_to_string(PlangaWeb.ErrorView, "500.html", []) ==
            "Internal Server Error"
   end
 end

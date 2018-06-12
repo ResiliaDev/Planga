@@ -1,6 +1,6 @@
-defmodule PlangeWeb.ConversationUsersView do
-  use PlangeWeb, :view
-  alias PlangeWeb.ConversationUsersView
+defmodule PlangaWeb.ConversationUsersView do
+  use PlangaWeb, :view
+  alias PlangaWeb.ConversationUsersView
 
   def render("index.json", %{conversations_users: conversations_users}) do
     %{data: render_many(conversations_users, ConversationUsersView, "conversation_users.json")}

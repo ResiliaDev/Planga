@@ -1,4 +1,4 @@
-defmodule Plange.Chat.App do
+defmodule Planga.Chat.App do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,8 +7,8 @@ defmodule Plange.Chat.App do
     field :name, :string
     field :secret_api_key, :string
 
-    has_many :conversations, Plange.Chat.Conversation
-    has_many :users, Plange.Chat.User
+    has_many :conversations, Planga.Chat.Conversation
+    has_many :users, Planga.Chat.User
 
     timestamps()
   end

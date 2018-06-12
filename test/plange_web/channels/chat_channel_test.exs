@@ -1,7 +1,7 @@
-defmodule PlangeWeb.ChatChannelTest do
-  use PlangeWeb.ChannelCase
+defmodule PlangaWeb.ChatChannelTest do
+  use PlangaWeb.ChannelCase
 
-  alias PlangeWeb.ChatChannel
+  alias PlangaWeb.ChatChannel
 
   setup do
     {:ok, _, socket} =

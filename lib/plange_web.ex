@@ -1,12 +1,12 @@
-defmodule PlangeWeb do
+defmodule PlangaWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.
 
   This can be used in your application as:
 
-      use PlangeWeb, :controller
-      use PlangeWeb, :view
+      use PlangaWeb, :controller
+      use PlangaWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -19,17 +19,17 @@ defmodule PlangeWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: PlangeWeb
+      use Phoenix.Controller, namespace: PlangaWeb
       import Plug.Conn
-      import PlangeWeb.Router.Helpers
-      import PlangeWeb.Gettext
+      import PlangaWeb.Router.Helpers
+      import PlangaWeb.Gettext
     end
   end
 
   def view do
     quote do
       use Phoenix.View, root: "lib/planga_web/templates",
-                        namespace: PlangeWeb
+                        namespace: PlangaWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
@@ -37,9 +37,9 @@ defmodule PlangeWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import PlangeWeb.Router.Helpers
-      import PlangeWeb.ErrorHelpers
-      import PlangeWeb.Gettext
+      import PlangaWeb.Router.Helpers
+      import PlangaWeb.ErrorHelpers
+      import PlangaWeb.Gettext
     end
   end
 
@@ -54,7 +54,7 @@ defmodule PlangeWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import PlangeWeb.Gettext
+      import PlangaWeb.Gettext
     end
   end
 

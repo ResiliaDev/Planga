@@ -1,8 +1,8 @@
-defmodule PlangeWeb.AppControllerTest do
-  use PlangeWeb.ConnCase
+defmodule PlangaWeb.AppControllerTest do
+  use PlangaWeb.ConnCase
 
-  alias Plange.Chat
-  alias Plange.Chat.App
+  alias Planga.Chat
+  alias Planga.Chat.App
 
   @create_attrs %{name: "some name", secret_api_key: "some secret_api_key"}
   @update_attrs %{name: "some updated name", secret_api_key: "some updated secret_api_key"}

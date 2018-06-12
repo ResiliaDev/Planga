@@ -1,4 +1,4 @@
-defmodule Plange.DataCase do
+defmodule Planga.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -16,20 +16,20 @@ defmodule Plange.DataCase do
 
   using do
     quote do
-      alias Plange.Repo
+      alias Planga.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Plange.DataCase
+      import Planga.DataCase
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Plange.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Planga.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Plange.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Planga.Repo, {:shared, self()})
     end
 
     :ok

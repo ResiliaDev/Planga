@@ -1,11 +1,11 @@
-defmodule Plange.Chat.Message do
+defmodule Planga.Chat.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
 
   schema "message" do
-    belongs_to :sender, Plange.Chat.User
-    belongs_to :conversation, Plange.Chat.Conversation
+    belongs_to :sender, Planga.Chat.User
+    belongs_to :conversation, Planga.Chat.Conversation
     field :content, :string
 
     timestamps()

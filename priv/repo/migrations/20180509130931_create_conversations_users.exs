@@ -1,4 +1,4 @@
-defmodule Plange.Repo.Migrations.CreateConversationsUsers do
+defmodule Planga.Repo.Migrations.CreateConversationsUsers do
   use Ecto.Migration
 
   def change do

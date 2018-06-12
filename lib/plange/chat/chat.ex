@@ -1,10 +1,10 @@
-defmodule Plange.Chat do
+defmodule Planga.Chat do
   @moduledoc """
   The Chat context.
   """
   import Ecto.Query, warn: false
-  alias Plange.Repo
-  alias Plange.Chat.{User, Message, Conversation, App, ConversationUser}
+  alias Planga.Repo
+  alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
   def check_user_hmac(app_id, remote_user_id, base64_hmac) do
     app = Repo.get!(App, app_id)

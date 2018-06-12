@@ -1,4 +1,4 @@
-defmodule PlangeWeb.ErrorHelpers do
+defmodule PlangaWeb.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -36,9 +36,9 @@ defmodule PlangeWeb.ErrorHelpers do
     # should be written to the errors.po file. The :count option is
     # set by Ecto and indicates we should also apply plural rules.
     if count = opts[:count] do
-      Gettext.dngettext(PlangeWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(PlangaWeb.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(PlangeWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(PlangaWeb.Gettext, "errors", msg, opts)
     end
   end
 end

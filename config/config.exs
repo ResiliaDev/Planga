@@ -7,14 +7,14 @@ use Mix.Config
 
 # General application configuration
 config :planga,
-  ecto_repos: [Plange.Repo]
+  ecto_repos: [Planga.Repo]
 
 # Configures the endpoint
-config :planga, PlangeWeb.Endpoint,
+config :planga, PlangaWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "dgTIYvEjoRnW2skBhpjBpxCeR0TqB51dcAl0+CTWfpm9eKAThxdLSv4N2hVxWif7",
-  render_errors: [view: PlangeWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Plange.PubSub,
+  render_errors: [view: PlangaWeb.ErrorView, accepts: ~w(html json)],
+  pubsub: [name: Planga.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger

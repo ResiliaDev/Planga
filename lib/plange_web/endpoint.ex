@@ -1,7 +1,7 @@
-defmodule PlangeWeb.Endpoint do
+defmodule PlangaWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :planga
 
-  socket "/socket", PlangeWeb.UserSocket
+  socket "/socket", PlangaWeb.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -37,7 +37,7 @@ defmodule PlangeWeb.Endpoint do
     key: "_planga_key",
     signing_salt: "4EI9Ly//"
 
-  plug PlangeWeb.Router
+  plug PlangaWeb.Router
 
   @doc """
   Callback invoked for dynamically configuring the endpoint.

@@ -21,7 +21,7 @@
      let current_user_name_hmac = 'egXsb74vmAGMzwolWVSuL+QI7xhCCMmjiLt/7ZoZddk=';
      let current_user_id_hmac = "fg64+ddT23JDe9ANfLxcmEe/HQQIvqSPV0URlSxmgIE="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
-     let planga = new Plange({
+     let planga = new Planga({
          app_id: '1',
          current_user_id: current_user_id,
          current_user_id_hmac: current_user_id_hmac,

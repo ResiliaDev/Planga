@@ -1,5 +1,5 @@
-defmodule PlangeWeb.Router do
-  use PlangeWeb, :router
+defmodule PlangaWeb.Router do
+  use PlangaWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -20,7 +20,7 @@ defmodule PlangeWeb.Router do
 
   end
 
-  scope "/", PlangeWeb do
+  scope "/", PlangaWeb do
     pipe_through :browser # Use the default browser stack
 
     get "/example", PageController, :example
@@ -29,7 +29,7 @@ defmodule PlangeWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PlangeWeb do
+  # scope "/api", PlangaWeb do
   #   pipe_through :api
   # end
 end

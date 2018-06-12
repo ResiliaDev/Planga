@@ -1,4 +1,4 @@
-defmodule Plange.Repo.Migrations.CreateUsers do
+defmodule Planga.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
   def change do

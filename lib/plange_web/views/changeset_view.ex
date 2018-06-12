@@ -1,11 +1,11 @@
-defmodule PlangeWeb.ChangesetView do
-  use PlangeWeb, :view
+defmodule PlangaWeb.ChangesetView do
+  use PlangaWeb, :view
 
   @doc """
   Traverses and translates changeset errors.
 
   See `Ecto.Changeset.traverse_errors/2` and
-  `PlangeWeb.ErrorHelpers.translate_error/1` for more details.
+  `PlangaWeb.ErrorHelpers.translate_error/1` for more details.
   """
   def translate_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, &translate_error/1)

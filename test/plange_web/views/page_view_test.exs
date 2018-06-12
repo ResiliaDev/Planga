@@ -1,3 +1,3 @@
-defmodule PlangeWeb.PageViewTest do
-  use PlangeWeb.ConnCase, async: true
+defmodule PlangaWeb.PageViewTest do
+  use PlangaWeb.ConnCase, async: true
 end

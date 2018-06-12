@@ -1,4 +1,4 @@
-defmodule Plange.ReleaseTasks do
+defmodule Planga.ReleaseTasks do
 
   @start_apps [
     :crypto,

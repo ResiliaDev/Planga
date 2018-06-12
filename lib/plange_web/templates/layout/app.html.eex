@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Hello Plange!</title>
+        <title>Hello Planga!</title>
         <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script> -->
     </head>
@@ -15,7 +15,7 @@
     <body>
         <header class="ui menu">
             <a class="header item" href="/">
-                Plange
+                Planga
             </a>
             <a class="item" href="/example">
                 Chat1

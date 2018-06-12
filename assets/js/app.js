@@ -28,7 +28,7 @@ console.log("PLANGE!");
 import socket from "./socket";
 
 
-class Plange {
+class Planga {
     constructor(options) {
         this.current_user_hmac = options.current_user_hmac;
         this.current_user_id = options.current_user_id;
@@ -46,13 +46,13 @@ class Plange {
         });
 
         channel.on('new_message', payload => {
-            console.log("Plange: New Message", payload);
+            console.log("Planga: New Message", payload);
             list.append(`<b>${payload.name || 'Anonymous'}:</b> ${payload.message}<br>`);
             list.prop({scrollTop: list.prop("scrollHeight")});
         });
 
         channel.on('messages_so_far', payload => {
-            console.log("Plange: Messages So Far Payload", payload);
+            console.log("Planga: Messages So Far Payload", payload);
             payload.messages.forEach(message => {
                 list.innerHTML='';
                 list.append(`<b>${message.name || 'Anonymous'}:</b> ${message.message}<br>`);
@@ -78,7 +78,7 @@ class Plange {
 
 console.log("PLANGE!");
 
-console.log("Bar", window.Plange);
+console.log("Bar", window.Planga);
 
 $(function(){
     let app_id = '1';
@@ -89,7 +89,7 @@ $(function(){
     let remote_user_id = '1234';
     let remote_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
 
-    let planga = new Plange({app_id: '1', current_user_id: '1234', current_user_hmac: remote_user_id_hmac});
+    let planga = new Planga({app_id: '1', current_user_id: '1234', current_user_hmac: remote_user_id_hmac});
     planga.createCommuncationSection($("#message-list"), "asdf");
 
 });

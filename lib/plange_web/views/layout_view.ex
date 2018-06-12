@@ -1,3 +1,3 @@
-defmodule PlangeWeb.LayoutView do
-  use PlangeWeb, :view
+defmodule PlangaWeb.LayoutView do
+  use PlangaWeb, :view
 end

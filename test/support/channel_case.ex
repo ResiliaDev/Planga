@@ -1,4 +1,4 @@
-defmodule PlangeWeb.ChannelCase do
+defmodule PlangaWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,15 +21,15 @@ defmodule PlangeWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint PlangeWeb.Endpoint
+      @endpoint PlangaWeb.Endpoint
     end
   end
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Plange.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Planga.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Plange.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Planga.Repo, {:shared, self()})
     end
     :ok
   end

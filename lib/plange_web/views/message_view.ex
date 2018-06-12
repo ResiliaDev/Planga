@@ -1,6 +1,6 @@
-defmodule PlangeWeb.MessageView do
-  use PlangeWeb, :view
-  alias PlangeWeb.MessageView
+defmodule PlangaWeb.MessageView do
+  use PlangaWeb, :view
+  alias PlangaWeb.MessageView
 
   def render("index.json", %{message: message}) do
     %{data: render_many(message, MessageView, "message.json")}

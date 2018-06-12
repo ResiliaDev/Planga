@@ -1,15 +1,15 @@
-defmodule Plange.Chat.User do
+defmodule Planga.Chat.User do
   use Ecto.Schema
   import Ecto.Changeset
 
 
   schema "users" do
-    belongs_to :app, Plange.Chat.App
+    belongs_to :app, Planga.Chat.App
     field :name, :string
     field :remote_id, :string
 
-    has_many :sent_messages, Plange.Chat.Message
-    many_to_many :conversations, Plange.Chat.Conversation, join_through: "conversations_users"
+    has_many :sent_messages, Planga.Chat.Message
+    many_to_many :conversations, Planga.Chat.Conversation, join_through: "conversations_users"
 
     timestamps()
   end

@@ -63,7 +63,7 @@ let callWithBottomFixedVscroll = (elem, func) => {
     $(elem).prop({scrollTop: $(elem).prop('scrollHeight') - current_scroll_pos});
 };
 
-class Plange {
+class Planga {
     constructor(options) {
         this.current_user_id_hmac = options.current_user_id_hmac;
         this.current_user_name = options.current_user_name;
@@ -117,7 +117,7 @@ class Plange {
 
         channel.on('new_message', payload => {
             if(this.debug)
-                console.log("Plange: New Message", payload);
+                console.log("Planga: New Message", payload);
             let author_name = payload.name || "Anonymous";
             addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
         });
@@ -125,7 +125,7 @@ class Plange {
         let loading_new_messages = false;
         channel.on('messages_so_far', payload => {
             loading_new_messages = false;
-            // console.log("Plange: Messages So Far Payload", payload);
+            // console.log("Planga: Messages So Far Payload", payload);
             callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
@@ -152,11 +152,11 @@ class Plange {
                 $('.planga--new-message-field').prop('disabled', false);
                 $('.planga--new-message-submit-button').prop('disabled', false);
                 if(this.debug)
-                    console.log("Joined Plange communication successfully.", resp);
+                    console.log("Joined Planga communication successfully.", resp);
             })
             .receive("error", resp => {
                 if(this.debug)
-                    console.log("Unable to join Plange communication: ", resp);
+                    console.log("Unable to join Planga communication: ", resp);
                 $('.planga--new-message-field').attr('placeholder', 'Unable to join chat communication. Reason: ' + resp.reason);
             });
 
@@ -173,5 +173,5 @@ class Plange {
     }
 }
 // Export to outside world
-window.Plange = Plange;
-export default Plange;
+window.Planga = Planga;
+export default Planga;
