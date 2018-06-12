@@ -75,7 +75,7 @@ class Plange {
         console.log(this.socket_location);
 
 
-        this.socket = new Socket(this.socket_location, {params: {}, transport: LongPoll});
+        this.socket = new Socket(this.socket_location, {params: {}/*, transport: LongPoll */});
         this.socket.connect();
 
         if("Notification" in window){

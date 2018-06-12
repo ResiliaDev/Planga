@@ -6,7 +6,6 @@ defmodule PlangeWeb.ChatChannel do
       qualified_conversation_id
       |> String.split("#")
       |> Enum.map(&Base.decode64!/1)
-    IO.inspect({"Attempting to join channel", qualified_conversation_id, app_id, remote_conversation_id})
     with {user = %Plange.Chat.User{}, conversation_id} <- attempt_authorization(payload, app_id, remote_conversation_id) do
       socket =
         socket
@@ -14,7 +13,6 @@ defmodule PlangeWeb.ChatChannel do
         |> assign(:app_id, app_id)
         |> assign(:remote_conversation_id, remote_conversation_id)
         |> assign(:conversation_id, conversation_id)
-        |> IO.inspect
 
       if payload["remote_user_name_hmac"] do
         Plange.Chat.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
@@ -41,14 +39,11 @@ defmodule PlangeWeb.ChatChannel do
 
 
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
-    # conversation = Plange.Chat.get_conversation_by_remote_id!(socket.assigns.app_id, socket.assigns.remote_conversation_id)
-    # IO.inspect({"CONVERSATION:", conversation})
     conversation_id = socket.assigns.conversation_id
     messages = Plange.Chat.get_messages_by_conversation_id(conversation_id, sent_before_datetime)
     json_hash =
       messages
       |> Enum.map(&message_dict/1)
-      |> IO.inspect(tag: "messages")
     push socket, "messages_so_far", %{messages: json_hash}
   end
 
@@ -79,13 +74,11 @@ defmodule PlangeWeb.ChatChannel do
                               "conversation_id_hmac" => conversation_id_hmac,
                               "remote_user_name" => remote_user_name,
                              }, app_id, remote_conversation_id) do
-    IO.inspect({:payload, payload})
     with true <- Plange.Chat.check_user_hmac(app_id, remote_user_id, remote_user_id_hmac),
          true <- Plange.Chat.check_conversation_hmac(app_id, remote_conversation_id, conversation_id_hmac) do
 
       user = Plange.Chat.get_user_by_remote_id!(app_id, remote_user_id, remote_user_name)
       conversation = Plange.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
-      IO.inspect({user, conversation})
       {user, conversation.id}
     else _ -> nil
     end
