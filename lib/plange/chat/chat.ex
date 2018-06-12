@@ -14,10 +14,11 @@ defmodule Plange.Chat do
 
   def update_user_name_if_hmac_correct(app_id, user_id, remote_user_name_hmac, remote_user_name) do
     if check_user_name_hmac(app_id, remote_user_name, remote_user_name_hmac) do
-      user = Repo.get!(User, user_id)
-      user
-      |> Ecto.Changeset.change(name: remote_user_name)
-      |> Repo.update()
+      Repo.transaction(fn ->
+        Repo.get!(User, user_id)
+        |> Ecto.Changeset.change(name: remote_user_name)
+        |> Repo.update()
+      end)
     end
     {:error, :invalid_hmac}
   end
@@ -47,20 +48,41 @@ defmodule Plange.Chat do
 
   def get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
     if(sent_before_datetime) do
-      from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :inserted_at], limit: 10)
-      |> preload(:sender)
+      # from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :inserted_at], limit: 10)
+      from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 10)
+      # |> preload(:sender)
       |> Repo.all()
+      |> Enum.map(&put_sender/1)
     else
-      from(m in Message, where: m.conversation_id == ^conversation_id, limit: 20, order_by: [desc: :inserted_at])
-      |> preload(:sender)
+      from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 20)
+      # from(m in Message, where: m.conversation_id == ^conversation_id, limit: 20, order_by: [desc: :inserted_at])
+      # |> preload(:sender)
       |> Repo.all()
+      |> Enum.map(&put_sender/1)
     end
+  end
+
+  # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
+  defp put_sender(message) do
+    sender = Repo.get(User, message.sender_id)
+    %Message{message | sender: sender}
   end
 
   def get_conversation_by_remote_id!(app_id, remote_id) do
     # query = [remote_id: remote_id]
-    app = Repo.get!(App, app_id)
-    {:ok, conversation} = Repo.insert(%Conversation{app_id: app.id, remote_id: remote_id}, on_conflict: :nothing)
+    {:ok, {app, conversation}} = Repo.transaction(fn ->
+      app = Repo.get!(App, app_id)
+      conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
+      if conversation do
+        {app, conversation}
+      else
+        conversation = Repo.insert!(%Conversation{app_id: app.id, remote_id: remote_id})
+        {app, conversation}
+      end
+      # {:ok, conversation} = Repo.insert(%Conversation{app_id: app.id, remote_id: remote_id}, on_conflict: :nothing)
+    end)
+    # app = Repo.get!(App, app_id)
+    # {:ok, conversation} = Repo.insert(%Conversation{app_id: app.id, remote_id: remote_id}, on_conflict: :nothing)
     IO.inspect({"CONVERSATION: ", conversation, conversation.id})
     if(conversation.id != nil) do
       IO.inspect({"CONVERSATION2: ", conversation, conversation.id})
@@ -83,7 +105,15 @@ defmodule Plange.Chat do
 
   def idempotently_add_user_to_conversation(conversation_id, user_id) do
     IO.inspect("TODO", label: :idempotently_add_user_to_conversation)
-    Repo.insert!(%ConversationUser{user_id: user_id, conversation_id: conversation_id}, on_conflict: :nothing)
+    {:ok, _user} = Repo.transaction(fn ->
+      user = Repo.get_by(ConversationUser, conversation_id: conversation_id, user_id: user_id)
+      if user do
+        user
+      else
+        Repo.insert!(%ConversationUser{conversation_id: conversation_id, user_id: user_id})
+      end
+    end)
+    # Repo.insert!(%ConversationUser{user_id: user_id, conversation_id: conversation_id}, on_conflict: :nothing)
     # Repo.get!(User, user_id)
     # |> Repo.preload(:conversations)
     # |> Ecto.Changeset.change()
