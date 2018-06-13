@@ -3,7 +3,7 @@ defmodule Planga.Repo.Migrations.CreateConversations do
 
   def change do
     create table(:conversations) do
-      add :app_id, :integer #references("apps")
+      add :app_id, references(:apps)
       add :remote_id, :string
 
       timestamps()

@@ -47,8 +47,8 @@ defmodule Planga.Chat do
 
   def get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
     if(sent_before_datetime) do
-      # from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :inserted_at], limit: 10)
-      from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 10)
+      from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :inserted_at], limit: 10)
+      # from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 10)
       # |> preload(:sender)
       |> Repo.all()
       |> Enum.map(&put_sender/1)

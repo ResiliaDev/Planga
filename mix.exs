@@ -42,6 +42,7 @@ defmodule Planga.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       # {:sqlite_ecto2, "~> 2.2"},
+      {:ecto, "~> 2.1.6", override: true},
       {:ecto_mnesia, "~> 0.9.0"},
       {:corsica, "~> 1.0"},
 
