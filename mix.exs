@@ -43,7 +43,9 @@ defmodule Planga.Mixfile do
       {:cowboy, "~> 1.0"},
       # {:sqlite_ecto2, "~> 2.2"},
       {:ecto, "~> 2.1.6", override: true},
-      {:ecto_mnesia, "~> 0.9.0"},
+      # {:ecto_mnesia, "~> 0.9.0"},
+      {:ecto_mnesia, git: "git@github.com:Nebo15/ecto_mnesia.git"},
+      # {:ecto_mnesia, git: "git@github.com:Qqwy/ecto_mnesia.git", branch: "match_spec_tuples"},
       {:corsica, "~> 1.0"},
 
       {:distillery, "~> 1.5", runtime: false},

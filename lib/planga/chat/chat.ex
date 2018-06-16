@@ -47,18 +47,20 @@ defmodule Planga.Chat do
 
   def get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
     if(sent_before_datetime) do
-      from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :inserted_at], limit: 10)
+      from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 10)
       # from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 10)
       # |> preload(:sender)
       |> Repo.all()
       |> Enum.map(&put_sender/1)
     else
-      from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 20)
+      from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :id], limit: 20)
       # from(m in Message, where: m.conversation_id == ^conversation_id, limit: 20, order_by: [desc: :inserted_at])
       # |> preload(:sender)
       |> Repo.all()
       |> Enum.map(&put_sender/1)
     end
+    |> IO.inspect
+    # |> Enum.sort_by(&(&1.inserted_at))
   end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
