@@ -10,6 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 # alias Planga.Repo
+IO.inspect :mnesia.system_info(:is_running)
 
 Planga.Repo.insert!(%Planga.Chat.App{name: "tokener", secret_api_key: "topsecret"})
 # wm = Repo.insert!(%Planga.Chat.User{name: "wm", remote_id: "1234", app_id: app.id})

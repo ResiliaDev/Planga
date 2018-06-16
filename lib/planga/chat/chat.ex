@@ -94,6 +94,7 @@ defmodule Planga.Chat do
   def create_good_message(conversation_id, user_id, message) do
     Repo.insert!(
       %Message{
+        id: Snowflakex.new!(),
         content: message,
         conversation_id: conversation_id,
         sender_id: user_id
