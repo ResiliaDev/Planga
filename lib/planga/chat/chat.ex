@@ -6,7 +6,7 @@ defmodule Planga.Chat do
   """
   import Ecto.Query, warn: false
   alias Planga.Repo
-  alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
+  alias Planga.Chat.{User, Message, Conversation, App, ConversationUser, Topic, ConversationTopic}
 
   @doc """
   Given a user's `remote_id`, returns the User struct.
