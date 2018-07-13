@@ -100,6 +100,9 @@ defmodule Planga.Chat do
     message
   end
 
+  @doc """
+  False if message is invalid and should not be sent.
+  """
   def valid_message?(message) do
     not empty_message?(message)
   end

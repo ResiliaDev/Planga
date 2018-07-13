@@ -9,7 +9,7 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("chat:" <> qualified_conversation_id, payload, socket) do
-    {app_id, remote_conversation_id} = grab_conversation_id(qualified_conversation_id)
+    {app_id, remote_conversation_id} = decode_conversation_id(qualified_conversation_id)
     with user = %Planga.Chat.User{} <- attempt_authorization(payload, app_id, remote_conversation_id) do
       socket = fill_socket(socket, user, app_id, remote_conversation_id)
       maybe_update_username(payload, app_id, user)
@@ -26,7 +26,7 @@ defmodule PlangaWeb.ChatChannel do
     {:error, %{reason: "Improper channel format"}}
   end
 
-  defp grab_conversation_id(qualified_conversation_id) do
+  defp decode_conversation_id(qualified_conversation_id) do
     [app_id, remote_conversation_id] =
       qualified_conversation_id
       |> String.split("#")
@@ -41,7 +41,6 @@ defmodule PlangaWeb.ChatChannel do
       |> assign(:user_id, user.id)
       |> assign(:app_id, app_id)
       |> assign(:remote_conversation_id, remote_conversation_id)
-      # |> assign(:conversation_id, conversation_id)
   end
 
   defp maybe_update_username(payload, app_id, user) do
@@ -113,7 +112,6 @@ defmodule PlangaWeb.ChatChannel do
          true <- Planga.Chat.HMAC.check_conversation(app_id, remote_conversation_id, remote_conversation_id_hmac) do
 
       user = Planga.Chat.get_user_by_remote_id!(app_id, remote_user_id, remote_user_name)
-      # conversation = Planga.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
       user
     else _ -> nil
     end
