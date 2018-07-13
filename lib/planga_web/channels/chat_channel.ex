@@ -1,6 +1,13 @@
 defmodule PlangaWeb.ChatChannel do
   use PlangaWeb, :channel
+  @moduledoc """
+  The ChatChannel is responsible for the WebSocket (or fallback)-connection between the client
+  and a single chat-conversation.
+  """
 
+  @doc """
+  Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
+  """
   def join("chat:" <> qualified_conversation_id, payload, socket) do
     {app_id, remote_conversation_id} = grab_conversation_id(qualified_conversation_id)
     with {user = %Planga.Chat.User{}, conversation_id} <- attempt_authorization(payload, app_id, remote_conversation_id) do
@@ -44,21 +51,28 @@ defmodule PlangaWeb.ChatChannel do
     end
   end
 
+  @doc """
+  Called immediately after joining to send latest messages to just-connected chatter.
+  """
   def handle_info(:after_join, socket) do
     send_previous_messages(socket)
     {:noreply, socket}
   end
 
-
+  @doc """
+  Called whenever chatter requires more (i.e. earlier) messages.
+  """
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
     conversation_id = socket.assigns.conversation_id
-    messages = Planga.Chat.get_messages_by_conversation_id(conversation_id, sent_before_datetime)
-    json_hash =
-      messages
+    messages =
+      Planga.Chat.get_messages_by_conversation_id(conversation_id, sent_before_datetime)
       |> Enum.map(&message_dict/1)
-    push socket, "messages_so_far", %{messages: json_hash}
+    push socket, "messages_so_far", %{messages: messages}
   end
 
+  @doc """
+  Called whenever the chatter attempts to send a new message.
+  """
   def handle_in("new_message", payload, socket) do
     conversation_id = socket.assigns.conversation_id
     user_id = socket.assigns.user_id
@@ -68,6 +82,9 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
+  @doc """
+  Called whenever the chatter attempts to see earlier messages.
+  """
   def handle_in("load_old_messages", %{"sent_before" => sent_before}, socket) do
     case NaiveDateTime.from_iso8601(sent_before) do
       {:ok, sent_before_datetime} ->
@@ -78,7 +95,7 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  # Add authorization logic here as required.
+  # Authorization logic
   defp attempt_authorization(payload = %{
                               "remote_user_id" => remote_user_id,
                               "remote_user_id_hmac" => remote_user_id_hmac,
@@ -97,6 +114,7 @@ defmodule PlangaWeb.ChatChannel do
 
   defp attempt_authorization(_payload, _, _), do: false
 
+  # Turns returned message information in a format the front-end understands.
   defp message_dict(message) do
     %{
       "name" => message.sender.name,
