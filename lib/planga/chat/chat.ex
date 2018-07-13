@@ -22,12 +22,7 @@ defmodule Planga.Chat do
     end
   end
 
-  @doc """
-  Returns the latest 20 messages that are part of a conversation indicated by `conversation_id`.
-
-  Optionally, the argument `sent_before_datetime` can be used to look back further in history.
-  """
-  def get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
+  defp get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
     if(sent_before_datetime) do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 20)
     else
@@ -35,6 +30,21 @@ defmodule Planga.Chat do
     end
     |> Repo.all()
     |> Enum.map(&put_sender/1)
+  end
+
+  @doc """
+  Returns the latest 20 messages that are part of a conversation indicated by `app_id` + `remote_conversation_id`.
+
+  Optionally, the argument `sent_before_datetime` can be used to look back further in history.
+  """
+  def get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime \\ nil) do
+    app = Repo.get!(App, app_id)
+    case Repo.get_by(Conversation, app_id: app.id, remote_id: remote_conversation_id) do
+      conversation = %Conversation{} ->
+        get_messages_by_conversation_id(conversation.id, sent_before_datetime)
+      nil ->
+        []
+    end
   end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
@@ -75,15 +85,21 @@ defmodule Planga.Chat do
 
   TODO name function better
   """
-  def create_good_message(conversation_id, user_id, message) do
-    Repo.insert!(
-      %Message{
-        id: Snowflakex.new!(),
-        content: message,
-        conversation_id: conversation_id,
-        sender_id: user_id
-      })
-      |> Repo.preload(:sender)
+  def create_good_message(app_id, remote_conversation_id, user_id, message) do
+    {:ok, message} = Repo.transaction( fn ->
+      conversation = get_conversation_by_remote_id!(app_id, remote_conversation_id)
+      idempotently_add_user_to_conversation(conversation.id, user_id)
+      Repo.insert!(
+        %Message{
+          id: Snowflakex.new!(),
+          content: message,
+          conversation_id: conversation.id,
+          sender_id: user_id
+        })
+        |> Repo.preload(:sender)
+    end)
+
+    message
   end
 
   def valid_message?(message) do

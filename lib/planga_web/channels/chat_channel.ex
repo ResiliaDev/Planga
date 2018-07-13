@@ -10,10 +10,9 @@ defmodule PlangaWeb.ChatChannel do
   """
   def join("chat:" <> qualified_conversation_id, payload, socket) do
     {app_id, remote_conversation_id} = grab_conversation_id(qualified_conversation_id)
-    with {user = %Planga.Chat.User{}, conversation_id} <- attempt_authorization(payload, app_id, remote_conversation_id) do
-      socket = fill_socket(socket, user, app_id, remote_conversation_id, conversation_id)
+    with user = %Planga.Chat.User{} <- attempt_authorization(payload, app_id, remote_conversation_id) do
+      socket = fill_socket(socket, user, app_id, remote_conversation_id)
       maybe_update_username(payload, app_id, user)
-      Planga.Chat.idempotently_add_user_to_conversation(conversation_id, user.id)
 
       send(self(), :after_join)
       {:ok, socket}
@@ -36,13 +35,13 @@ defmodule PlangaWeb.ChatChannel do
     {app_id, remote_conversation_id}
   end
 
-  defp fill_socket(socket, user, app_id, remote_conversation_id, conversation_id) do
+  defp fill_socket(socket, user, app_id, remote_conversation_id) do
     socket =
       socket
       |> assign(:user_id, user.id)
       |> assign(:app_id, app_id)
       |> assign(:remote_conversation_id, remote_conversation_id)
-      |> assign(:conversation_id, conversation_id)
+      # |> assign(:conversation_id, conversation_id)
   end
 
   defp maybe_update_username(payload, app_id, user) do
@@ -63,9 +62,11 @@ defmodule PlangaWeb.ChatChannel do
   Called whenever chatter requires more (i.e. earlier) messages.
   """
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
-    conversation_id = socket.assigns.conversation_id
+
+    app_id = socket.assigns.app_id
+    remote_conversation_id = socket.assigns.remote_conversation_id
     messages =
-      Planga.Chat.get_messages_by_conversation_id(conversation_id, sent_before_datetime)
+      Planga.Chat.get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime)
       |> Enum.map(&message_dict/1)
     push socket, "messages_so_far", %{messages: messages}
   end
@@ -77,9 +78,10 @@ defmodule PlangaWeb.ChatChannel do
     message = payload["message"]
 
     if Planga.Chat.valid_message?(message) do
-      conversation_id = socket.assigns.conversation_id
+      app_id = socket.assigns.app_id
+      remote_conversation_id = socket.assigns.remote_conversation_id
       user_id = socket.assigns.user_id
-      message = Planga.Chat.create_good_message(conversation_id, user_id, message)
+      message = Planga.Chat.create_good_message(app_id, remote_conversation_id, user_id, message)
       broadcast! socket, "new_message", message_dict(message)
     end
 
@@ -104,15 +106,15 @@ defmodule PlangaWeb.ChatChannel do
   defp attempt_authorization(payload = %{
                               "remote_user_id" => remote_user_id,
                               "remote_user_id_hmac" => remote_user_id_hmac,
-                              "conversation_id_hmac" => conversation_id_hmac,
+                              "conversation_id_hmac" => remote_conversation_id_hmac,
                               "remote_user_name" => remote_user_name,
                              }, app_id, remote_conversation_id) do
     with true <- Planga.Chat.HMAC.check_user(app_id, remote_user_id, remote_user_id_hmac),
-         true <- Planga.Chat.HMAC.check_conversation(app_id, remote_conversation_id, conversation_id_hmac) do
+         true <- Planga.Chat.HMAC.check_conversation(app_id, remote_conversation_id, remote_conversation_id_hmac) do
 
       user = Planga.Chat.get_user_by_remote_id!(app_id, remote_user_id, remote_user_name)
-      conversation = Planga.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {user, conversation.id}
+      # conversation = Planga.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
+      user
     else _ -> nil
     end
   end
