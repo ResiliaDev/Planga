@@ -4,6 +4,8 @@ Planga is the Chat-Service that is very easy to integrate with your existing app
 
 It is currently in a relatively early alpha-stage; check back soon for more information.
 
+# Table of Contents
+
 <!--ts-->
    * [Planga](#planga)
       * [Using Planga](#using-planga)
