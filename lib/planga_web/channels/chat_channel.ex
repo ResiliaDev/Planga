@@ -2,22 +2,10 @@ defmodule PlangaWeb.ChatChannel do
   use PlangaWeb, :channel
 
   def join("chat:" <> qualified_conversation_id, payload, socket) do
-    [app_id, remote_conversation_id] =
-      qualified_conversation_id
-      |> String.split("#")
-      |> Enum.map(&Base.decode64!/1)
+    {app_id, remote_conversation_id} = grab_conversation_id(qualified_conversation_id)
     with {user = %Planga.Chat.User{}, conversation_id} <- attempt_authorization(payload, app_id, remote_conversation_id) do
-      socket =
-        socket
-        |> assign(:user_id, user.id)
-        |> assign(:app_id, app_id)
-        |> assign(:remote_conversation_id, remote_conversation_id)
-        |> assign(:conversation_id, conversation_id)
-
-      if payload["remote_user_name_hmac"] do
-        Planga.Chat.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
-      end
-
+      socket = fill_socket(socket, user, app_id, remote_conversation_id, conversation_id)
+      maybe_update_username(payload, app_id, user)
       Planga.Chat.idempotently_add_user_to_conversation(conversation_id, user.id)
 
       send(self(), :after_join)
@@ -30,6 +18,30 @@ defmodule PlangaWeb.ChatChannel do
 
   def join(_, _, socket) do
     {:error, %{reason: "Improper channel format"}}
+  end
+
+  defp grab_conversation_id(qualified_conversation_id) do
+    [app_id, remote_conversation_id] =
+      qualified_conversation_id
+      |> String.split("#")
+      |> Enum.map(&Base.decode64!/1)
+
+    {app_id, remote_conversation_id}
+  end
+
+  defp fill_socket(socket, user, app_id, remote_conversation_id, conversation_id) do
+    socket =
+      socket
+      |> assign(:user_id, user.id)
+      |> assign(:app_id, app_id)
+      |> assign(:remote_conversation_id, remote_conversation_id)
+      |> assign(:conversation_id, conversation_id)
+  end
+
+  defp maybe_update_username(payload, app_id, user) do
+    if payload["remote_user_name_hmac"] do
+      Planga.Chat.HMAC.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
+    end
   end
 
   def handle_info(:after_join, socket) do
@@ -73,8 +85,8 @@ defmodule PlangaWeb.ChatChannel do
                               "conversation_id_hmac" => conversation_id_hmac,
                               "remote_user_name" => remote_user_name,
                              }, app_id, remote_conversation_id) do
-    with true <- Planga.Chat.check_user_hmac(app_id, remote_user_id, remote_user_id_hmac),
-         true <- Planga.Chat.check_conversation_hmac(app_id, remote_conversation_id, conversation_id_hmac) do
+    with true <- Planga.Chat.HMAC.check_user(app_id, remote_user_id, remote_user_id_hmac),
+         true <- Planga.Chat.HMAC.check_conversation(app_id, remote_conversation_id, conversation_id_hmac) do
 
       user = Planga.Chat.get_user_by_remote_id!(app_id, remote_user_id, remote_user_name)
       conversation = Planga.Chat.get_conversation_by_remote_id!(app_id, remote_conversation_id)
