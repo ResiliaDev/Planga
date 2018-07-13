@@ -86,6 +86,12 @@ defmodule Planga.Chat do
       |> Repo.preload(:sender)
   end
 
+  def valid_message?(message) do
+    not empty_message?(message)
+  end
+
+  defp empty_message?(message), do: String.trim(message) == ""
+
   @doc """
   Adds a user to a conversation.
 

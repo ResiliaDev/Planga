@@ -76,7 +76,7 @@ defmodule PlangaWeb.ChatChannel do
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
 
-    unless empty_message?(message) do
+    if Planga.Chat.valid_message?(message) do
       conversation_id = socket.assigns.conversation_id
       user_id = socket.assigns.user_id
       message = Planga.Chat.create_good_message(conversation_id, user_id, message)
@@ -86,7 +86,6 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  defp empty_message?(message), do: String.trim(message) == ""
 
   @doc """
   Called whenever the chatter attempts to see earlier messages.
