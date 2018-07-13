@@ -9,51 +9,6 @@ defmodule Planga.Chat do
   alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
   @doc """
-  Makes sure a chatter has a correct SHA256-HMAC indicating their App ID.
-  """
-  def check_user_hmac(app_id, remote_user_id, base64_hmac) do
-    app = Repo.get!(App, app_id)
-    local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, remote_user_id)
-    local_computed_hmac == Base.decode64!(base64_hmac)
-  end
-
-  @doc """
-  Alters the user's set name iff they have a correct SHA256-HMAC specifying their new name.
-  """
-  def update_user_name_if_hmac_correct(app_id, user_id, remote_user_name_hmac, remote_user_name) do
-    if check_user_name_hmac(app_id, remote_user_name, remote_user_name_hmac) do
-      Repo.transaction(fn ->
-        Repo.get!(User, user_id)
-        |> Ecto.Changeset.change(name: remote_user_name)
-        |> Repo.update()
-      end)
-    end
-    {:error, :invalid_hmac}
-  end
-
-  @doc """
-  Makes sure a chatter uses a correct SHA256-HMAC for their username.
-
-  TODO merge with `check_user_hmac` since very similar.
-  """
-  def check_user_name_hmac(app_id, user_name, base64_hmac) do
-    app = Repo.get!(App, app_id)
-    local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, user_name)
-    local_computed_hmac == Base.decode64!(base64_hmac)
-  end
-
-  @doc """
-  Makes sure a chatter conversation has a correct SHA256-HMAC.
-
-  TODO merge with `check_user_hmac` since very similar.
-  """
-  def check_conversation_hmac(app_id, conversation_id, base64_hmac) do
-    app = Repo.get!(App, app_id)
-    local_computed_hmac = :crypto.hmac(:sha256, app.secret_api_key, conversation_id)
-    local_computed_hmac == Base.decode64!(base64_hmac)
-  end
-
-  @doc """
   Given a user's `remote_id`, returns the User struct.
   Will throw an Ecto.NoResultsError error if user could not be found.
   """
