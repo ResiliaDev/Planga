@@ -1,14 +1,6 @@
 <div id='planga-example' class='row'>
 </div>
 
-<!-- <div class='row form-group'> -->
-<!-- <div class='col-md-3'> -->
-<!-- <input type='text' id='name' class='form-control' placeholder='Name' /> -->
-<!-- </div> -->
-<!-- <div class='col-md-9'> -->
-<!-- <input type='text' id='message' class='form-control' placeholder='Message' /> -->
-<!-- </div> -->
-<!-- </div> -->
 <script type="text/javascript" >
  // Usage Example:
  window.onload = function(){

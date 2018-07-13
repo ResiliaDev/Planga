@@ -48,19 +48,13 @@ defmodule Planga.Chat do
   def get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
     if(sent_before_datetime) do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 10)
-      # from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :inserted_at], limit: 10)
-      # |> preload(:sender)
       |> Repo.all()
       |> Enum.map(&put_sender/1)
     else
       from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :id], limit: 20)
-      # from(m in Message, where: m.conversation_id == ^conversation_id, limit: 20, order_by: [desc: :inserted_at])
-      # |> preload(:sender)
       |> Repo.all()
       |> Enum.map(&put_sender/1)
     end
-    |> IO.inspect
-    # |> Enum.sort_by(&(&1.inserted_at))
   end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
@@ -70,7 +64,6 @@ defmodule Planga.Chat do
   end
 
   def get_conversation_by_remote_id!(app_id, remote_id) do
-    # query = [remote_id: remote_id]
     {:ok, {app, conversation}} = Repo.transaction(fn ->
       app = Repo.get!(App, app_id)
       conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
@@ -80,10 +73,7 @@ defmodule Planga.Chat do
         conversation = Repo.insert!(%Conversation{app_id: app.id, remote_id: remote_id})
         {app, conversation}
       end
-      # {:ok, conversation} = Repo.insert(%Conversation{app_id: app.id, remote_id: remote_id}, on_conflict: :nothing)
     end)
-    # app = Repo.get!(App, app_id)
-    # {:ok, conversation} = Repo.insert(%Conversation{app_id: app.id, remote_id: remote_id}, on_conflict: :nothing)
     if(conversation.id != nil) do
       conversation
     else

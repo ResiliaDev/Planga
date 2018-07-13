@@ -48,7 +48,6 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def handle_in("new_message", payload, socket) do
-    # conversation = Planga.Chat.get_conversation_by_remote_id!(socket.assigns.app_id, socket.assigns.remote_conversation_id)
     conversation_id = socket.assigns.conversation_id
     user_id = socket.assigns.user_id
     message = Planga.Chat.create_good_message(conversation_id, user_id, payload["message"])
