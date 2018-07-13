@@ -36,6 +36,8 @@ These are used to make the application secure: They ensure that your back-end:
 #### How do I compute a SHA256-HMAC?
 
 This is a very common thing to do.
+Planga expects the SHA256-HMAC to be in hexadecimal (also known as hexdigest) format.
+
 Here are a couple of programming language examples:
 
 _For other languages, see [these more in-depth hmac-examples](https://github.com/danharper/hmac-examples)_
