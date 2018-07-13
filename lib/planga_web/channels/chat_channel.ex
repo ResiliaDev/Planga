@@ -74,13 +74,19 @@ defmodule PlangaWeb.ChatChannel do
   Called whenever the chatter attempts to send a new message.
   """
   def handle_in("new_message", payload, socket) do
-    conversation_id = socket.assigns.conversation_id
-    user_id = socket.assigns.user_id
-    message = Planga.Chat.create_good_message(conversation_id, user_id, payload["message"])
+    message = payload["message"]
 
-    broadcast! socket, "new_message", message_dict(message)
+    unless empty_message?(message) do
+      conversation_id = socket.assigns.conversation_id
+      user_id = socket.assigns.user_id
+      message = Planga.Chat.create_good_message(conversation_id, user_id, message)
+      broadcast! socket, "new_message", message_dict(message)
+    end
+
     {:noreply, socket}
   end
+
+  defp empty_message?(message), do: String.trim(message) == ""
 
   @doc """
   Called whenever the chatter attempts to see earlier messages.
