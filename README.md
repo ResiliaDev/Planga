@@ -8,13 +8,14 @@ It is currently in a relatively early alpha-stage; check back soon for more info
 
 _This documentation is a work-in-progress!_
 
-### Back-end preparation
+### Back-end setup
 
-1. Return in your HTML some information so the front-end is able to create a new Planga chat-screen:
+1. Compute some information that Planga needs: 
   - `user_id`: The identifier of the currently logged-in user. Can be any string that uniquely identifies a user.
   - `user_id_hmac`: The SHA256-HMAC of the `user_id`, using your API-key for signing.
   - The `conversation_id` of the conversation the user can interact with. Can be any string that uniquely identifies a conversation.
   - `conversation_id_hmac`: The SHA256-HMAC of the `conversation_id`, using your API-key for signing.
+2. Send/output that information in a way that your front-end JavaScript can access it.
   
 #### What should I use for `conversation_id`?
 
@@ -102,13 +103,26 @@ conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY', 'utf-8'), bytes(conversati
 ```
 
 
-### Front-end work
+### Front-end setup
 
 1. Add a script-tag to your application, loading the Planga JS-snippet.
 2. Add an HTML-element somewhere in your document that you want the chat interface to be contained in.
 3. In JavaScript, create a new `Planga` object, passing any options you'd want to create the current conversation(s):
-  - These options contain the information the back-end sent to the front-end.
+  - These options contain the information the back-end sent to the front-end:
+    - `current_user_id`
+    - `current_user_id_hmac`
+    - `conversation_id`
+    - `conversation_id_hmac`
+  - And the following extra options:
+    - `app_id`: Unique Identifier that Planga assigns to your account. This is public information.
+  - Optionally, you can also send the following extra options:
+    - `current_user_name`: This will set the current user's name to the given name. If this was already set earlier, it requires an `current_user_name_hmac` to override the previous value (to prevent abuse).
+    - `notifications_enabled_message`: Can be a custom string message that will be shown when the user enables browser notifications.
+    - `socket_location`: Required only if you host the application somewhere else.
 
+
+
+#### Example:
 
 ```html
 <!-- To be able to use 'Planga', add this to your application: -->
@@ -121,10 +135,11 @@ conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY', 'utf-8'), bytes(conversati
 <script type="text/javascript" >
  // Usage Example:
  window.onload = function(){
+     let messages_list_elem = document.getElementById('planga-example');
+
      let app_id = '1';
      let conversation_id = "asdf";
      let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
-     let messages_list_elem    = document.getElementById('planga-example');
      let current_user_id = '1234';
      let current_user_name = 'wm';
      let current_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
@@ -134,8 +149,6 @@ conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY', 'utf-8'), bytes(conversati
          current_user_id: current_user_id,
          current_user_id_hmac: current_user_id_hmac,
          current_user_name: current_user_name,
-         socket_location: "/socket",
-         notifications_enabled_message: "The Chat Notifications of Our Amazing Application are now on!"
      });
      planga.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
  };
