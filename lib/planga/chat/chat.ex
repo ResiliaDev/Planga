@@ -77,15 +77,13 @@ defmodule Planga.Chat do
 
   @doc """
   Creates a Message struct and stores it in the application,
-  that will be part the conversation indicated by `conversation_id`
+  that will be part the conversation indicated by `app_id` and `remote_conversation_id`
   and sent by the user indicated by `user_id`.
 
   The to-be-sent message will be `message`.
 
-
-  TODO name function better
   """
-  def create_good_message(app_id, remote_conversation_id, user_id, message) do
+  def create_message(app_id, remote_conversation_id, user_id, message) do
     {:ok, message} = Repo.transaction( fn ->
       conversation = get_conversation_by_remote_id!(app_id, remote_conversation_id)
       idempotently_add_user_to_conversation(conversation.id, user_id)
