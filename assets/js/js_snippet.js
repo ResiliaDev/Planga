@@ -2,19 +2,30 @@
 import {Socket, LongPoll} from 'phoenix';
 import $ from 'jquery';
 
-
+let ensureFieldExists = (options, field_name) => {
+    console.log(options, field_name);
+    if(!(field_name in options)) {
+        throw "Eror: `" + field_name + "` field expected in `options`";
+    };
+};
 
 class Planga {
     constructor(options) {
+        ensureFieldExists(options, "current_user_id");
+        this.current_user_id = options.current_user_id;
+
+        ensureFieldExists(options, "current_user_id_hmac");
         this.current_user_id_hmac = options.current_user_id_hmac;
+
+        ensureFieldExists(options, "current_user_name");
         this.current_user_name = options.current_user_name;
         this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
-        this.current_user_id = options.current_user_id;
+
+        ensureFieldExists(options, "app_id");
         this.app_id = options.app_id;
         this.debug = options.debug || false;
         this.socket_location = options.socket_location || "http://planga.io/socket";
         this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
-        console.log(this.socket_location);
 
 
         this.socket = new Socket(this.socket_location, {params: {}/*, transport: LongPoll */});
