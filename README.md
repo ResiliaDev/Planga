@@ -8,30 +8,31 @@ It is currently in a relatively early alpha-stage; check back soon for more info
 
 <!--ts-->
    * [Planga](#planga)
-      * [Using Planga](#using-planga)
-         * [Back-end setup](#back-end-setup)
-            * [What should I use for conversation_id?](#what-should-i-use-for-conversation_id)
-            * [What is a SHA256-HMAC?](#what-is-a-sha256-hmac)
-            * [How do I compute a SHA256-HMAC?](#how-do-i-compute-a-sha256-hmac)
-               * [Ruby:](#ruby)
-               * [PHP:](#php)
-               * [NodeJS:](#nodejs)
-               * [Elixir:](#elixir)
-               * [Python2](#python2)
-               * [Python3](#python3)
-         * [Front-end setup](#front-end-setup)
-            * [Example:](#example)
-      * [Running Planga Yourself](#running-planga-yourself)
+   * [Table of Contents](#table-of-contents)
+   * [Using Planga](#using-planga)
+      * [Back-end setup](#back-end-setup)
+         * [What should I use for conversation_id?](#what-should-i-use-for-conversation_id)
+         * [What is a SHA256-HMAC?](#what-is-a-sha256-hmac)
+         * [How do I compute a SHA256-HMAC?](#how-do-i-compute-a-sha256-hmac)
+            * [Ruby:](#ruby)
+            * [PHP:](#php)
+            * [NodeJS:](#nodejs)
+            * [Elixir:](#elixir)
+            * [Python2](#python2)
+            * [Python3](#python3)
+      * [Front-end setup](#front-end-setup)
+         * [Example:](#example)
+   * [Running Planga Yourself](#running-planga-yourself)
 
-<!-- Added by: qqwy, at: 2018-07-13T17:18+02:00 -->
+<!-- Added by: qqwy, at: 2018-07-13T17:21+02:00 -->
 
 <!--te-->
 
-## Using Planga
+# Using Planga
 
 _This documentation is a work-in-progress!_
 
-### Back-end setup
+## Back-end setup
 
 1. Compute some information that Planga needs: 
   - `user_id`: The identifier of the currently logged-in user. Can be any string that uniquely identifies a user.
@@ -40,7 +41,7 @@ _This documentation is a work-in-progress!_
   - `conversation_id_hmac`: The SHA256-HMAC of the `conversation_id`, using your API-key for signing.
 2. Send/output that information in a way that your front-end JavaScript can access it.
   
-#### What should I use for `conversation_id`?
+### What should I use for `conversation_id`?
 
 For conversations that all users are allowed to be part of, it is simple: Just use a string like `"general"` for a general chat channel.
 
@@ -51,13 +52,13 @@ Say we have the users `Alice` with user_id `12` and `Bob` with user_id `42`, the
 
 _Tl;Dr: Planga does not restrict you at all in choosing conversation identifiers, so choose something that makes sense for your application!_
   
-#### What is a SHA256-HMAC?
+### What is a SHA256-HMAC?
 
 These are used to make the application secure: They ensure that your back-end:
 - that the current user exists and is the specifically listed user.
 - that the current user is allowed to connect to the given conversation.
 
-#### How do I compute a SHA256-HMAC?
+### How do I compute a SHA256-HMAC?
 
 This is a very common thing to do.
 Planga expects the SHA256-HMAC to be in hexadecimal (also known as hexdigest) format.
@@ -66,7 +67,7 @@ Here are a couple of programming language examples:
 
 _For other languages, see [these more in-depth hmac-examples](https://github.com/danharper/hmac-examples)_
 
-##### Ruby:
+#### Ruby:
 
 ```ruby
 require 'openssl'
@@ -75,14 +76,14 @@ user_id_hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), "YOUR_API_
 conversation_id_hmac = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha256"), "YOUR_API_KEY", conversation_id)
 ```
 
-##### PHP:
+#### PHP:
 
 ```php
 $user_id_hmac = hash_hmac("sha256", $user_id, "YOUR_API_KEY")
 $conversation_id_hmac = hash_hmac("sha256", $conversation_id, "YOUR_API_KEY")
 ```
 
-##### NodeJS:
+#### NodeJS:
 
 ```nodejs
 const crypto = require("crypto")
@@ -91,7 +92,7 @@ let user_id_hmac = crypto.createHmac("SHA256", "YOUR_API_KEY").update(user_id).d
 let conversation_id_hmac = crypto.createHmac("SHA256", "YOUR_API_KEY").update(conversation_id).digest("hex");
 ```
 
-##### Elixir:
+#### Elixir:
 
 ```elixir
 user_id_hmac = 
@@ -104,7 +105,7 @@ conversation_id_hmac =
   |> Base.encode16
 ```
 
-##### Python2
+#### Python2
 
 ```python2
 import hashlib
@@ -114,7 +115,7 @@ user_id_hmac = hmac.new(bytes('YOUR_API_KEY').encode('utf-8'), bytes(user_id).en
 conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY').encode('utf-8'), bytes(conversation_id).encode('utf-8'), hashlib.sha256).hexdigest()
 ```
 
-##### Python3
+#### Python3
 
 
 ```python3
@@ -126,7 +127,7 @@ conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY', 'utf-8'), bytes(conversati
 ```
 
 
-### Front-end setup
+## Front-end setup
 
 1. Add a script-tag to your application, loading the Planga JS-snippet.
 2. Add an HTML-element somewhere in your document that you want the chat interface to be contained in.
@@ -145,7 +146,7 @@ conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY', 'utf-8'), bytes(conversati
 
 
 
-#### Example:
+### Example:
 
 ```html
 <!-- To be able to use 'Planga', add this to your application: -->
@@ -179,7 +180,7 @@ conversation_id_hmac = hmac.new(bytes('YOUR_API_KEY', 'utf-8'), bytes(conversati
 ```
 
 
-## Running Planga Yourself
+# Running Planga Yourself
 
 1. Copy this repository
 2. Install Erlang and Elixir
