@@ -18,6 +18,7 @@
          current_user_id_hmac: current_user_id_hmac,
          current_user_name: current_user_name,
          socket_location: "/socket",
+         notifications_enabled_message: "The Chat Notifications of Our Amazing Application are now on!"
      });
      planga.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
  };

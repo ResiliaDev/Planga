@@ -3,65 +3,6 @@ import {Socket, LongPoll} from 'phoenix';
 import $ from 'jquery';
 
 
-let addMessage = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
-    $(messages_list_elem).append(messageHTML(author_name, content, sent_at, current_user_name));
-    $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
-    if(author_name !== current_user_name){
-        sendNotification(notificationHTML(author_name, content, sent_at, current_user_name));
-    }
-};
-
-
-let addMessageTop = (messages_list_elem, author_name, content, sent_at, current_user_name) => {
-    $(messages_list_elem).prepend(messageHTML(author_name, content, sent_at, current_user_name));
-};
-
-let sendNotification = (message) => {
-    if(Notification.permission === 'granted') {
-        new Notification(message);
-    }
-};
-
-
-
-let messageHTML = (author_name, content, sent_at, current_user_name) => {
-    let current_user_class = author_name == current_user_name ? 'planga--chat-current-user-message' : '';
-    return `
-    <div class='planga--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
-            <div class='planga--chat-message-sent-at-wrapper'>
-                <span class='planga--chat-message-sent-at' title='${styledDateTime(sent_at)}'>${styledTime(sent_at)}</span>
-            </div>
-            <div class='planga--chat-author-wrapper'>
-                <span class='planga--chat-author-name'>${author_name}</span><span class='planga--chat-message-separator'>: </span>
-            </div>
-            <div class='planga--chat-message-content' >${content}</div>
-    </div>
-    `;
-};
-
-let styledTime = (sent_at) => {
-    return new Date(sent_at).toLocaleTimeString();
-};
-
-let styledDateTime = (sent_at) => {
-    return new Date(sent_at).toLocaleString();
-};
-
-
-let notificationHTML = (author_name, content, sent_at, current_user_name) => {
-    return `${author_name}: ${content}`;
-};
-
-let sendMessage = (message_field, channel) => {
-    channel.push('new_message', { message: message_field.val() });
-    message_field.val('');
-};
-
-let callWithBottomFixedVscroll = (elem, func) => {
-    let current_scroll_pos = $(elem).prop('scrollHeight') - $(elem).scrollTop();
-    func();
-    $(elem).prop({scrollTop: $(elem).prop('scrollHeight') - current_scroll_pos});
-};
 
 class Planga {
     constructor(options) {
@@ -72,6 +13,7 @@ class Planga {
         this.app_id = options.app_id;
         this.debug = options.debug || false;
         this.socket_location = options.socket_location || "http://planga.io/socket";
+        this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
         console.log(this.socket_location);
 
 
@@ -81,7 +23,7 @@ class Planga {
         if("Notification" in window){
             Notification.requestPermission(permission => {
                 if(permission === "granted"){
-                    new Notification("Chat Notifications are now enabled!");
+                    new Notification(this.notifications_enabled_message);
                 }
             });
         }
@@ -89,21 +31,8 @@ class Planga {
 
     createCommuncationSection (chat_container_elem, conversation_id, conversation_id_hmac) {
         let container = $(chat_container_elem);
-        // console.log(container);
-        container.html(
-            `<div class='planga--chat-container'>
-                <dl class='planga--chat-messages'>
-                </dl>
-                <div class='planga--new-message-form'>
-                    <div class='planga--new-message-field-wrapper'>
-                        <input type='text' placeholder='${this.current_user_name}: Type your message here' name='planga--new-message-field' class='planga--new-message-field'/>
-                    </div>
-                    <button class='planga--new-message-submit-button'>Send</button>
-                </div>
-            </div>`
-        );
+        container.html(this.containerHTML(this.current_user_name));
         let messages_list_elem    = $('.planga--chat-messages', container);
-        // console.log(messages_list_elem);
         let opts = {
             app_id: this.app_id,
             remote_user_id: this.current_user_id,
@@ -112,24 +41,22 @@ class Planga {
             remote_user_name_hmac: this.current_user_name_hmac,
             conversation_id_hmac: conversation_id_hmac
         };
-        // console.log(opts);
         let channel = this.socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), opts);
 
         channel.on('new_message', payload => {
             if(this.debug)
                 console.log("Planga: New Message", payload);
             let author_name = payload.name || "Anonymous";
-            addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
+            this.addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
         });
 
         let loading_new_messages = false;
         channel.on('messages_so_far', payload => {
             loading_new_messages = false;
-            // console.log("Planga: Messages So Far Payload", payload);
-            callWithBottomFixedVscroll(messages_list_elem, () => {
+            this.callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
-                    addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, this.current_user_name);
+                    this.addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, this.current_user_name);
                     if(this.debug)
                         console.log("Loading older message: ", message);
                 });
@@ -137,7 +64,6 @@ class Planga {
         });
 
         $(messages_list_elem).on('scroll', event => {
-            // console.log($(messages_list_elem).scrollTop(), $(messages_list_elem).innerHeight());
             if($(messages_list_elem).scrollTop() < 50 && !loading_new_messages) {
                 loading_new_messages = true;
                 channel.push('load_old_messages', { sent_before: $('.planga--chat-message:first', messages_list_elem).data('message-sent-at') });
@@ -163,14 +89,88 @@ class Planga {
         let message_field = $('.planga--new-message-field', container);
         message_field.on('keypress', event => {
             if (event.keyCode == 13) {
-                sendMessage(message_field, channel);
+                this.sendMessage(message_field, channel);
             }
         });
         let message_button = $('.planga--new-message-submit-button', container);
         message_button.on('click', event => {
-            sendMessage(message_field, channel);
+            this.sendMessage(message_field, channel);
         });
     }
+
+    containerHTML (current_user_name) {
+        return `<div class='planga--chat-container'>
+                <dl class='planga--chat-messages'>
+                </dl>
+                <div class='planga--new-message-form'>
+                    <div class='planga--new-message-field-wrapper'>
+                        <input type='text' placeholder='${current_user_name}: Type your message here' name='planga--new-message-field' class='planga--new-message-field'/>
+                    </div>
+                    <button class='planga--new-message-submit-button'>Send</button>
+                </div>
+            </div>`;
+    }
+
+
+    addMessage (messages_list_elem, author_name, content, sent_at, current_user_name) {
+        $(messages_list_elem).append(this.messageHTML(author_name, content, sent_at, current_user_name));
+        $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
+        if(author_name !== current_user_name){
+            this.sendNotification(this.notificationHTML(author_name, content, sent_at, current_user_name));
+        }
+    };
+
+
+    addMessageTop (messages_list_elem, author_name, content, sent_at, current_user_name) {
+        $(messages_list_elem).prepend(this.messageHTML(author_name, content, sent_at, current_user_name));
+    };
+
+    sendNotification (message) {
+        if(Notification.permission === 'granted') {
+            new Notification(message);
+        }
+    };
+
+
+
+    messageHTML (author_name, content, sent_at, current_user_name) {
+        let current_user_class = author_name == current_user_name ? 'planga--chat-current-user-message' : '';
+        return `
+    <div class='planga--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
+            <div class='planga--chat-message-sent-at-wrapper'>
+                <span class='planga--chat-message-sent-at' title='${this.styledDateTime(sent_at)}'>${this.styledTime(sent_at)}</span>
+            </div>
+            <div class='planga--chat-author-wrapper'>
+                <span class='planga--chat-author-name'>${author_name}</span><span class='planga--chat-message-separator'>: </span>
+            </div>
+            <div class='planga--chat-message-content' >${content}</div>
+    </div>
+    `;
+    };
+
+    styledTime (sent_at) {
+        return new Date(sent_at).toLocaleTimeString();
+    };
+
+    styledDateTime (sent_at) {
+        return new Date(sent_at).toLocaleString();
+    };
+
+
+    notificationHTML (author_name, content, sent_at, current_user_name) {
+        return `${author_name}: ${content}`;
+    };
+
+    sendMessage (message_field, channel) {
+        channel.push('new_message', { message: message_field.val() });
+        message_field.val('');
+    };
+
+    callWithBottomFixedVscroll (elem, func) {
+        let current_scroll_pos = $(elem).prop('scrollHeight') - $(elem).scrollTop();
+        func();
+        $(elem).prop({scrollTop: $(elem).prop('scrollHeight') - current_scroll_pos});
+    };
 }
 // Export to outside world
 window.Planga = Planga;
