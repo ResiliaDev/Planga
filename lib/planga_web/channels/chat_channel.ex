@@ -62,7 +62,7 @@ defmodule PlangaWeb.ChatChannel do
       |> String.split("#")
       |> Enum.map(&Base.decode64!/1)
 
-    {app_id, rencrypted_conversation_info}
+    {app_id, encrypted_conversation_info}
   end
 
   defp fill_socket(socket, user, app_id, remote_conversation_id) do

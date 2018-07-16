@@ -3,8 +3,9 @@ defmodule Planga.Chat.APIKeyPair do
   import Ecto.Changeset
 
 
+  @primary_key {:public_id, :string, []}
   schema "api_key_pairs" do
-    field :public_id, :string
+    # field :public_id, :string
     field :secret_key, :string
     belongs_to :app, Planga.Chat.App
 
