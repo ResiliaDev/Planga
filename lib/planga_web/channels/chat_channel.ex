@@ -54,7 +54,7 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   defp lookup_api_key_pair(pub_api_id) do
-    Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id)
+    Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
     # JOSE.JWK.from_oct(<<0::128>>)
   end
 

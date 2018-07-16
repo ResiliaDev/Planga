@@ -14,7 +14,7 @@
  // Usage Example:
  window.onload = function(){
      let messages_list_elem = document.getElementById('planga-example');
-     let planga = new Planga(messages_list_elem,
+     new Planga(messages_list_elem,
                              {
                                  public_api_id: "<%= pub_api_id %>",
                                  encrypted_options: "<%= encrypted_conversation_info %>",
