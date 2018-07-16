@@ -48,6 +48,7 @@ defmodule Planga.Mixfile do
       # {:ecto_mnesia, git: "git@github.com:Qqwy/ecto_mnesia.git", branch: "match_spec_tuples"},
       {:corsica, "~> 1.0"},
       {:snowflakex, "~> 1.1"},
+      {:jose, "~> 1.8.4"},
 
       {:distillery, "~> 1.5", runtime: false},
     ]
