@@ -1,8 +1,8 @@
 <div id='planga-example' class='row'>
 </div>
 
-<% pub_api_id = "1" %>
-<% priv_api_key = JOSE.JWK.from_oct(<<0::128>>) %>
+<% pub_api_id = "foobar" %>
+<% priv_api_key = JOSE.JWK.from_oct(<<42::128>>) %>
 <% priv_data = %{
     conversation_id: "general",
     current_user_id: "1234",

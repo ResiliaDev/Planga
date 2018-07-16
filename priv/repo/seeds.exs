@@ -12,9 +12,13 @@
 # alias Planga.Repo
 IO.inspect :mnesia.system_info(:is_running)
 
-Planga.Repo.insert!(%Planga.Chat.App{name: "tokener", api_key_pairs: [
-                                        %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: <<42::128>>}
-                                      ]})
+Planga.Repo.insert!(%Planga.Chat.App{
+      id: 1,
+      name: "tokener",
+      api_key_pairs: [
+        %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: <<42::128>>}
+      ]
+})
 # wm = Repo.insert!(%Planga.Chat.User{name: "wm", remote_id: "1234", app_id: app.id})
 # rene = Repo.insert!(%Planga.Chat.User{name: "rene", remote_id: "4567", app_id: app.id})
 

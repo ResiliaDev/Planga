@@ -9,15 +9,17 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
-    {app_id, encrypted_conversation_info} = decode_conversation_info(qualified_conversation_info)
-    secret_info = jose_decrypt(encrypted_conversation_info, app_id)
+    {public_api_id, encrypted_conversation_info} = decode_conversation_info(qualified_conversation_info)
+    api_key_pair = lookup_api_key_pair(public_api_id)
+    secret_info = jose_decrypt(encrypted_conversation_info, api_key_pair)
     with %{
           "conversation_id" => conversation_id,
           "current_user_id" => current_user_id
      }  = secret_info do
+      app_id = api_key_pair.app_id
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
-      PlangaWeb.Endpoint.subscribe("chat:" <> app_id <> "#" <> conversation_id)
-      socket = fill_socket(socket, user, app_id, conversation_id)
+      PlangaWeb.Endpoint.subscribe("chat:#{app_id}#{conversation_id}")
+      socket = fill_socket(socket, user, api_key_pair, app_id, conversation_id)
 
       if(secret_info["current_user_name"]) do
         Planga.Chat.update_username(user.id, secret_info["current_user_name"])
@@ -38,9 +40,9 @@ defmodule PlangaWeb.ChatChannel do
     {:error, %{reason: "Improper channel format"}}
   end
 
-  defp jose_decrypt(encrypted_conversation_info, pub_api_id) do
-    priv_api_key = lookup_private_api_key(pub_api_id)
-    JOSE.JWE.block_decrypt(priv_api_key, encrypted_conversation_info)
+  defp jose_decrypt(encrypted_conversation_info, api_key_pair) do
+    secret_key = JOSE.JWK.from_oct(api_key_pair.secret_key)
+    JOSE.JWE.block_decrypt(secret_key, encrypted_conversation_info)
     |> elem(0)
     |> Poison.decode!()
   end
@@ -51,24 +53,25 @@ defmodule PlangaWeb.ChatChannel do
     }
   end
 
-  defp lookup_private_api_key(pub_api_id) do
-    # TODO
-    JOSE.JWK.from_oct(<<0::128>>)
+  defp lookup_api_key_pair(pub_api_id) do
+    Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id)
+    # JOSE.JWK.from_oct(<<0::128>>)
   end
 
   defp decode_conversation_info(qualified_conversation_info) do
-    [app_id, encrypted_conversation_info] =
+    [api_pub_id, encrypted_conversation_info] =
       qualified_conversation_info
       |> String.split("#")
       |> Enum.map(&Base.decode64!/1)
 
-    {app_id, encrypted_conversation_info}
+    {api_pub_id, encrypted_conversation_info}
   end
 
-  defp fill_socket(socket, user, app_id, remote_conversation_id) do
+  defp fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id) do
     socket =
       socket
       |> assign(:user_id, user.id)
+      |> assign(:api_key_pair, api_key_pair)
       |> assign(:app_id, app_id)
       |> assign(:remote_conversation_id, remote_conversation_id)
   end
