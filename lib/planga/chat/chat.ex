@@ -13,13 +13,16 @@ defmodule Planga.Chat do
   Will throw an Ecto.NoResultsError error if user could not be found.
   """
   def get_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
-    app = Repo.get!(App, app_id)
-    {:ok, user} = Repo.insert(%User{app_id: app.id, remote_id: remote_user_id, name: user_name}, on_conflict: :nothing)
-    if(user.id != nil) do
-      user
-    else
-      Repo.get_by!(User, [app_id: app.id, remote_id: remote_user_id])
-    end
+    {:ok, user} = Repo.transaction(fn ->
+      app = Repo.get!(App, app_id)
+      user =  Repo.get_by(User, [app_id: app.id, remote_id: remote_user_id])
+      if user do
+        user
+      else
+        user = Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
+      end
+    end)
+    user
   end
 
   defp get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
@@ -122,6 +125,14 @@ defmodule Planga.Chat do
       else
         Repo.insert!(%ConversationUser{conversation_id: conversation_id, user_id: user_id})
       end
+    end)
+  end
+
+  def update_username(user_id, remote_user_name) do
+    Repo.transaction(fn ->
+      Repo.get!(User, user_id)
+      |> Ecto.Changeset.change(name: remote_user_name)
+      |> Repo.update()
     end)
   end
 end

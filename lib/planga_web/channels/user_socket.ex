@@ -8,7 +8,7 @@ defmodule PlangaWeb.UserSocket do
   transport :websocket, Phoenix.Transports.WebSocket
   transport :longpoll, Phoenix.Transports.LongPoll
 
-  channel "chat:*", PlangaWeb.ChatChannel
+  channel "encrypted_chat:*", PlangaWeb.ChatChannel
 
 
   # Socket params are passed from the client and can

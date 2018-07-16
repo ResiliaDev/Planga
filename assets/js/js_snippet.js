@@ -11,23 +11,29 @@ let ensureFieldExists = (options, field_name) => {
 
 class Planga {
     constructor(options) {
-        ensureFieldExists(options, "current_user_id");
-        this.current_user_id = options.current_user_id;
+        // ensureFieldExists(options, "encrypted_options");
+        ensureFieldExists(options, "public_api_id");
+        // this.encrypted_options = options.encrypted_options;
+        this.public_api_id = options.public_api_id;
 
-        ensureFieldExists(options, "current_user_id_hmac");
-        this.current_user_id_hmac = options.current_user_id_hmac;
+        // ensureFieldExists(options, "current_user_id");
+        // this.current_user_id = options.current_user_id;
 
-        ensureFieldExists(options, "current_user_name");
-        this.current_user_name = options.current_user_name;
-        this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
+        // ensureFieldExists(options, "current_user_id_hmac");
+        // this.current_user_id_hmac = options.current_user_id_hmac;
 
-        ensureFieldExists(options, "app_id");
-        this.app_id = options.app_id;
+        // ensureFieldExists(options, "current_user_name");
+        // this.current_user_name = options.current_user_name;
+        // this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
+
+        // ensureFieldExists(options, "app_id");
+        // this.app_id = options.app_id;
+
         this.debug = options.debug || false;
         this.socket_location = options.socket_location || "http://planga.io/socket";
         this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
 
-
+        console.log(this);
         this.socket = new Socket(this.socket_location, {params: {}/*, transport: LongPoll */});
         this.socket.connect();
 
@@ -40,25 +46,30 @@ class Planga {
         }
     }
 
-    createCommuncationSection (chat_container_elem, conversation_id, conversation_id_hmac) {
+    createCommunicationSection (chat_container_elem, encrypted_options) {
+        console.log("TEST");
+        this.encrypted_options = encrypted_options;
         let container = $(chat_container_elem);
         container.html(this.containerHTML(this.current_user_name));
         let messages_list_elem    = $('.planga--chat-messages', container);
         let opts = {
-            app_id: this.app_id,
-            remote_user_id: this.current_user_id,
-            remote_user_id_hmac: this.current_user_id_hmac,
-            remote_user_name: this.current_user_name,
-            remote_user_name_hmac: this.current_user_name_hmac,
-            conversation_id_hmac: conversation_id_hmac
+            // app_id: this.app_id,
+            // remote_user_id: this.current_user_id,
+            // remote_user_id_hmac: this.current_user_id_hmac,
+            // remote_user_name: this.current_user_name,
+            // remote_user_name_hmac: this.current_user_name_hmac,
+            // conversation_id_hmac: conversation_id_hmac
         };
-        let channel = this.socket.channel("chat:" + btoa(this.app_id) + '#' + btoa(conversation_id), opts);
+        console.log(this);
+        let channel_name = "encrypted_chat:" + btoa(this.public_api_id) + '#' + btoa(this.encrypted_options);
+        console.log(channel_name);
+        let channel = this.socket.channel(channel_name, opts);
 
         channel.on('new_message', payload => {
             if(this.debug)
                 console.log("Planga: New Message", payload);
             let author_name = payload.name || "Anonymous";
-            this.addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
+            this.addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, payload.current_user_name);
         });
 
         let loading_new_messages = false;
@@ -67,7 +78,7 @@ class Planga {
             this.callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
-                    this.addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, this.current_user_name);
+                    this.addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, message.current_user_name);
                     if(this.debug)
                         console.log("Loading older message: ", message);
                 });
@@ -86,7 +97,8 @@ class Planga {
 
         channel.join()
             .receive("ok", resp => {
-                $('.planga--new-message-field').prop('disabled', false);
+                console.log(resp);
+                $('.planga--new-message-field').prop('disabled', false).attr('placeholder', this.inputPlaceholder(resp.current_user_name));
                 $('.planga--new-message-submit-button').prop('disabled', false);
                 if(this.debug)
                     console.log("Joined Planga communication successfully.", resp);
@@ -109,17 +121,24 @@ class Planga {
         });
     }
 
-    containerHTML (current_user_name) {
+    containerHTML () {
         return `<div class='planga--chat-container'>
                 <dl class='planga--chat-messages'>
                 </dl>
                 <div class='planga--new-message-form'>
                     <div class='planga--new-message-field-wrapper'>
-                        <input type='text' placeholder='${current_user_name}: Type your message here' name='planga--new-message-field' class='planga--new-message-field'/>
+                        <input type='text' placeholder='${this.inputPlaceholder()}' name='planga--new-message-field' class='planga--new-message-field'/>
                     </div>
                     <button class='planga--new-message-submit-button'>Send</button>
                 </div>
             </div>`;
+    }
+
+    inputPlaceholder (current_user_name) {
+        if(!current_user_name) {
+            return `Type your message here`;
+        }
+        return `${current_user_name}: Type your message here`;
     }
 
 

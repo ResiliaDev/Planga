@@ -1,30 +1,23 @@
 <div id='planga-example' class='row'>
 </div>
 
-<% pub_api_key = "topsecret" %>
+<% pub_api_id = "1" %>
 <% priv_api_key = JOSE.JWK.from_oct(<<0::128>>) %>
-<% priv_data = %{channel_id: "asdf", current_user_id: "1234", current_user_name: "wm"} |> Poison.encode! %>
+<% priv_data = %{
+    conversation_id: "general",
+    current_user_id: "1234",
+    current_user_name: "Wiebe-Marten"
+} |> Poison.encode! %>
 <% encrypted_conversation_info = JOSE.JWE.block_encrypt(priv_api_key, priv_data, %{ "alg" => "A128GCMKW", "enc" => "A128GCM" }) |> JOSE.JWE.compact |> elem(1) %>
 
 <script type="text/javascript" >
  // Usage Example:
  window.onload = function(){
-     let app_id = '1';
-     let conversation_id = "<%= encrypted_conversation_info %>";
-     let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
-     let messages_list_elem    = document.getElementById('planga-example');
-     let current_user_id = '1234';
-     let current_user_name = 'wm';
-     let current_user_id_hmac = "5ZS5CUUX7eg3/nNw7TevR6PyUfEMrtPRN/V7s7JhdTw="; // Based on API key 'topsecret' for app id '1', with HMAC message '1234' (the user's remote ID)
-
+     let messages_list_elem = document.getElementById('planga-example');
      let planga = new Planga({
-         app_id: '1',
-         current_user_id: current_user_id,
-         current_user_id_hmac: current_user_id_hmac,
-         current_user_name: current_user_name,
+         public_api_id: <%= pub_api_id %>,
          socket_location: "/socket",
-         notifications_enabled_message: "The Chat Notifications of Our Amazing Application are now on!"
      });
-     planga.createCommuncationSection(messages_list_elem, conversation_id, conversation_id_hmac);
- };
+     planga.createCommunicationSection(messages_list_elem, "<%= encrypted_conversation_info %>");
+};
 </script>

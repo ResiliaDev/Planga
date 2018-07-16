@@ -8,16 +8,37 @@ defmodule PlangaWeb.ChatChannel do
   @doc """
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
-  def join("chat:" <> qualified_conversation_info, payload, socket) do
+  def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
     {app_id, remote_conversation_id} = decode_conversation_id(qualified_conversation_info)
     secret_info = jose_decrypt(remote_conversation_id, app_id)
     IO.inspect(secret_info)
+    with %{
+          "conversation_id" => conversation_id,
+          "current_user_id" => current_user_id
+     }  = secret_info do
+      PlangaWeb.Endpoint.subscribe("chat:" <> app_id <> "#" <> conversation_id)
+      user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
+      IO.inspect(user)
+      socket = fill_socket(socket, user, app_id, conversation_id)
+
+      if(secret_info["current_user_name"]) do
+        Planga.Chat.update_username(user.id, secret_info["current_user_name"])
+      end
+
+      send(self(), :after_join)
+
+      {:ok, %{"current_user_name" => secret_info["current_user_name"]},socket}
+
+    else
+      _ ->
+        {:error, %{reason: "unauthorized"}}
+    end
+
     # with user = %Planga.Chat.User{} <- attempt_authorization(payload, app_id, remote_conversation_id) do
     #   socket = fill_socket(socket, user, app_id, remote_conversation_id)
     #   maybe_update_username(payload, app_id, user)
 
     #   send(self(), :after_join)
-      {:ok, socket}
     # else
     #   _ ->
     #     {:error, %{reason: "unauthorized"}}
@@ -35,6 +56,12 @@ defmodule PlangaWeb.ChatChannel do
     JOSE.JWE.block_decrypt(priv_api_key, encrypted_conversation_info)
     |> elem(0)
     |> Poison.decode!()
+  end
+
+  def public_secrets(secret_info) do
+    %{
+      current_user_name: secret_info["current_user_name"]
+    }
   end
 
   defp lookup_private_api_key(pub_api_id) do
@@ -59,6 +86,7 @@ defmodule PlangaWeb.ChatChannel do
       |> assign(:remote_conversation_id, remote_conversation_id)
   end
 
+  # TODO update for JOSE
   defp maybe_update_username(payload, app_id, user) do
     if payload["remote_user_name_hmac"] do
       Planga.Chat.HMAC.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
