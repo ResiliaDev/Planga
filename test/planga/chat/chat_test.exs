@@ -430,4 +430,66 @@ defmodule Planga.ChatTest do
       assert %Ecto.Changeset{} = Chat.change_conversation_topic(conversation_topic)
     end
   end
+
+  describe "api_key_pairs" do
+    alias Planga.Chat.APIKeyPair
+
+    @valid_attrs %{public_id: "some public_id", secret_key: "some secret_key"}
+    @update_attrs %{public_id: "some updated public_id", secret_key: "some updated secret_key"}
+    @invalid_attrs %{public_id: nil, secret_key: nil}
+
+    def api_key_pair_fixture(attrs \\ %{}) do
+      {:ok, api_key_pair} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Chat.create_api_key_pair()
+
+      api_key_pair
+    end
+
+    test "list_api_key_pairs/0 returns all api_key_pairs" do
+      api_key_pair = api_key_pair_fixture()
+      assert Chat.list_api_key_pairs() == [api_key_pair]
+    end
+
+    test "get_api_key_pair!/1 returns the api_key_pair with given id" do
+      api_key_pair = api_key_pair_fixture()
+      assert Chat.get_api_key_pair!(api_key_pair.id) == api_key_pair
+    end
+
+    test "create_api_key_pair/1 with valid data creates a api_key_pair" do
+      assert {:ok, %APIKeyPair{} = api_key_pair} = Chat.create_api_key_pair(@valid_attrs)
+      assert api_key_pair.public_id == "some public_id"
+      assert api_key_pair.secret_key == "some secret_key"
+    end
+
+    test "create_api_key_pair/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Chat.create_api_key_pair(@invalid_attrs)
+    end
+
+    test "update_api_key_pair/2 with valid data updates the api_key_pair" do
+      api_key_pair = api_key_pair_fixture()
+      assert {:ok, api_key_pair} = Chat.update_api_key_pair(api_key_pair, @update_attrs)
+      assert %APIKeyPair{} = api_key_pair
+      assert api_key_pair.public_id == "some updated public_id"
+      assert api_key_pair.secret_key == "some updated secret_key"
+    end
+
+    test "update_api_key_pair/2 with invalid data returns error changeset" do
+      api_key_pair = api_key_pair_fixture()
+      assert {:error, %Ecto.Changeset{}} = Chat.update_api_key_pair(api_key_pair, @invalid_attrs)
+      assert api_key_pair == Chat.get_api_key_pair!(api_key_pair.id)
+    end
+
+    test "delete_api_key_pair/1 deletes the api_key_pair" do
+      api_key_pair = api_key_pair_fixture()
+      assert {:ok, %APIKeyPair{}} = Chat.delete_api_key_pair(api_key_pair)
+      assert_raise Ecto.NoResultsError, fn -> Chat.get_api_key_pair!(api_key_pair.id) end
+    end
+
+    test "change_api_key_pair/1 returns a api_key_pair changeset" do
+      api_key_pair = api_key_pair_fixture()
+      assert %Ecto.Changeset{} = Chat.change_api_key_pair(api_key_pair)
+    end
+  end
 end

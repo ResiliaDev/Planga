@@ -135,4 +135,100 @@ defmodule Planga.Chat do
       |> Repo.update()
     end)
   end
+
+  alias Planga.Chat.APIKeyPair
+
+  @doc """
+  Returns the list of api_key_pairs.
+
+  ## Examples
+
+      iex> list_api_key_pairs()
+      [%APIKeyPair{}, ...]
+
+  """
+  def list_api_key_pairs do
+    Repo.all(APIKeyPair)
+  end
+
+  @doc """
+  Gets a single api_key_pair.
+
+  Raises `Ecto.NoResultsError` if the Api key pair does not exist.
+
+  ## Examples
+
+      iex> get_api_key_pair!(123)
+      %APIKeyPair{}
+
+      iex> get_api_key_pair!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_api_key_pair!(id), do: Repo.get!(APIKeyPair, id)
+
+  @doc """
+  Creates a api_key_pair.
+
+  ## Examples
+
+      iex> create_api_key_pair(%{field: value})
+      {:ok, %APIKeyPair{}}
+
+      iex> create_api_key_pair(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_api_key_pair(attrs \\ %{}) do
+    %APIKeyPair{}
+    |> APIKeyPair.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a api_key_pair.
+
+  ## Examples
+
+      iex> update_api_key_pair(api_key_pair, %{field: new_value})
+      {:ok, %APIKeyPair{}}
+
+      iex> update_api_key_pair(api_key_pair, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_api_key_pair(%APIKeyPair{} = api_key_pair, attrs) do
+    api_key_pair
+    |> APIKeyPair.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a APIKeyPair.
+
+  ## Examples
+
+      iex> delete_api_key_pair(api_key_pair)
+      {:ok, %APIKeyPair{}}
+
+      iex> delete_api_key_pair(api_key_pair)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_api_key_pair(%APIKeyPair{} = api_key_pair) do
+    Repo.delete(api_key_pair)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking api_key_pair changes.
+
+  ## Examples
+
+      iex> change_api_key_pair(api_key_pair)
+      %Ecto.Changeset{source: %APIKeyPair{}}
+
+  """
+  def change_api_key_pair(%APIKeyPair{} = api_key_pair) do
+    APIKeyPair.changeset(api_key_pair, %{})
+  end
 end

@@ -4,7 +4,7 @@ defmodule Planga.Repo.Migrations.CreateApps do
   def change do
     create table(:apps) do
       add :name, :string
-      add :secret_api_key, :string
+      # add :secret_api_key, :string
 
       timestamps()
     end

@@ -9,16 +9,14 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
-    {app_id, remote_conversation_id} = decode_conversation_id(qualified_conversation_info)
-    secret_info = jose_decrypt(remote_conversation_id, app_id)
-    IO.inspect(secret_info)
+    {app_id, encrypted_conversation_info} = decode_conversation_info(qualified_conversation_info)
+    secret_info = jose_decrypt(encrypted_conversation_info, app_id)
     with %{
           "conversation_id" => conversation_id,
           "current_user_id" => current_user_id
      }  = secret_info do
-      PlangaWeb.Endpoint.subscribe("chat:" <> app_id <> "#" <> conversation_id)
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
-      IO.inspect(user)
+      PlangaWeb.Endpoint.subscribe("chat:" <> app_id <> "#" <> conversation_id)
       socket = fill_socket(socket, user, app_id, conversation_id)
 
       if(secret_info["current_user_name"]) do
@@ -31,6 +29,7 @@ defmodule PlangaWeb.ChatChannel do
 
     else
       _ ->
+        # TODO Improve error messages in case of missing encrypted fields!
         {:error, %{reason: "unauthorized"}}
     end
   end
@@ -40,9 +39,7 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   defp jose_decrypt(encrypted_conversation_info, pub_api_id) do
-    IO.inspect(encrypted_conversation_info)
     priv_api_key = lookup_private_api_key(pub_api_id)
-    IO.inspect(priv_api_key)
     JOSE.JWE.block_decrypt(priv_api_key, encrypted_conversation_info)
     |> elem(0)
     |> Poison.decode!()
@@ -59,13 +56,13 @@ defmodule PlangaWeb.ChatChannel do
     JOSE.JWK.from_oct(<<0::128>>)
   end
 
-  defp decode_conversation_id(qualified_conversation_id) do
-    [app_id, remote_conversation_id] =
-      qualified_conversation_id
+  defp decode_conversation_info(qualified_conversation_info) do
+    [app_id, encrypted_conversation_info] =
+      qualified_conversation_info
       |> String.split("#")
       |> Enum.map(&Base.decode64!/1)
 
-    {app_id, remote_conversation_id}
+    {app_id, rencrypted_conversation_info}
   end
 
   defp fill_socket(socket, user, app_id, remote_conversation_id) do

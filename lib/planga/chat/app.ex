@@ -5,7 +5,7 @@ defmodule Planga.Chat.App do
 
   schema "apps" do
     field :name, :string
-    field :secret_api_key, :string
+    has_many :api_key_pairs, Planga.Chat.APIKeyPair
 
     has_many :conversations, Planga.Chat.Conversation
     has_many :users, Planga.Chat.User
@@ -16,7 +16,7 @@ defmodule Planga.Chat.App do
   @doc false
   def changeset(app, attrs) do
     app
-    |> cast(attrs, [:name, :secret_api_key])
-    |> validate_required([:name, :secret_api_key])
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
   end
 end
