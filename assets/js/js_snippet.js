@@ -10,24 +10,13 @@ let ensureFieldExists = (options, field_name) => {
 };
 
 class Planga {
-    constructor(options) {
-        // ensureFieldExists(options, "encrypted_options");
+    constructor(chat_container_elem, options) {
+        ensureFieldExists(options, "encrypted_options");
+        this.encrypted_options = options.encrypted_options;
+
         ensureFieldExists(options, "public_api_id");
-        // this.encrypted_options = options.encrypted_options;
         this.public_api_id = options.public_api_id;
-
-        // ensureFieldExists(options, "current_user_id");
-        // this.current_user_id = options.current_user_id;
-
-        // ensureFieldExists(options, "current_user_id_hmac");
-        // this.current_user_id_hmac = options.current_user_id_hmac;
-
-        // ensureFieldExists(options, "current_user_name");
-        // this.current_user_name = options.current_user_name;
-        // this.current_user_name_hmac = options.current_user_name_hmac; // Optional; name will be auto-updated if set.
-
-        // ensureFieldExists(options, "app_id");
-        // this.app_id = options.app_id;
+        this.current_user_name = null;
 
         this.debug = options.debug || false;
         this.socket_location = options.socket_location || "http://planga.io/socket";
@@ -44,32 +33,23 @@ class Planga {
                 }
             });
         }
+
+        this.createCommunicationSection(chat_container_elem);
     }
 
-    createCommunicationSection (chat_container_elem, encrypted_options) {
-        console.log("TEST");
-        this.encrypted_options = encrypted_options;
+    createCommunicationSection (chat_container_elem) {
         let container = $(chat_container_elem);
         container.html(this.containerHTML(this.current_user_name));
         let messages_list_elem    = $('.planga--chat-messages', container);
-        let opts = {
-            // app_id: this.app_id,
-            // remote_user_id: this.current_user_id,
-            // remote_user_id_hmac: this.current_user_id_hmac,
-            // remote_user_name: this.current_user_name,
-            // remote_user_name_hmac: this.current_user_name_hmac,
-            // conversation_id_hmac: conversation_id_hmac
-        };
-        console.log(this);
+        let channel_opts = {};
         let channel_name = "encrypted_chat:" + btoa(this.public_api_id) + '#' + btoa(this.encrypted_options);
-        console.log(channel_name);
-        let channel = this.socket.channel(channel_name, opts);
+        let channel = this.socket.channel(channel_name, channel_opts);
 
         channel.on('new_message', payload => {
             if(this.debug)
                 console.log("Planga: New Message", payload);
             let author_name = payload.name || "Anonymous";
-            this.addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, payload.current_user_name);
+            this.addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
         });
 
         let loading_new_messages = false;
@@ -78,7 +58,7 @@ class Planga {
             this.callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
-                    this.addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, message.current_user_name);
+                    this.addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, this.current_user_name);
                     if(this.debug)
                         console.log("Loading older message: ", message);
                 });
@@ -97,8 +77,8 @@ class Planga {
 
         channel.join()
             .receive("ok", resp => {
-                console.log(resp);
-                $('.planga--new-message-field').prop('disabled', false).attr('placeholder', this.inputPlaceholder(resp.current_user_name));
+                this.current_user_name = resp.current_user_name || null;
+                $('.planga--new-message-field').prop('disabled', false).attr('placeholder', this.inputPlaceholder(this.current_user_name));
                 $('.planga--new-message-submit-button').prop('disabled', false);
                 if(this.debug)
                     console.log("Joined Planga communication successfully.", resp);

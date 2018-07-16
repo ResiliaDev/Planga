@@ -14,11 +14,11 @@
  // Usage Example:
  window.onload = function(){
      let messages_list_elem = document.getElementById('planga-example');
-     let planga = new Planga({
-         public_api_id: <%= pub_api_id %>,
-         socket_location: "/socket",
-         debug: true
-     });
-     planga.createCommunicationSection(messages_list_elem, "<%= encrypted_conversation_info %>");
+     let planga = new Planga(messages_list_elem,
+                             {
+                                 public_api_id: "<%= pub_api_id %>",
+                                 encrypted_options: "<%= encrypted_conversation_info %>",
+                                 socket_location: "/socket",
+                             });
  };
 </script>

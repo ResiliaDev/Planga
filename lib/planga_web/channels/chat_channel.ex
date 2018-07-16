@@ -33,16 +33,6 @@ defmodule PlangaWeb.ChatChannel do
       _ ->
         {:error, %{reason: "unauthorized"}}
     end
-
-    # with user = %Planga.Chat.User{} <- attempt_authorization(payload, app_id, remote_conversation_id) do
-    #   socket = fill_socket(socket, user, app_id, remote_conversation_id)
-    #   maybe_update_username(payload, app_id, user)
-
-    #   send(self(), :after_join)
-    # else
-    #   _ ->
-    #     {:error, %{reason: "unauthorized"}}
-    # end
   end
 
   def join(_, _, socket) do
@@ -84,13 +74,6 @@ defmodule PlangaWeb.ChatChannel do
       |> assign(:user_id, user.id)
       |> assign(:app_id, app_id)
       |> assign(:remote_conversation_id, remote_conversation_id)
-  end
-
-  # TODO update for JOSE
-  defp maybe_update_username(payload, app_id, user) do
-    if payload["remote_user_name_hmac"] do
-      Planga.Chat.HMAC.update_user_name_if_hmac_correct(app_id, user.id, payload["remote_user_name_hmac"], payload["remote_user_name"])
-    end
   end
 
   @doc """
@@ -144,24 +127,6 @@ defmodule PlangaWeb.ChatChannel do
     end
     {:noreply, socket}
   end
-
-  # Authorization logic
-  defp attempt_authorization(payload = %{
-                              "remote_user_id" => remote_user_id,
-                              "remote_user_id_hmac" => remote_user_id_hmac,
-                              "conversation_id_hmac" => remote_conversation_id_hmac,
-                              "remote_user_name" => remote_user_name,
-                             }, app_id, remote_conversation_id) do
-    with true <- Planga.Chat.HMAC.check_user(app_id, remote_user_id, remote_user_id_hmac),
-         true <- Planga.Chat.HMAC.check_conversation(app_id, remote_conversation_id, remote_conversation_id_hmac) do
-
-      user = Planga.Chat.get_user_by_remote_id!(app_id, remote_user_id, remote_user_name)
-      user
-    else _ -> nil
-    end
-  end
-
-  defp attempt_authorization(_payload, _, _), do: false
 
   # Turns returned message information in a format the front-end understands.
   defp message_dict(message) do
