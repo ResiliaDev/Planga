@@ -1,11 +1,16 @@
 <div id='planga-example' class='row'>
 </div>
 
+<% pub_api_key = "topsecret" %>
+<% priv_api_key = JOSE.JWK.from_oct(<<0::128>>) %>
+<% priv_data = %{channel_id: "asdf", current_user_id: "1234", current_user_name: "wm"} |> Poison.encode! %>
+<% encrypted_conversation_info = JOSE.JWE.block_encrypt(priv_api_key, priv_data, %{ "alg" => "A128GCMKW", "enc" => "A128GCM" }) |> JOSE.JWE.compact |> elem(1) %>
+
 <script type="text/javascript" >
  // Usage Example:
  window.onload = function(){
      let app_id = '1';
-     let conversation_id = "asdf";
+     let conversation_id = "<%= encrypted_conversation_info %>";
      let conversation_id_hmac = "Syv/GTCGSFSYtRVKxq7ECm2/M320i2Dby7jOl7+057E=";
      let messages_list_elem    = document.getElementById('planga-example');
      let current_user_id = '1234';

@@ -49,6 +49,7 @@ defmodule Planga.Mixfile do
       {:corsica, "~> 1.0"},
       {:snowflakex, "~> 1.1"},
       {:jose, "~> 1.8.4"},
+      {:poison, "~> 3.1"},
 
       {:distillery, "~> 1.5", runtime: false},
     ]
