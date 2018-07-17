@@ -26,11 +26,13 @@ defmodule Planga.Chat do
   end
 
   defp get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
-    if(sent_before_datetime) do
+    query = if sent_before_datetime do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 20)
     else
       from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :id], limit: 20)
     end
+
+    query
     |> Repo.all()
     |> Enum.map(&put_sender/1)
   end
@@ -71,7 +73,7 @@ defmodule Planga.Chat do
         {app, conversation}
       end
     end)
-    if(conversation.id != nil) do
+    if conversation.id != nil do
       conversation
     else
       Repo.get_by!(Conversation, app_id: app.id, remote_id: remote_id)
@@ -87,21 +89,21 @@ defmodule Planga.Chat do
 
   """
   def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
-    {:ok, message} = Repo.transaction( fn ->
+    {:ok, message} = Repo.transaction(fn ->
       conversation = get_conversation_by_remote_id!(app_id, remote_conversation_id)
       idempotently_add_user_to_conversation(conversation.id, user_id)
 
       other_user_ids
-      |> Enum.map(&idempotently_add_user_with_remote_id_to_conversation(app_id, conversation.id, &1))
+      |> Enum.each(&idempotently_add_user_with_remote_id_to_conversation(app_id, conversation.id, &1))
 
-      Repo.insert!(
-        %Message{
-          id: Snowflakex.new!(),
-          content: message,
-          conversation_id: conversation.id,
-          sender_id: user_id
-        })
-        |> Repo.preload(:sender)
+      %Message{
+        id: Snowflakex.new!(),
+        content: message,
+        conversation_id: conversation.id,
+        sender_id: user_id
+      }
+      |> Repo.insert!()
+      |> Repo.preload(:sender)
     end)
 
     message
@@ -130,7 +132,8 @@ defmodule Planga.Chat do
 
   def update_username(user_id, remote_user_name) do
     Repo.transaction(fn ->
-      Repo.get!(User, user_id)
+      User
+      |> Repo.get!(user_id)
       |> Ecto.Changeset.change(name: remote_user_name)
       |> Repo.update()
     end)

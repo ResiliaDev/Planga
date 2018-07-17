@@ -52,6 +52,7 @@ defmodule Planga.Mixfile do
       {:poison, "~> 3.1"},
 
       {:distillery, "~> 1.5", runtime: false},
+      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}
     ]
   end
 

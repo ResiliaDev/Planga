@@ -22,15 +22,13 @@ defmodule PlangaWeb.ChatChannel do
       other_users = (secret_info["other_users"] || []) |> parse_other_users()
       socket = fill_socket(socket, user, api_key_pair, app_id, conversation_id, other_users)
 
-      if(secret_info["current_user_name"]) do
+      if secret_info["current_user_name"] do
         Planga.Chat.update_username(user.id, secret_info["current_user_name"])
       end
 
-      IO.inspect(socket)
-
       send(self(), :after_join)
 
-      {:ok, %{"current_user_name" => secret_info["current_user_name"]},socket}
+      {:ok, %{"current_user_name" => secret_info["current_user_name"]}, socket}
 
     else
       _ ->
@@ -75,7 +73,7 @@ defmodule PlangaWeb.ChatChannel do
     other_users
     |> Enum.map(fn
       user ->
-      if(Map.has_key?(user, "id")) do
+      if Map.has_key?(user, "id") do
         user_map = %{id: user["id"], name: user["name"]}
         {:ok, user_map}
       else
@@ -83,7 +81,6 @@ defmodule PlangaWeb.ChatChannel do
       end
     end)
     |> Enum.map(&elem(&1, 1))
-    
   end
 
   def public_secrets(secret_info) do
@@ -128,10 +125,12 @@ defmodule PlangaWeb.ChatChannel do
     app_id = socket.assigns.app_id
     remote_conversation_id = socket.assigns.remote_conversation_id
     messages =
-      Planga.Chat.get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime)
+      app_id
+      |> Planga.Chat.get_messages_by_remote_conversation_id(remote_conversation_id, sent_before_datetime)
       |> Enum.map(&message_dict/1)
     push socket, "messages_so_far", %{messages: messages}
   end
+
 
   @doc """
   Called whenever the chatter attempts to send a new message.
