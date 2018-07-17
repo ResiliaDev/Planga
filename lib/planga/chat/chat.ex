@@ -86,10 +86,14 @@ defmodule Planga.Chat do
   The to-be-sent message will be `message`.
 
   """
-  def create_message(app_id, remote_conversation_id, user_id, message) do
+  def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
     {:ok, message} = Repo.transaction( fn ->
       conversation = get_conversation_by_remote_id!(app_id, remote_conversation_id)
       idempotently_add_user_to_conversation(conversation.id, user_id)
+
+      other_user_ids
+      |> Enum.map(& idempotently_add_user_to_conversation(conversation.id, &1))
+
       Repo.insert!(
         %Message{
           id: Snowflakex.new!(),
@@ -102,15 +106,6 @@ defmodule Planga.Chat do
 
     message
   end
-
-  @doc """
-  False if message is invalid and should not be sent.
-  """
-  def valid_message?(message) do
-    not empty_message?(message)
-  end
-
-  defp empty_message?(message), do: String.trim(message) == ""
 
   @doc """
   Adds a user to a conversation.
@@ -135,4 +130,9 @@ defmodule Planga.Chat do
       |> Repo.update()
     end)
   end
+
+  def get_api_key_pair_by_public_id!(pub_api_id) do
+    Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
+  end
+
 end
