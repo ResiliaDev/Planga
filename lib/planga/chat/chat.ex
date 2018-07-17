@@ -92,7 +92,7 @@ defmodule Planga.Chat do
       idempotently_add_user_to_conversation(conversation.id, user_id)
 
       other_user_ids
-      |> Enum.map(& idempotently_add_user_to_conversation(conversation.id, &1))
+      |> Enum.map(&idempotently_add_user_with_remote_id_to_conversation(app_id, conversation.id, &1))
 
       Repo.insert!(
         %Message{
@@ -121,6 +121,11 @@ defmodule Planga.Chat do
         Repo.insert!(%ConversationUser{conversation_id: conversation_id, user_id: user_id})
       end
     end)
+  end
+
+  def idempotently_add_user_with_remote_id_to_conversation(app_id, conversation_id, remote_user_id) do
+    user = get_user_by_remote_id!(app_id, remote_user_id)
+    idempotently_add_user_to_conversation(conversation_id, user.id)
   end
 
   def update_username(user_id, remote_user_name) do

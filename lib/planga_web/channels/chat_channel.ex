@@ -19,7 +19,7 @@ defmodule PlangaWeb.ChatChannel do
       app_id = api_key_pair.app_id
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
       PlangaWeb.Endpoint.subscribe("chat:#{app_id}#{conversation_id}")
-      other_users = payload["other_users"] || [] |> parse_other_users
+      other_users = (secret_info["other_users"] || []) |> parse_other_users()
       socket = fill_socket(socket, user, api_key_pair, app_id, conversation_id, other_users)
 
       if(secret_info["current_user_name"]) do
@@ -72,7 +72,8 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def parse_other_users(other_users) do
-    Enum.map(other_users, fn
+    other_users
+    |> Enum.map(fn
       user ->
       if(Map.has_key?(user, "id")) do
         user_map = %{id: user["id"], name: user["name"]}
@@ -81,6 +82,8 @@ defmodule PlangaWeb.ChatChannel do
         {:error, "invalid `other_users` element: missing `id` field."}
       end
     end)
+    |> Enum.map(&elem(&1, 1))
+    
   end
 
   def public_secrets(secret_info) do
@@ -141,7 +144,7 @@ defmodule PlangaWeb.ChatChannel do
       remote_conversation_id = socket.assigns.remote_conversation_id
       user_id = socket.assigns.user_id
       other_users = socket.assigns.other_users
-      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users)
+      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users |> Enum.map(&(&1.id)))
       broadcast! socket, "new_message", message_dict(message)
     end
 

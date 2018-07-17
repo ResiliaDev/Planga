@@ -22,6 +22,10 @@
             <a class="item" href="/example2">
                 Chat2
             </a>
+
+            <a class="item" href="/private_example">
+                PrivateChat
+            </a>
         </header>
 
         <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
