@@ -1,6 +1,17 @@
 <div id='planga-example' class='row'>
 </div>
 
+<%= PlangaPhoenix.chat(
+    %{public_api_id: "foobar",
+        private_api_key: "iv3lCL2TgVG3skeVF4l5-Q",
+        conversation_id: "general",
+        current_user_id: "4567",
+        current_user_name: "Rene",
+        container_id: "planga-example",
+        options: %{}})
+%>
+
+
 <% pub_api_id = "foobar" %>
 <% priv_api_key = JOSE.JWK.from_oct(<<42::128>>) %>
 <% priv_data = %{
@@ -12,7 +23,7 @@
 
 <script type="text/javascript" >
  // Usage Example:
- window.onload = function(){
+ /* window.onload = function(){
      let messages_list_elem = document.getElementById('planga-example');
      let planga = new Planga(messages_list_elem,
                              {
@@ -20,5 +31,5 @@
                                  encrypted_options: "<%= encrypted_conversation_info %>",
                                  socket_location: "/socket",
                              });
- };
+ };*/
 </script>

@@ -50,6 +50,7 @@ defmodule Planga.Mixfile do
       {:snowflakex, "~> 1.1"},
       {:jose, "~> 1.8.4"},
       {:poison, "~> 3.1"},
+      {:vex, "~> 0.8.0"}, # For PlangaEx; validating options
 
       {:distillery, "~> 1.5", runtime: false},
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}

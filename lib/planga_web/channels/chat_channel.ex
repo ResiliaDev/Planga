@@ -62,7 +62,7 @@ defmodule PlangaWeb.ChatChannel do
 
   defp do_jose_decode_api_key(api_key_pair) do
     try do
-      secret_key = JOSE.JWK.from_oct(api_key_pair.secret_key)
+      secret_key = JOSE.JWK.from_map(%{"k" => api_key_pair.secret_key, "kty" => "oct"})
       {:ok, secret_key}
     rescue
       FunctionClauseError -> {:error, "invalid secret API key format!"}

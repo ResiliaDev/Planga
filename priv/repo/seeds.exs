@@ -17,7 +17,7 @@ Planga.Repo.transaction(fn ->
         id: 1,
         name: "Planga Test",
         api_key_pairs: [
-          %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: <<42::128>>, enabled: true}
+          %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: "iv3lCL2TgVG3skeVF4l5-Q", enabled: true}
         ]
 })
 end)
