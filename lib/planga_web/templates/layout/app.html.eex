@@ -36,6 +36,6 @@
         </main>
 
             </div> <!-- /container -->
-            <script src="<%= static_path(@conn, "/js/js_snippet.js") %>" type="text/javascript"></script>
+            <!-- <script src="<%= static_path(@conn, "/js/js_snippet.js") %>" type="text/javascript"></script> -->
     </body>
 </html>

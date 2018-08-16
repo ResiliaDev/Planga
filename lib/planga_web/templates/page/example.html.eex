@@ -1,14 +1,11 @@
-<div id='planga-example' class='row'>
-</div>
-
 <%= PlangaPhoenix.chat(
     %{public_api_id: "foobar",
         private_api_key: "iv3lCL2TgVG3skeVF4l5-Q",
         conversation_id: "general",
         current_user_id: "1234",
         current_user_name: "Wiebe-Marten",
-        container_id: "planga-example",
-        options: %{}})
+        server_location: "localhost:4000",
+    })
 %>
 
 <% pub_api_id = "foobar" %>

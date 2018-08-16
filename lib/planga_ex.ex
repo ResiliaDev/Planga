@@ -10,19 +10,30 @@ defmodule PlangaPhoenix do
   def chat(options) do
     {:ok, options} = validate_options(options)
 
+
     encrypted_info = encrypted_conversation_info(options.private_api_key, options.conversation_id, options.current_user_id, options.current_user_name)
 
-    Phoenix.HTML.Tag.content_tag :script,
-      Phoenix.HTML.raw """
-      window.onload = function(){
-        new Planga(document.getElementById("#{Phoenix.HTML.escape_javascript(options.container_id)}"),
-        {
-          public_api_id: "#{Phoenix.HTML.escape_javascript(options.public_api_id)}",
-          encrypted_options: "#{Phoenix.HTML.escape_javascript(encrypted_info)}",
-          socket_location: "/socket",
-        });
-      };
-      """
+    options =
+      options
+      |> Map.put_new(:server_location, "chat.planga.io")
+      |> Map.put_new(:container_id, "planga-chat-#{Phoenix.HTML.escape_javascript(encrypted_info)}")
+
+
+    [
+      Phoenix.HTML.Tag.content_tag(:script, "", src: "//#{options.server_location}/js/js_snippet.js"),
+      Phoenix.HTML.Tag.content_tag(:div, "", id: options.container_id),
+      Phoenix.HTML.Tag.content_tag(:script,
+          Phoenix.HTML.raw """
+          window.onload = function(){
+          new Planga(document.getElementById("#{Phoenix.HTML.escape_javascript(options.container_id)}"),
+          {
+            public_api_id: "#{Phoenix.HTML.escape_javascript(options.public_api_id)}",
+            encrypted_options: "#{Phoenix.HTML.escape_javascript(encrypted_info)}",
+            socket_location: "//#{options.server_location}/socket",
+          });
+          };
+          """)
+    ]
   end
 
   defp encrypted_conversation_info(private_api_key, conversation_id, current_user_id, current_user_name) do
@@ -48,7 +59,6 @@ defmodule PlangaPhoenix do
           conversation_id: [presence: true],
           current_user_id: [presence: true],
           current_user_name: [presence: true],
-          container_id: [presence: true]
         ])
 
     if(errors != []) do
