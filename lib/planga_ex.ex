@@ -10,8 +10,11 @@ defmodule PlangaPhoenix do
   def chat(options) do
     {:ok, options} = validate_options(options)
 
+    options =
+      options
+      |> Map.put_new(:other_users, [])
 
-    encrypted_info = encrypted_conversation_info(options.private_api_key, options.conversation_id, options.current_user)
+    encrypted_info = encrypted_conversation_info(options.private_api_key, options.conversation_id, options.current_user, options.other_users)
 
     options =
       options
@@ -36,7 +39,7 @@ defmodule PlangaPhoenix do
     ]
   end
 
-  defp encrypted_conversation_info(private_api_key, conversation_id, current_user = %{id: _, name: _}) do
+  defp encrypted_conversation_info(private_api_key, conversation_id, current_user = %{id: _, name: _}, other_users) when is_list(other_users) do
     decoded_privkey = JOSE.JWK.from_map(%{"k" => private_api_key, "kty" => "oct"})
     inspect decoded_privkey
     priv_data =
@@ -58,8 +61,10 @@ defmodule PlangaPhoenix do
           :private_api_key => [presence: true, format: ~r/[a-zA-Z]+/],
           :conversation_id => [presence: true],
           :current_user => [presence: true],
-          # [:current_user, :id] => [presence: true],
-          # [:current_user, :name] => [presence: true],
+          :other_users => 
+          fn users ->
+            Enum.all?(users, &Vex.valid?(&1, %{id: [presence: true], name: [presence: true]}))
+          end
         })
 
 
