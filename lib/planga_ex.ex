@@ -61,7 +61,7 @@ defmodule PlangaPhoenix do
           :private_api_key => [presence: true, format: ~r/[a-zA-Z]+/],
           :conversation_id => [presence: true],
           :current_user => [presence: true],
-          :other_users => 
+          :other_users =>
           fn users ->
             Enum.all?(users, &Vex.valid?(&1, %{id: [presence: true], name: [presence: true]}))
           end
