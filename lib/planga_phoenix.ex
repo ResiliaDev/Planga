@@ -23,7 +23,7 @@ defmodule PlangaPhoenix do
 
 
     [
-      Phoenix.HTML.Tag.content_tag(:script, "", src: "//#{options.server_location}/js/js_snippet.js"),
+      Phoenix.HTML.Tag.content_tag(:script, "", src: "#{options.server_location}/js/js_snippet.js"),
       Phoenix.HTML.Tag.content_tag(:div, "", id: options.container_id),
       Phoenix.HTML.Tag.content_tag(:script,
           Phoenix.HTML.raw """
@@ -32,7 +32,7 @@ defmodule PlangaPhoenix do
           {
             public_api_id: "#{Phoenix.HTML.escape_javascript(options.public_api_id)}",
             encrypted_options: "#{Phoenix.HTML.escape_javascript(encrypted_info)}",
-            socket_location: "//#{options.server_location}/socket",
+            socket_location: "#{options.server_location}/socket",
           });
           };
           """)

@@ -7,6 +7,6 @@
             id: "1234",
             name: "Wiebe-Marten"
         },
-        server_location: "localhost:4000",
+        server_location: URI.to_string(%URI{PlangaWeb.Endpoint.struct_url | scheme: nil}), # <- Line only required if non-standard server location
     })
 %>
