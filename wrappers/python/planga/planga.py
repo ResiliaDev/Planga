@@ -3,6 +3,8 @@ import json
 from jwcrypto import jwk, jwe
 
 class Planga(object):
+    REMOTE_HOST = "planga.def"
+
     @staticmethod
     def get_planga_snippet(configuration):
         snippet = """
@@ -10,13 +12,14 @@ class Planga(object):
                 new Planga(document.getElementById({}) {{
                     public_api_id: {},
                     encrypted_options: {},
-                    socket_location: \"/socket\",
+                    socket_location: \"{}/socket\",
                 }});
             </script>
         """.format(
             configuration.container_id,
             configuration.public_api_id,
-            Planga._encrypt_options(configuration)
+            Planga._encrypt_options(configuration),
+            REMOTE_HOST
         )
         
         print(snippet)
@@ -38,10 +41,10 @@ class Planga(object):
         encryption.add_recipient(key)
         return encryption.serialize(compact=True)
 
-
+# TODO: KWARGS
 class PlangaConfiguration(object):
     def __init__(self, public_api_id, private_api_key, conversation_id,
-        current_user_id, current_user_name, container_id):
+        current_user_id, current_user_name, container_id, kwargs**):
 
         self.public_api_id = public_api_id
         self.private_api_key = private_api_key

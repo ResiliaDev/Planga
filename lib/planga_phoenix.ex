@@ -49,7 +49,7 @@ defmodule PlangaPhoenix do
         current_user_name: current_user.name
       }
       |> Poison.encode!
-      |> IO.inspect "The JSON Planga Serializes: "
+      |> IO.inspect label: "The JSON Planga Serializes: "
 
     decoded_privkey
     |> JOSE.JWE.block_encrypt(priv_data, %{"alg" => "A128GCMKW", "enc" => "A128GCM"})
