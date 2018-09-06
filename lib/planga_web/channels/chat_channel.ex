@@ -10,7 +10,7 @@ defmodule PlangaWeb.ChatChannel do
   """
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
     {public_api_id, encrypted_conversation_info} = decode_conversation_info(qualified_conversation_info)
-    api_key_pair = lookup_api_key_pair(public_api_id)
+    api_key_pair = Planga.Chat.get_api_key_pair_by_public_id!(public_api_id)
     secret_info = jose_decrypt(encrypted_conversation_info, api_key_pair)
     with %{
           "conversation_id" => conversation_id,
@@ -19,15 +19,16 @@ defmodule PlangaWeb.ChatChannel do
       app_id = api_key_pair.app_id
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
       PlangaWeb.Endpoint.subscribe("chat:#{app_id}#{conversation_id}")
-      socket = fill_socket(socket, user, api_key_pair, app_id, conversation_id)
+      other_users = (secret_info["other_users"] || []) |> parse_other_users()
+      socket = fill_socket(socket, user, api_key_pair, app_id, conversation_id, other_users)
 
-      if(secret_info["current_user_name"]) do
+      if secret_info["current_user_name"] do
         Planga.Chat.update_username(user.id, secret_info["current_user_name"])
       end
 
       send(self(), :after_join)
 
-      {:ok, %{"current_user_name" => secret_info["current_user_name"]},socket}
+      {:ok, %{"current_user_name" => secret_info["current_user_name"]}, socket}
 
     else
       _ ->
@@ -41,10 +42,45 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   defp jose_decrypt(encrypted_conversation_info, api_key_pair) do
-    secret_key = JOSE.JWK.from_oct(api_key_pair.secret_key)
-    JOSE.JWE.block_decrypt(secret_key, encrypted_conversation_info)
+    {:ok, res} = do_jose_decrypt(encrypted_conversation_info, api_key_pair)
+
+    res
     |> elem(0)
     |> Poison.decode!()
+  end
+
+  defp do_jose_decrypt(encrypted_conversation_info, api_key_pair) do
+    with {:ok, secret_key} <- do_jose_decode_api_key(api_key_pair) do
+      try do
+        res = JOSE.JWE.block_decrypt(secret_key, encrypted_conversation_info)
+        {:ok, res}
+      rescue
+        FunctionClauseError -> {:error, "Cannot decrypt `encrypted_conversation_info`. Either the provided public key does not match the used secret key, or the ciphertext is malformed."}
+      end
+    end
+  end
+
+  defp do_jose_decode_api_key(api_key_pair) do
+    try do
+      secret_key = JOSE.JWK.from_map(%{"k" => api_key_pair.secret_key, "kty" => "oct"})
+      {:ok, secret_key}
+    rescue
+      FunctionClauseError -> {:error, "invalid secret API key format!"}
+    end
+  end
+
+  def parse_other_users(other_users) do
+    other_users
+    |> Enum.map(fn
+      user ->
+      if Map.has_key?(user, "id") do
+        user_map = %{id: user["id"], name: user["name"]}
+        {:ok, user_map}
+      else
+        {:error, "invalid `other_users` element: missing `id` field."}
+      end
+    end)
+    |> Enum.map(&elem(&1, 1))
   end
 
   def public_secrets(secret_info) do
@@ -53,10 +89,6 @@ defmodule PlangaWeb.ChatChannel do
     }
   end
 
-  defp lookup_api_key_pair(pub_api_id) do
-    Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id)
-    # JOSE.JWK.from_oct(<<0::128>>)
-  end
 
   defp decode_conversation_info(qualified_conversation_info) do
     [api_pub_id, encrypted_conversation_info] =
@@ -67,13 +99,14 @@ defmodule PlangaWeb.ChatChannel do
     {api_pub_id, encrypted_conversation_info}
   end
 
-  defp fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id) do
+  defp fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id, other_users) do
     socket =
       socket
       |> assign(:user_id, user.id)
       |> assign(:api_key_pair, api_key_pair)
       |> assign(:app_id, app_id)
       |> assign(:remote_conversation_id, remote_conversation_id)
+      |> assign(:other_users, other_users)
   end
 
   @doc """
@@ -92,10 +125,12 @@ defmodule PlangaWeb.ChatChannel do
     app_id = socket.assigns.app_id
     remote_conversation_id = socket.assigns.remote_conversation_id
     messages =
-      Planga.Chat.get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime)
+      app_id
+      |> Planga.Chat.get_messages_by_remote_conversation_id(remote_conversation_id, sent_before_datetime)
       |> Enum.map(&message_dict/1)
     push socket, "messages_so_far", %{messages: messages}
   end
+
 
   @doc """
   Called whenever the chatter attempts to send a new message.
@@ -103,11 +138,12 @@ defmodule PlangaWeb.ChatChannel do
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
 
-    if Planga.Chat.valid_message?(message) do
+    if Planga.Chat.Message.valid_message?(message) do
       app_id = socket.assigns.app_id
       remote_conversation_id = socket.assigns.remote_conversation_id
       user_id = socket.assigns.user_id
-      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message)
+      other_users = socket.assigns.other_users
+      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users |> Enum.map(&(&1.id)))
       broadcast! socket, "new_message", message_dict(message)
     end
 

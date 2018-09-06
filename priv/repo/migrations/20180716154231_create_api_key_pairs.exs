@@ -6,6 +6,7 @@ defmodule Planga.Repo.Migrations.CreateApiKeyPairs do
       add :public_id, :string, primary_key: true
       add :secret_key, :string
       add :app_id, references(:apps, on_delete: :nothing)
+      add :enabled, :boolean
 
       timestamps()
     end

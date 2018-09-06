@@ -17,4 +17,13 @@ defmodule Planga.Chat.Message do
     |> cast(attrs, [:sender_id, :content, :channel_id])
     |> validate_required([:sender_id, :content, :channel_id])
   end
+
+  @doc """
+  False if message is invalid and should not be sent.
+  """
+  def valid_message?(message) do
+    not empty_message?(message)
+  end
+
+  defp empty_message?(message), do: String.trim(message) == ""
 end
