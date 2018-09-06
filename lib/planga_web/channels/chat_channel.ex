@@ -46,6 +46,7 @@ defmodule PlangaWeb.ChatChannel do
 
     res
     |> elem(0)
+    |> IO.inspect "The decrypted strigifiedJSON Planga will deserialize: "
     |> Poison.decode!()
   end
 
