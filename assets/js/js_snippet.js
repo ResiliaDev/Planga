@@ -37,6 +37,19 @@ class Planga {
         this.createCommunicationSection(chat_container_elem);
     }
 
+    disableChatInterface (container, reason) {
+        $('.planga--new-message-field').prop('disabled', true);
+        $('.planga--new-message-submit-button').prop('disabled', true);
+        $('.planga--new-message-field').attr('placeholder', 'Unable to connect to Planga Chat: ' + reason);
+    }
+
+    enableChatInterface (container) {
+        $('.planga--new-message-field').prop('disabled', false);
+        $('.planga--new-message-submit-button').prop('disabled', false);
+        $('.planga--new-message-field').attr('placeholder', this.inputPlaceholder(this.current_user_name) )
+    }
+
+
     createCommunicationSection (chat_container_elem) {
         let container = $(chat_container_elem);
         container.html(this.containerHTML(this.current_user_name));
@@ -44,6 +57,12 @@ class Planga {
         let channel_opts = {};
         let channel_name = "encrypted_chat:" + btoa(this.public_api_id) + '#' + btoa(this.encrypted_options);
         let channel = this.socket.channel(channel_name, channel_opts);
+
+        this.disableChatInterface(container, "Connecting...");
+        this.socket.onError(() => this.disableChatInterface(container, "Could not connect to server"));
+        this.socket.onClose(() => this.disableChatInterface(container, "No connection to the internet?" ));
+        channel.onError(() => this.disableChatInterface(container, "Could not connect to server"));
+        channel.onClose(() => this.disableChatInterface(container, "No connection to the internet?" ));
 
         channel.on('new_message', message => {
             if(this.debug)
@@ -74,8 +93,6 @@ class Planga {
             };
         });
 
-        $('.planga--new-message-field').prop('disabled', true);
-        $('.planga--new-message-submit-button').prop('disabled', true);
 
         channel.join()
             .receive("ok", resp => {
@@ -88,7 +105,7 @@ class Planga {
             .receive("error", resp => {
                 if(this.debug)
                     console.log("Unable to join Planga communication: ", resp);
-                $('.planga--new-message-field').attr('placeholder', 'Unable to join chat communication. Reason: ' + resp.reason);
+                this.disableChatInterface(container, resp);
             });
 
         let message_field = $('.planga--new-message-field', container);
@@ -101,6 +118,8 @@ class Planga {
         message_button.on('click', event => {
             this.sendMessage(message_field, channel);
         });
+
+        this.enableChatInterface(container);
     }
 
     containerHTML () {
