@@ -7,15 +7,17 @@ defmodule Planga.Chat.Message do
     belongs_to :sender, Planga.Chat.User
     belongs_to :conversation, Planga.Chat.Conversation
     field :content, :string
+    field :uuid, Ecto.UUID
 
     timestamps()
   end
 
   @doc false
-  def changeset(message, attrs) do
+  def changeset(message, attrs \\ %{}) do
     message
-    |> cast(attrs, [:sender_id, :content, :channel_id])
-    |> validate_required([:sender_id, :content, :channel_id])
+    |> change(uuid: (message.uuid || Ecto.UUID.autogenerate)) # Not auto-handled by Ecto.Mnesia
+    |> cast(attrs, [:sender_id, :content])
+    |> validate_required([:sender_id, :content, :uuid, :conversation_id])
   end
 
   @doc """
