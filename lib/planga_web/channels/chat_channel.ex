@@ -172,12 +172,19 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
-    IO.inspect(payload)
+  # def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
+  #   IO.inspect(payload)
+  #   broadcast! socket, "new_remote_message", message_dict(payload)
+
+  #   {:noreply, socket}
+  # end
+
+  def handle_info("new_remote_message", payload, socket) do
     broadcast! socket, "new_remote_message", message_dict(payload)
 
     {:noreply, socket}
   end
+
 
 
   # Turns returned message information in a format the front-end understands.
