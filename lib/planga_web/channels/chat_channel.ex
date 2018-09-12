@@ -13,14 +13,14 @@ defmodule PlangaWeb.ChatChannel do
     api_key_pair = Planga.Chat.get_api_key_pair_by_public_id!(public_api_id)
     secret_info = jose_decrypt(encrypted_conversation_info, api_key_pair)
     with %{
-          "conversation_id" => conversation_id,
+          "conversation_id" => remote_conversation_id,
           "current_user_id" => current_user_id
      }  = secret_info do
       app_id = api_key_pair.app_id
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
-      PlangaWeb.Endpoint.subscribe("chat:#{app_id}#{conversation_id}")
+      PlangaWeb.Endpoint.subscribe(static_topic(app_id, remote_conversation_id))
       other_users = (secret_info["other_users"] || []) |> parse_other_users()
-      socket = fill_socket(socket, user, api_key_pair, app_id, conversation_id, other_users)
+      socket = fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id, other_users)
 
       if secret_info["current_user_name"] do
         Planga.Chat.update_username(user.id, secret_info["current_user_name"])
@@ -39,6 +39,10 @@ defmodule PlangaWeb.ChatChannel do
 
   def join(_, _, socket) do
     {:error, %{reason: "Improper channel format"}}
+  end
+
+  defp static_topic(app_id, conversation_id) do
+    "chat:#{app_id}#{conversation_id}"
   end
 
   defp jose_decrypt(encrypted_conversation_info, api_key_pair) do
@@ -144,12 +148,15 @@ defmodule PlangaWeb.ChatChannel do
       remote_conversation_id = socket.assigns.remote_conversation_id
       user_id = socket.assigns.user_id
       other_users = socket.assigns.other_users
-      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users |> Enum.map(&(&1.id)))
-      broadcast! socket, "new_message", message_dict(message)
+      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users
+        |> Enum.map(&(&1.id)))
+
+      PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "new_remote_message", message)
     end
 
     {:noreply, socket}
   end
+
 
 
   @doc """
@@ -164,6 +171,14 @@ defmodule PlangaWeb.ChatChannel do
     end
     {:noreply, socket}
   end
+
+  def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
+    IO.inspect(payload)
+    broadcast! socket, "new_remote_message", message_dict(payload)
+
+    {:noreply, socket}
+  end
+
 
   # Turns returned message information in a format the front-end understands.
   defp message_dict(message) do

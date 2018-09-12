@@ -64,7 +64,7 @@ class Planga {
         channel.onError(() => this.disableChatInterface(container, "Could not connect to server"));
         channel.onClose(() => this.disableChatInterface(container, "No connection to the internet?" ));
 
-        channel.on('new_message', message => {
+        channel.on('new_remote_message', message => {
             if(this.debug)
                 console.log("Planga: New Message", message);
             let author_name = message.name || "Anonymous";
