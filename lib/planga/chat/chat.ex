@@ -102,6 +102,7 @@ defmodule Planga.Chat do
         conversation_id: conversation.id,
         sender_id: user_id
       }
+      |> Message.changeset
       |> Repo.insert!()
       |> Repo.preload(:sender)
     end)

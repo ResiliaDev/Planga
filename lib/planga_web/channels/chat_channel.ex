@@ -46,7 +46,7 @@ defmodule PlangaWeb.ChatChannel do
 
     res
     |> elem(0)
-    |> IO.inspect "The decrypted strigifiedJSON Planga will deserialize: "
+    |> IO.inspect(label: "The decrypted strigifiedJSON Planga will deserialize: ")
     |> Poison.decode!()
   end
 
@@ -168,6 +168,7 @@ defmodule PlangaWeb.ChatChannel do
   # Turns returned message information in a format the front-end understands.
   defp message_dict(message) do
     %{
+      "uuid" => message.uuid,
       "name" => message.sender.name,
       "content" => message.content,
       "sent_at" => message.inserted_at

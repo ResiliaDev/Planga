@@ -7,7 +7,7 @@ defmodule Planga.Chat.Message do
     belongs_to :sender, Planga.Chat.User
     belongs_to :conversation, Planga.Chat.Conversation
     field :content, :string
-    field :uuid, Ecto.UUID
+    field :uuid, Ecto.UUID # Public unique reference, so when message is updated (like content filter), it can be re-loaded, overriding old thing in interface.
 
     timestamps()
   end
