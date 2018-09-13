@@ -1,28 +1,30 @@
 import re
 import json
+import uuid
 from jwcrypto import jwk, jwe
 
 class Planga(object):
-    REMOTE_HOST = "planga.def"
 
     @staticmethod
     def get_planga_snippet(configuration):
-        snippet = """
-            <script type=\"text/javascript\" >
-                new Planga(document.getElementById({}) {{
-                    public_api_id: {},
-                    encrypted_options: {},
-                    socket_location: \"{}/socket\",
+        return """
+        <script type="text/javascript" src="{}/js/js_snippet.js"></script>
+        <div id="{}"></div>
+            <script type="text/javascript" >
+                new Planga(document.getElementById("{}"), {{
+                    public_api_id: "{}",
+                    encrypted_options: "{}",
+                    socket_location: "{}/socket",
                 }});
             </script>
         """.format(
+            configuration.remote_host,
+            configuration.container_id,
             configuration.container_id,
             configuration.public_api_id,
             Planga._encrypt_options(configuration),
-            REMOTE_HOST
+            configuration.remote_host
         )
-        
-        print(snippet)
 
     ## Private Methods ##
 
@@ -44,7 +46,7 @@ class Planga(object):
 # TODO: KWARGS
 class PlangaConfiguration(object):
     def __init__(self, public_api_id, private_api_key, conversation_id,
-        current_user_id, current_user_name, container_id, kwargs**):
+        current_user_id, current_user_name, container_id=None):
 
         self.public_api_id = public_api_id
         self.private_api_key = private_api_key
@@ -52,6 +54,10 @@ class PlangaConfiguration(object):
         self.current_user_id = current_user_id
         self.current_user_name = current_user_name
         self.container_id = container_id
+        self.remote_host = "//planga.def"
+
+        if not container_id:
+            self.container_id = "planga-chat-" + str(uuid.uuid4()) 
 
     def is_valid(self):
         return self._is_alpha(self.public_api_id) and self._is_alpha(self.private_api_key)
