@@ -23,9 +23,19 @@ Planga Python Wrapper:
 
 Installing jwcrypto manually is only necessary when uploading the planga wrapper to test.pypi.org. The installation tool will attempt to install jwcrypto from test.pypi.org as well, which fails. Having jwcrypto pre-installed allows the installation of the planga wrapper to finish successfully.
 
-**Deploy to live Pypi**
+**Deploy to live Pypi:**
 
 * run `twine upload dist/* --skip-existing`
 
 For information on how to package for PiPy:
 [https://packaging.python.org/tutorials/packaging-projects/](https://packaging.python.org/tutorials/packaging-projects/)
+
+**Example usage:**
+
+```python
+from planga import *
+
+conf = PlangaConfiguration("foobar", "kl9psH9VrLZ1hfsPY0b3-W", "general", "1234", "Bob", "my_container_div")
+
+snippet = Planga.get_planga_snippet(conf)
+```
