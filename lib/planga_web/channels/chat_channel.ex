@@ -172,18 +172,18 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  # def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
-  #   IO.inspect(payload)
-  #   broadcast! socket, "new_remote_message", message_dict(payload)
-
-  #   {:noreply, socket}
-  # end
-
-  def handle_info("new_remote_message", payload, socket) do
+  def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
+    IO.inspect(payload)
     broadcast! socket, "new_remote_message", message_dict(payload)
 
     {:noreply, socket}
   end
+
+  # def handle_in("new_remote_message", payload, socket) do
+  #   broadcast! socket, "new_remote_message", message_dict(payload)
+
+  #   {:noreply, socket}
+  # end
 
 
 

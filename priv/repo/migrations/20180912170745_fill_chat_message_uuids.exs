@@ -21,5 +21,4 @@ defmodule Planga.Repo.Migrations.FillChatMessageUuids do
       end)
     end)
   end
-
 end
