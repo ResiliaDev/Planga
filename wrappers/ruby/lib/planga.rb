@@ -39,8 +39,8 @@ class PlangaConfiguration
     attr_accessor :public_api_id, :private_api_key, :conversation_id,
         :current_user_id, :current_user_name, :container_id, :remote_host
 
-    def initialize(public_api_id, private_api_key, conversation_id,
-        current_user_id, current_user_name, container_id=nil)
+    def initialize(public_api_id=nil, private_api_key=nil, conversation_id=nil,
+        current_user_id=nil, current_user_name=nil, container_id=nil)
 
         @public_api_id = public_api_id
         @private_api_key = private_api_key
