@@ -4,7 +4,6 @@ import uuid
 from jwcrypto import jwk, jwe
 
 class Planga(object):
-
     @staticmethod
     def get_planga_snippet(configuration):
         return """
