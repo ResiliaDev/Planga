@@ -42,10 +42,9 @@ class Planga(object):
         encryption.add_recipient(key)
         return encryption.serialize(compact=True)
 
-# TODO: KWARGS
 class PlangaConfiguration(object):
-    def __init__(self, public_api_id, private_api_key, conversation_id,
-        current_user_id, current_user_name, container_id=None):
+    def __init__(self, public_api_id=None, private_api_key=None, conversation_id=None,
+        current_user_id=None, current_user_name=None, container_id=None):
 
         self.public_api_id = public_api_id
         self.private_api_key = private_api_key
