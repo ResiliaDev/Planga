@@ -11,6 +11,8 @@ config :planga,
   planga_dashboard_url: "http://0.0.0.0:3000",
   planga_api_key_sync_password: "4eHjPZYTw7Wex455xsM5KQ"
 
+config :repository, ecto_repos: [Planga.Repo]
+
 config :planga, Planga.Scheduler,
   jobs: [
     # Every minute, resync API keys
