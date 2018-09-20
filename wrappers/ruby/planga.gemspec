@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   s.homepage     = 'https://github.com/ResiliaDev/Planga'
   s.license      = 'MIT'
 
-  s.add_dependency('jose')
+  s.add_dependency('jose', '~> 0')
 end
