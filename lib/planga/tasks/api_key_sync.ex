@@ -58,6 +58,7 @@ defmodule Planga.Tasks.ApiKeySync do
             existing
         end
 
+      app =
         app
         |> Planga.Chat.App.from_json(api_key_json)
         |> Planga.Repo.insert_or_update!
@@ -71,6 +72,10 @@ defmodule Planga.Tasks.ApiKeySync do
                          IO.inspect("EXISTING KEY")
           existing
       end
+      IO.inspect(app, label: "APP")
+
+      api_key_json =
+        Map.merge(api_key_json, %{"app_id" => app.id})
 
       api_key_pair
       |> IO.inspect
