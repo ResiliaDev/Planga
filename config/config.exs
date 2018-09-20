@@ -8,7 +8,9 @@ use Mix.Config
 # General application configuration
 config :planga,
   ecto_repos: [Planga.Repo],
-  planga_dashboard_url: "//0.0.0.0:3000",
+  planga_dashboard_url: "//0.0.0.0:3000"
+
+config :planga, Planga.Scheduler,
   jobs: [
     # Every minute, resync API keys
     {"* * * * *",      {Planga.Tasks.ApiKeySync, :sync_all, []}},
@@ -25,7 +27,8 @@ config :planga, PlangaWeb.Endpoint,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:user_id]
+  metadata: [:user_id],
+  level: :debug
 
 config :ecto_mnesia,
   host: {:system, :atom, "MNESIA_HOST", Kernel.node()},
