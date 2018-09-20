@@ -23,7 +23,7 @@ class Planga {
         this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
 
         console.log(this);
-        this.socket = new Socket(this.socket_location, {params: {}/*, transport: LongPoll */});
+        this.socket = new Socket(this.socket_location, {params: {}, transport: LongPoll });
         this.socket.connect();
 
         if("Notification" in window){
@@ -37,6 +37,19 @@ class Planga {
         this.createCommunicationSection(chat_container_elem);
     }
 
+    disableChatInterface (container, reason) {
+        $('.planga--new-message-field').prop('disabled', true);
+        $('.planga--new-message-submit-button').prop('disabled', true);
+        $('.planga--new-message-field').attr('placeholder', 'Unable to connect to Planga Chat: ' + reason);
+    }
+
+    enableChatInterface (container) {
+        $('.planga--new-message-field').prop('disabled', false);
+        $('.planga--new-message-submit-button').prop('disabled', false);
+        $('.planga--new-message-field').attr('placeholder', this.inputPlaceholder(this.current_user_name) )
+    }
+
+
     createCommunicationSection (chat_container_elem) {
         let container = $(chat_container_elem);
         container.html(this.containerHTML(this.current_user_name));
@@ -45,11 +58,18 @@ class Planga {
         let channel_name = "encrypted_chat:" + btoa(this.public_api_id) + '#' + btoa(this.encrypted_options);
         let channel = this.socket.channel(channel_name, channel_opts);
 
-        channel.on('new_message', payload => {
+        this.disableChatInterface(container, "Connecting...");
+        this.socket.onError(() => this.disableChatInterface(container, "Could not connect to server"));
+        this.socket.onClose(() => this.disableChatInterface(container, "No connection to the internet?" ));
+        channel.onError(() => this.disableChatInterface(container, "Could not connect to server"));
+        channel.onClose(() => this.disableChatInterface(container, "No connection to the internet?" ));
+
+        channel.on('new_remote_message', message => {
             if(this.debug)
-                console.log("Planga: New Message", payload);
-            let author_name = payload.name || "Anonymous";
-            this.addMessage(messages_list_elem, author_name, payload.content, payload.sent_at, this.current_user_name);
+                console.log("Planga: New Message", message);
+            let author_name = message.name || "Anonymous";
+            console.log("MESSAGE:", message)
+            this.addMessage(messages_list_elem, message.uuid, author_name, message.content, message.sent_at, this.current_user_name);
         });
 
         let loading_new_messages = false;
@@ -58,7 +78,8 @@ class Planga {
             this.callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
-                    this.addMessageTop($(messages_list_elem), author_name, message.content, message.sent_at, this.current_user_name);
+                    console.log("MESSAGE:", message)
+                    this.addMessageTop($(messages_list_elem), message.uuid, author_name, message.content, message.sent_at, this.current_user_name);
                     if(this.debug)
                         console.log("Loading older message: ", message);
                 });
@@ -72,8 +93,6 @@ class Planga {
             };
         });
 
-        $('.planga--new-message-field').prop('disabled', true);
-        $('.planga--new-message-submit-button').prop('disabled', true);
 
         channel.join()
             .receive("ok", resp => {
@@ -86,7 +105,7 @@ class Planga {
             .receive("error", resp => {
                 if(this.debug)
                     console.log("Unable to join Planga communication: ", resp);
-                $('.planga--new-message-field').attr('placeholder', 'Unable to join chat communication. Reason: ' + resp.reason);
+                this.disableChatInterface(container, resp);
             });
 
         let message_field = $('.planga--new-message-field', container);
@@ -99,6 +118,8 @@ class Planga {
         message_button.on('click', event => {
             this.sendMessage(message_field, channel);
         });
+
+        this.enableChatInterface(container);
     }
 
     containerHTML () {
@@ -122,17 +143,31 @@ class Planga {
     }
 
 
-    addMessage (messages_list_elem, author_name, content, sent_at, current_user_name) {
-        $(messages_list_elem).append(this.messageHTML(author_name, content, sent_at, current_user_name));
-        $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
-        if(author_name !== current_user_name){
-            this.sendNotification(this.notificationHTML(author_name, content, sent_at, current_user_name));
+    addMessage (messages_list_elem, uuid, author_name, content, sent_at, current_user_name) {
+        const new_message = this.messageHTML(uuid, author_name, content, sent_at, current_user_name);
+        let stale_message = $(`.planga--chat-message[data-message-uuid="${uuid}"]`, messages_list_elem);
+        console.log("stale message:", stale_message);
+        if(stale_message.length > 0) {
+            $(stale_message).replaceWith(new_message);
+        } else {
+            $(messages_list_elem).append(new_message);
+            $(messages_list_elem).prop({scrollTop: messages_list_elem.prop("scrollHeight")});
+            if(author_name !== current_user_name){
+                this.sendNotification(this.notificationHTML(author_name, content, sent_at, current_user_name));
+            }
         }
     };
 
 
-    addMessageTop (messages_list_elem, author_name, content, sent_at, current_user_name) {
-        $(messages_list_elem).prepend(this.messageHTML(author_name, content, sent_at, current_user_name));
+    addMessageTop (messages_list_elem, uuid, author_name, content, sent_at, current_user_name) {
+        const new_message = this.messageHTML(uuid, author_name, content, sent_at, current_user_name);
+        let stale_message = $(`.planga--chat-message[data-message-uuid="${uuid}"]`, messages_list_elem);
+        console.log("stale message:", stale_message);
+        if(stale_message.length > 0) {
+            $(stale_message).replaceWith(new_message);
+        } else {
+            $(messages_list_elem).prepend(new_message);
+        }
     };
 
     sendNotification (message) {
@@ -143,10 +178,10 @@ class Planga {
 
 
 
-    messageHTML (author_name, content, sent_at, current_user_name) {
+    messageHTML (uuid, author_name, content, sent_at, current_user_name) {
         let current_user_class = author_name == current_user_name ? 'planga--chat-current-user-message' : '';
         return `
-    <div class='planga--chat-message ${current_user_class}' data-message-sent-at='${sent_at}'>
+    <div class='planga--chat-message ${current_user_class}' data-message-sent-at='${sent_at}' data-message-uuid='${uuid || "failure"}' >
             <div class='planga--chat-message-sent-at-wrapper'>
                 <span class='planga--chat-message-sent-at' title='${this.styledDateTime(sent_at)}'>${this.styledTime(sent_at)}</span>
             </div>

@@ -25,6 +25,7 @@ defmodule PlangaWeb.Router do
 
     get "/example", PageController, :example
     get "/example2", PageController, :example2
+    get "/private_example", PageController, :private_example
     get "/", PageController, :index
   end
 

@@ -2,11 +2,16 @@
     %{
         public_api_id: "foobar",
         private_api_key: "iv3lCL2TgVG3skeVF4l5-Q",
-        conversation_id: "general",
+        conversation_id: "private/#{1234}#{4567}",
         current_user: %{
-            id: "1234",
-            name: "Wiebe-Marten"
+            id: "4567",
+            name: "Rene"
         },
+        # An example with the 'other users' field filled in:
+        other_users: [
+            %{id: "1234", name: "Wiebe-Marten"}
+        ],
         server_location: URI.to_string(%URI{PlangaWeb.Endpoint.struct_url | scheme: nil}), # <- Line only required if non-standard server location
+
     })
 %>

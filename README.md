@@ -40,4 +40,4 @@ _This documentation is a work-in-progress!_
 2. Install Erlang and Elixir
 3. Install Elixir dependencies using `mix deps.get`
 4. Create the Mnesia database using `mix do ecto.create, ecto.migrate, run priv/repo/seeds.exs`
-5. Run the application using `mix phx.server` or with console using `iex -S mix. phx.server`
+5. Run the application using `mix phx.server` or with console using `iex -S mix phx.server`

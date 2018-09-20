@@ -4,7 +4,7 @@ defmodule Planga.Mixfile do
   def project do
     [
       app: :planga,
-      version: "0.1.0",
+      version: "0.2.3",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -44,8 +44,9 @@ defmodule Planga.Mixfile do
       # {:sqlite_ecto2, "~> 2.2"},
       {:ecto, "~> 2.1.6", override: true},
       # {:ecto_mnesia, "~> 0.9.0"},
-      {:ecto_mnesia, git: "git@github.com:Nebo15/ecto_mnesia.git"},
-      # {:ecto_mnesia, git: "git@github.com:Qqwy/ecto_mnesia.git", branch: "match_spec_tuples"},
+      # {:ecto_mnesia, "~> 0.9.1"},
+      # {:ecto_mnesia, git: "git@github.com:Nebo15/ecto_mnesia.git"},
+      {:ecto_mnesia, git: "git@github.com:Qqwy/ecto_mnesia.git", branch: "match_spec_tuples"},
       {:corsica, "~> 1.0"},
       {:snowflakex, "~> 1.1"},
       {:jose, "~> 1.8.4"},
@@ -53,9 +54,11 @@ defmodule Planga.Mixfile do
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
       {:httpoison, "~> 1.0"},
-
       {:distillery, "~> 1.5", runtime: false},
-      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
+
+      {:vex, "~> 0.8.0"}, # For PlangaEx; validating options
+
+      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}
     ]
   end
 

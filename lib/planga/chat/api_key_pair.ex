@@ -6,6 +6,7 @@ defmodule Planga.Chat.APIKeyPair do
   @primary_key {:public_id, :string, []}
   schema "api_key_pairs" do
     field :secret_key, :string
+    field :enabled, :boolean
     belongs_to :app, Planga.Chat.App
 
     timestamps()
