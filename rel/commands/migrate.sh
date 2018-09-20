@@ -1,3 +1,3 @@
 #!/bin/sh
 
-$RELEASE_ROOT_DIR/bin/myapp command Elixir.MyApp.ReleaseTasks seed
+$RELEASE_ROOT_DIR/bin/planga command Elixir.Repository.ReleaseTasks migrate
