@@ -1,12 +1,15 @@
 defmodule Planga.Tasks.ApiKeySync do
+  require Logger
   def sync_all do
-    IO.inspect("Fetching latest API keys!")
+    Logger.info("Fetching latest API keys!")
+    planga_dashboard_url = Application.get_env(:planga, :planga_dashboard_url)
     json =
-      HTTPoison.post!("http://0.0.0.0:3000/api_key_sync", "")
+      (planga_dashboard_url <> "/api_key_sync")
+      |> HTTPoison.post!("")
       |> Map.get(:body)
       |> decrypt
       |> Enum.each(&update_rails_user/1)
-    IO.inspect(json)
+    Logger.info("Finished fetching API keys!")
   end
 
   defp decrypt(text) do
@@ -23,38 +26,22 @@ defmodule Planga.Tasks.ApiKeySync do
   using the user ID as app name.
   """
   def update_rails_user(user_json) do
-    IO.inspect(user_json)
     Planga.Repo.transaction(fn ->
-    #   user =
-    #     case Planga.Repo.get_by(Planga.Chat.App, name: to_string(user_json["id"])) do
-    #       nil ->
-    #         IO.inspect("NEW USER")
-    #         %Planga.Chat.App{name: user_json["id"]}
-    #       existing ->
-    #         IO.inspect("EXISTING USER")
-    #         existing
-    #     end
-
-    #   user
-    #   |> Planga.Chat.App.from_json(user_json)
-    #   |> Planga.Repo.insert_or_update!
-
       user_json["api_credentials"]
       |> Enum.each(&update_credential/1)
     end)
   end
 
   def update_credential(api_key_json) do
-    IO.inspect(api_key_json)
     Planga.Repo.transaction(fn ->
 
       app =
         case Planga.Repo.get_by(Planga.Chat.App, name: to_string(api_key_json["public_id"])) do
           nil ->
-            IO.inspect("NEW APP")
+            Logger.info("Creating new app #{api_key_json["public_id"]}")
             %Planga.Chat.App{name: api_key_json["public_id"]}
           existing ->
-            IO.inspect("EXISTING APP")
+            Logger.info("Updating existing app #{api_key_json["public_id"]}")
             existing
         end
 
@@ -64,25 +51,23 @@ defmodule Planga.Tasks.ApiKeySync do
         |> Planga.Repo.insert_or_update!
 
 
-      api_key_pair = case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_json["public_id"]) do
-        nil ->
-                         IO.inspect("NEW KEY")
-          %Planga.Chat.APIKeyPair{public_id: api_key_json["public_id"]}
-        existing ->
-                         IO.inspect("EXISTING KEY")
-          existing
+      api_key_pair =
+        case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_json["public_id"]) do
+          nil ->
+            Logger.info("Creating new key #{api_key_json["public_id"]}")
+            %Planga.Chat.APIKeyPair{public_id: api_key_json["public_id"]}
+          existing ->
+            Logger.info("Updating existing key #{api_key_json["public_id"]}")
+            existing
       end
-      IO.inspect(app, label: "APP")
 
       api_key_json =
         Map.merge(api_key_json, %{"app_id" => app.id})
 
       api_key_pair
-      |> IO.inspect
       |> Planga.Chat.APIKeyPair.from_json(api_key_json)
-      |> IO.inspect
       |> Planga.Repo.insert_or_update!
-      |> IO.inspect
+      Logger.info("Done with key #{api_key_json["public_id"]}!")
     end)
   end
 end
