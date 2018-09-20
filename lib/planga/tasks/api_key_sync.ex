@@ -13,7 +13,10 @@ defmodule Planga.Tasks.ApiKeySync do
     JOSE.JWE.block_decrypt(secret_key, text)
     |> elem(0)
     |> Poison.decode!()
+  end
 
+  def update_credential(api_key_json) do
+    
   end
 
 end

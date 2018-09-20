@@ -8,7 +8,11 @@ use Mix.Config
 # General application configuration
 config :planga,
   ecto_repos: [Planga.Repo],
-  planga_dashboard_url: "//0.0.0.0:3000"
+  planga_dashboard_url: "//0.0.0.0:3000",
+  jobs: [
+    # Every minute, resync API keys
+    {"* * * * *",      {Planga.Tasks.ApiKeySync, :sync_all, []}},
+  ]
 
 # Configures the endpoint
 config :planga, PlangaWeb.Endpoint,
