@@ -23,7 +23,7 @@ config :planga, PlangaWeb.Endpoint,
   root: ".",
   version: Mix.Project.config[:version],
   cache_static_manifest: "priv/static/manifest.json",
-  check_origin: false, # Allow socket/channel connections from anywhere
+  check_origin: false # Allow socket/channel connections from anywhere
 
 config :planga,
   planga_dashboard_url: "https://planga.io"
