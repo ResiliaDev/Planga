@@ -14,6 +14,7 @@ defmodule Planga.Application do
       supervisor(PlangaWeb.Endpoint, []),
       # Start your own worker by calling: Planga.Worker.start_link(arg1, arg2, arg3)
       # worker(Planga.Worker, [arg1, arg2, arg3]),
+      worker(Planga.Scheduler, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

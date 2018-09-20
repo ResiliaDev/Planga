@@ -7,7 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :planga,
-  ecto_repos: [Planga.Repo]
+  ecto_repos: [Planga.Repo],
+  planga_dashboard_url: "//0.0.0.0:3000"
 
 # Configures the endpoint
 config :planga, PlangaWeb.Endpoint,

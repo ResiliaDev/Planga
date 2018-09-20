@@ -50,8 +50,12 @@ defmodule Planga.Mixfile do
       {:snowflakex, "~> 1.1"},
       {:jose, "~> 1.8.4"},
       {:poison, "~> 3.1"},
+      {:quantum, "~> 2.3"},
+      {:timex, "~> 3.0"},
+      {:httpoison, "~> 1.0"},
 
       {:distillery, "~> 1.5", runtime: false},
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
     ]
   end
 
