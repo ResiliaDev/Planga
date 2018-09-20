@@ -8,7 +8,8 @@ use Mix.Config
 # General application configuration
 config :planga,
   ecto_repos: [Planga.Repo],
-  planga_dashboard_url: "http://0.0.0.0:3000"
+  planga_dashboard_url: "http://0.0.0.0:3000",
+  planga_api_key_sync_password: "4eHjPZYTw7Wex455xsM5KQ"
 
 config :planga, Planga.Scheduler,
   jobs: [

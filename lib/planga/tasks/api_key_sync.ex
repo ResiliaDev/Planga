@@ -13,7 +13,7 @@ defmodule Planga.Tasks.ApiKeySync do
   end
 
   defp decrypt(text) do
-    secret_key = JOSE.JWK.from_map(%{"k" => "4eHjPZYTw7Wex455xsM5KQ", "kty" => "oct"})
+    secret_key = JOSE.JWK.from_map(%{"k" => Application.get_env(:planga, :planga_api_key_sync_password), "kty" => "oct"})
 
     secret_key
     |> JOSE.JWE.block_decrypt(text)
