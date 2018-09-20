@@ -54,7 +54,7 @@ defmodule Planga.Mixfile do
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
       {:httpoison, "~> 1.0"},
-      {:distillery, "~> 1.5", runtime: false},
+      {:distillery, "~> 1.5.4", runtime: false},
 
       {:vex, "~> 0.8.0"}, # For PlangaEx; validating options
 
