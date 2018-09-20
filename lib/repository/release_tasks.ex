@@ -6,9 +6,10 @@ defmodule Repository.ReleaseTasks do
     :ecto
   ]
 
-  def repository, do: :repository
+  # def repository, do: :repository
 
-  def repos, do: Application.get_env(repository(), :ecto_repos, [])
+  # def repos, do: Application.get_env(repository(), :ecto_repos, [])
+  def repos, do: [Planga.Repo]
 
   def migrate do
     migration()
