@@ -18,4 +18,15 @@ defmodule Planga.Chat.APIKeyPair do
     |> cast(attrs, [:public_id, :secret_key])
     |> validate_required([:public_id, :secret_key])
   end
+
+  def from_json(json) do
+    %__MODULE__{}
+    |> changeset(
+      %{
+        enabled: json["active"],
+        public_id: json["public_id"],
+        secret_key: json["private_key"]
+      }
+    )
+  end
 end
