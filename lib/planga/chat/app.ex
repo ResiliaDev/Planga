@@ -19,4 +19,9 @@ defmodule Planga.Chat.App do
     |> cast(attrs, [:name])
     |> validate_required([:name])
   end
+
+  def from_json(app \\ %__MODULE__{}, json) do
+    app
+    |> changeset(%{name: to_string(json["id"])})
+  end
 end
