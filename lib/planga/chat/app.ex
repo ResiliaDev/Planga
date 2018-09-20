@@ -22,6 +22,6 @@ defmodule Planga.Chat.App do
 
   def from_json(app \\ %__MODULE__{}, json) do
     app
-    |> changeset(%{name: to_string(json["id"])})
+    |> changeset(%{name: to_string(json["public_id"])})
   end
 end

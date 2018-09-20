@@ -25,19 +25,19 @@ defmodule Planga.Tasks.ApiKeySync do
   def update_rails_user(user_json) do
     IO.inspect(user_json)
     Planga.Repo.transaction(fn ->
-      user =
-        case Planga.Repo.get_by(Planga.Chat.App, name: to_string(user_json["id"])) do
-          nil ->
-            IO.inspect("NEW USER")
-            %Planga.Chat.App{name: user_json["id"]}
-          existing ->
-            IO.inspect("EXISTING USER")
-            existing
-        end
+    #   user =
+    #     case Planga.Repo.get_by(Planga.Chat.App, name: to_string(user_json["id"])) do
+    #       nil ->
+    #         IO.inspect("NEW USER")
+    #         %Planga.Chat.App{name: user_json["id"]}
+    #       existing ->
+    #         IO.inspect("EXISTING USER")
+    #         existing
+    #     end
 
-      user
-      |> Planga.Chat.App.from_json(user_json)
-      |> Planga.Repo.insert_or_update!
+    #   user
+    #   |> Planga.Chat.App.from_json(user_json)
+    #   |> Planga.Repo.insert_or_update!
 
       user_json["api_credentials"]
       |> Enum.each(&update_credential/1)
@@ -47,6 +47,22 @@ defmodule Planga.Tasks.ApiKeySync do
   def update_credential(api_key_json) do
     IO.inspect(api_key_json)
     Planga.Repo.transaction(fn ->
+
+      app =
+        case Planga.Repo.get_by(Planga.Chat.App, name: to_string(api_key_json["public_id"])) do
+          nil ->
+            IO.inspect("NEW APP")
+            %Planga.Chat.App{name: api_key_json["public_id"]}
+          existing ->
+            IO.inspect("EXISTING APP")
+            existing
+        end
+
+        app
+        |> Planga.Chat.App.from_json(api_key_json)
+        |> Planga.Repo.insert_or_update!
+
+
       api_key_pair = case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_json["public_id"]) do
         nil ->
                          IO.inspect("NEW KEY")
