@@ -15,7 +15,7 @@ defmodule Repository.ReleaseTasks do
   def repos, do: [Planga.Repo]
 
   def migrate do
-    :ok = Application.load(:planga)
+    Application.load(:planga)
     IO.puts "Starting dependencies.."
     # Start apps necessary for executing migrations
     Enum.each(@start_apps, &Application.ensure_all_started/1)
