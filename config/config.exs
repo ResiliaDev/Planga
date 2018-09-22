@@ -11,7 +11,12 @@ config :planga,
   planga_dashboard_url: "http://0.0.0.0:3000",
   planga_api_key_sync_password: "4eHjPZYTw7Wex455xsM5KQ"
 
-config :repository, ecto_repos: [Planga.Repo]
+config :planga, Planga.Repo,
+  adapter: EctoMnesia.Adapter,
+  # priv: "priv/ecto_mnesia_repo",
+  # host: {:system, :atom, "MNESIA_HOST", Kernel.node()},
+  host: {:system, :atom, "MNESIA_HOST", :"planga@127.0.0.1"},
+  storage_type: {:system, :atom, "MNESIA_STORAGE_TYPE", :disc_copies}
 
 config :planga, Planga.Scheduler,
   jobs: [
@@ -38,7 +43,7 @@ config :ecto_mnesia,
   storage_type: {:system, :atom, "MNESIA_STORAGE_TYPE", :disc_copies}
 
 config :mnesia,
-  dir: 'priv/data/mnesia' # Make sure this directory exists
+  dir: 'priv/' # Make sure this directory exists
 
 config :snowflakex, machine_id: 42
 

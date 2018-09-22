@@ -3,8 +3,10 @@ defmodule Planga.ReleaseTasks do
   @start_apps [
     :crypto,
     :ssl,
-    :postgrex,
-    :ecto
+    # :postgrex,
+    :ecto,
+    :ecto_mnesia,
+    :logger
   ]
 
   def myapp, do: Application.get_application(__MODULE__)

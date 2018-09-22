@@ -10,10 +10,10 @@ config :planga, PlangaWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :planga, Planga.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "planga_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+# config :planga, Planga.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "planga_test",
+#   hostname: "localhost",
+#   pool: Ecto.Adapters.SQL.Sandbox
