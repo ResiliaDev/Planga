@@ -51,7 +51,7 @@ defmodule Repository.ReleaseTasks do
 
       :ok -> Logger.info("Success creating DB")
       {:error, :already_up} -> Logger.info("DB was already created before.")
-      {:error, unknown_error} -> Logger.error("Unknown error: #{unknown_error}")
+      {:error, unknown_error} -> Logger.error("Unknown error: #{inspect unknown_error}")
     end
 
     app = Keyword.get(repo.config, :otp_app)
