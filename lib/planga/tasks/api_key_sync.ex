@@ -5,7 +5,7 @@ defmodule Planga.Tasks.ApiKeySync do
     planga_dashboard_url = Application.get_env(:planga, :planga_dashboard_url)
     json =
       (planga_dashboard_url <> "/api_key_sync")
-      |> HTTPoison.post!("")
+      |> HTTPoison.get!()
       |> Map.get(:body)
       |> decrypt
       |> Enum.each(&update_rails_user/1)
