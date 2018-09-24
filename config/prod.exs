@@ -26,7 +26,7 @@ config :planga, PlangaWeb.Endpoint,
   check_origin: false # Allow socket/channel connections from anywhere
 
 config :planga,
-  planga_dashboard_url: "https://planga.io"
+  planga_dashboard_url: "https://www.planga.io"
 
 # Do not print debug messages in production
 config :logger, level: :info
