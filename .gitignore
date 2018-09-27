@@ -32,6 +32,7 @@ npm-debug.log
 
 # Mnesia DB
 /priv/*.DCD
+/priv/*.DCL
 /priv/DECISION_TAB.LOG
 /priv/LATEST.LOG
 /priv/schema.DAT

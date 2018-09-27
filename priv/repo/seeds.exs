@@ -14,7 +14,6 @@ IO.inspect :mnesia.system_info(:is_running)
 
 Planga.Repo.transaction(fn ->
   Planga.Repo.insert!(%Planga.Chat.App{
-        id: 1,
         name: "Planga Test",
         api_key_pairs: [
           %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: "iv3lCL2TgVG3skeVF4l5-Q", enabled: true}
