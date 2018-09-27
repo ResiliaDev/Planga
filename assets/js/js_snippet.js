@@ -3,8 +3,6 @@ import {Socket, LongPoll} from 'phoenix';
 import $ from 'jquery';
 
 let ensureFieldExists = (options, field_name) => {
-    if(this.debug)
-        console.log(options, field_name);
     if(!(field_name in options)) {
         throw "Eror: `" + field_name + "` field expected in `options`";
     };
@@ -23,8 +21,6 @@ class Planga {
         this.socket_location = options.socket_location || "http://planga.io/socket";
         this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
 
-        if(this.debug)
-            console.log(this);
         this.socket = new Socket(this.socket_location, {params: {}, transport: LongPoll });
         this.socket.connect();
 
@@ -70,8 +66,6 @@ class Planga {
             if(this.debug)
                 console.log("Planga: New Message", message);
             let author_name = message.name || "Anonymous";
-            if(this.debug)
-                console.log("MESSAGE:", message)
             this.addMessage(messages_list_elem, message.uuid, author_name, message.content, message.sent_at, this.current_user_name);
         });
 
@@ -81,8 +75,6 @@ class Planga {
             this.callWithBottomFixedVscroll(messages_list_elem, () => {
                 payload.messages.forEach(message => {
                     let author_name = message.name || "Anonymous";
-                    if(this.debug)
-                        console.log("MESSAGE:", message)
                     this.addMessageTop($(messages_list_elem), message.uuid, author_name, message.content, message.sent_at, this.current_user_name);
                     if(this.debug)
                         console.log("Loading older message: ", message);
@@ -150,8 +142,6 @@ class Planga {
     addMessage (messages_list_elem, uuid, author_name, content, sent_at, current_user_name) {
         const new_message = this.messageHTML(uuid, author_name, content, sent_at, current_user_name);
         let stale_message = $(`.planga--chat-message[data-message-uuid="${uuid}"]`, messages_list_elem);
-        if(this.debug)
-            console.log("stale message:", stale_message);
         if(stale_message.length > 0) {
             $(stale_message).replaceWith(new_message);
         } else {
@@ -167,8 +157,6 @@ class Planga {
     addMessageTop (messages_list_elem, uuid, author_name, content, sent_at, current_user_name) {
         const new_message = this.messageHTML(uuid, author_name, content, sent_at, current_user_name);
         let stale_message = $(`.planga--chat-message[data-message-uuid="${uuid}"]`, messages_list_elem);
-        if(this.debug)
-            console.log("stale message:", stale_message);
         if(stale_message.length > 0) {
             $(stale_message).replaceWith(new_message);
         } else {
