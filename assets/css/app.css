@@ -46,6 +46,7 @@
 .planga--chat-message-content {
     display: inline-block;
     margin-left: 0px;
+    word-break: break-all;
 }
 
 .planga--new-message-field-wrapper {
