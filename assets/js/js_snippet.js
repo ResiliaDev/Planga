@@ -128,7 +128,7 @@ class Planga {
                 </dl>
                 <div class='planga--new-message-form'>
                     <div class='planga--new-message-field-wrapper'>
-                        <input type='text' placeholder='${this.inputPlaceholder()}' name='planga--new-message-field' class='planga--new-message-field'/>
+                        <input type='text' maxlength='4096' placeholder='${this.inputPlaceholder()}' name='planga--new-message-field' class='planga--new-message-field'/>
                     </div>
                     <button class='planga--new-message-submit-button'>Send</button>
                 </div>
