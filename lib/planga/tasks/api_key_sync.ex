@@ -8,6 +8,7 @@ defmodule Planga.Tasks.ApiKeySync do
       |> HTTPoison.get!()
       |> Map.get(:body)
       |> decrypt
+      |> IO.inspect(label: "APIKEYSYNC")
       |> Enum.each(&update_rails_user/1)
     Logger.info("Finished fetching API keys!")
   end

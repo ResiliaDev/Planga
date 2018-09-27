@@ -21,6 +21,7 @@ defmodule Planga.Chat.APIKeyPair do
 
   def from_json(api_key_pair \\ %__MODULE__{}, json) do
     api_key_pair
+    |> IO.inspect
     |> changeset(
       %{
         enabled: json["active"],
