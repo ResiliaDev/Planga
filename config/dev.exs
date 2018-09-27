@@ -62,3 +62,9 @@ config :phoenix, :stacktrace_depth, 20
 #   adapter: Sqlite.Ecto2,
 #   database: "planga_db.sqlite3"
 
+config :planga, Planga.Repo,
+  adapter: EctoMnesia.Adapter,
+  # priv: "priv/ecto_mnesia_repo",
+  # host: {:system, :atom, "MNESIA_HOST", Kernel.node()},
+  host: node(),
+  storage_type: :disc_copies

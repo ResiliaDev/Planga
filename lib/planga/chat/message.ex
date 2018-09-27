@@ -18,14 +18,19 @@ defmodule Planga.Chat.Message do
     |> change(uuid: (message.uuid || Ecto.UUID.autogenerate)) # Not auto-handled by Ecto.Mnesia
     |> cast(attrs, [:sender_id, :content])
     |> validate_required([:sender_id, :content, :uuid, :conversation_id])
-    |> validate_length(:content, max: 4096) # To prevent abuse
+    |> validate_message_content()
   end
 
   @doc """
   False if message is invalid and should not be sent.
   """
   def valid_message?(message) do
-    not empty_message?(message)
+    not empty_message?(message) && validate_message_content(message).valid?
+  end
+
+  def validate_message_content(message) do
+    message
+    |> validate_length(:content, max: 4096) # To prevent abuse
   end
 
   defp empty_message?(message), do: String.trim(message) == ""

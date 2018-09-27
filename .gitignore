@@ -29,3 +29,9 @@ npm-debug.log
 # secrets files as long as you replace their contents by environment
 # variables.
 /config/*.secret.exs
+
+# Mnesia DB
+/priv/*.DCD
+/priv/DECISION_TAB.LOG
+/priv/LATEST.LOG
+/priv/schema.DAT
