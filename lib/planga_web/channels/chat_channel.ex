@@ -192,7 +192,7 @@ defmodule PlangaWeb.ChatChannel do
     %{
       "uuid" => message.uuid,
       "name" => message.sender.name,
-      "content" => message.content,
+      "content" => message.content |> Phoenix.HTML.html_escape |> Phoenix.HTML.safe_to_string,
       "sent_at" => message.inserted_at
     }
   end
