@@ -21,7 +21,7 @@ class Planga {
         this.socket_location = options.socket_location || "http://planga.io/socket";
         this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
 
-        this.socket = new Socket(this.socket_location, {params: {}, transport: LongPoll });
+        this.socket = new Socket(this.socket_location, {params: {}});
         this.socket.connect();
 
         if("Notification" in window){
