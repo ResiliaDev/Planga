@@ -56,7 +56,7 @@ defmodule Planga.Mixfile do
       {:httpoison, "~> 1.0"},
       {:distillery, "~> 1.5.4", runtime: false},
 
-      {:planga_phoenix, "~> 0.1.0"},
+      # {:planga_phoenix, "~> 0.1.0"},
 
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}
     ]
