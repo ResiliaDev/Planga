@@ -1,4 +1,4 @@
-<%= Planga.Phoenix.chat(
+<%= PlangaPhoenix.chat(
     %{
         public_api_id: "foobar",
         private_api_key: "iv3lCL2TgVG3skeVF4l5-Q",
