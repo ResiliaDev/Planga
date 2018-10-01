@@ -4,7 +4,7 @@ defmodule Planga.Mixfile do
   def project do
     [
       app: :planga,
-      version: "0.3.14",
+      version: "0.3.15",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -56,7 +56,7 @@ defmodule Planga.Mixfile do
       {:httpoison, "~> 1.0"},
       {:distillery, "~> 1.5.4", runtime: false},
 
-      {:vex, "~> 0.8.0"}, # For PlangaEx; validating options
+      {:planga_phoenix, "~> 0.1.0"},
 
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}
     ]
