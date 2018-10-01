@@ -58,6 +58,8 @@ defmodule Planga.Mixfile do
 
       # {:planga_phoenix, "~> 0.1.0"},
 
+      {:vex, "~> 0.8.0"}, # For PlangaEx; validating options
+
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}
     ]
   end
