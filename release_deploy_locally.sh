@@ -1,6 +1,6 @@
 #!/bin/bash
-`mix deps.get`
-`mix compile` # Required to have the following command not contain warnings.
+mix deps.get
+mix compile # Required to have the following command not contain warnings.
 relnum=`mix app_version`
 echo "Creating release for version ${relnum}..."
 cd ./assets;
