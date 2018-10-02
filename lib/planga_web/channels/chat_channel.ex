@@ -157,8 +157,6 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-
-
   @doc """
   Called whenever the chatter attempts to see earlier messages.
   """
@@ -179,21 +177,19 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  # def handle_in("new_remote_message", payload, socket) do
-  #   broadcast! socket, "new_remote_message", message_dict(payload)
-
-  #   {:noreply, socket}
-  # end
-
-
-
   # Turns returned message information in a format the front-end understands.
   defp message_dict(message) do
     %{
       "uuid" => message.uuid,
-      "name" => message.sender.name,
-      "content" => message.content |> Phoenix.HTML.html_escape |> Phoenix.HTML.safe_to_string,
+      "name" => message.sender.name |> html_escape,
+      "content" => message.content |> html_escape,
       "sent_at" => message.inserted_at
     }
+  end
+
+  defp html_escape(unsafe_string) do
+    unsafe_string
+    |> Phoenix.HTML.html_escape
+    |> Phoenix.HTML.safe_to_string
   end
 end
