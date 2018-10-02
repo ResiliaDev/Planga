@@ -4,7 +4,7 @@ defmodule Planga.Mixfile do
   def project do
     [
       app: :planga,
-      version: "0.3.18",
+      version: "0.3.19",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -58,7 +58,8 @@ defmodule Planga.Mixfile do
 
       {:planga_phoenix, "~> 0.1.0"},
 
-      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false}
+      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
+      {:observer_cli, "~> 1.3"}
     ]
   end
 
