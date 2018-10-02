@@ -5,7 +5,7 @@ defmodule Planga.Tasks.ApiKeySync do
     planga_dashboard_url = Application.get_env(:planga, :planga_dashboard_url)
     json =
       (planga_dashboard_url <> "/api_key_sync")
-      |> HTTPoison.get!()
+      |> HTTPoison.get!(follow_redirect: true)
       |> Map.get(:body)
       |> decrypt
       |> IO.inspect(label: "APIKEYSYNC")
