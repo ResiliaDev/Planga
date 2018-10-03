@@ -8,6 +8,19 @@ let ensureFieldExists = (options, field_name) => {
     };
 };
 
+let normalizeSocketLocation = (sockeet_location) => {
+    // Absolute path with predefined protocol
+    if(socket_location.chatAt(0) !== "/") {
+        return socket_location;
+    }
+    // Always prefer SSL-connections over non-SSL.
+    if(socket_location.charAt(1) === "/") {
+        return "wss:" + socket_location;
+    }
+    // Relative path
+    return "wss://" + location.host + socket_location;
+};
+
 class Planga {
     constructor(chat_container_elem, options) {
         ensureFieldExists(options, "encrypted_options");
@@ -18,7 +31,7 @@ class Planga {
         this.current_user_name = null;
 
         this.debug = options.debug || false;
-        this.socket_location = options.socket_location || "http://planga.io/socket";
+        this.socket_location = normalizeSocketLocation(options.socket_location || "https://chat.planga.io/socket");
         this.notifications_enabled_message = options.notifications_enabled_message || "Chat Notifications are now enabled!";
 
         this.socket = new Socket(this.socket_location, {params: {}});
