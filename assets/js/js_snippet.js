@@ -8,7 +8,7 @@ let ensureFieldExists = (options, field_name) => {
     };
 };
 
-let normalizeSocketLocation = (sockeet_location) => {
+let normalizeSocketLocation = (socket_location) => {
     // Absolute path with predefined protocol
     if(socket_location.chatAt(0) !== "/") {
         return socket_location;
@@ -57,7 +57,7 @@ class Planga {
     enableChatInterface (container) {
         $('.planga--new-message-field').prop('disabled', false);
         $('.planga--new-message-submit-button').prop('disabled', false);
-        $('.planga--new-message-field').attr('placeholder', this.inputPlaceholder(this.current_user_name) )
+        $('.planga--new-message-field').attr('placeholder', this.inputPlaceholder(this.current_user_name) );
     }
 
 
