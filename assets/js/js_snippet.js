@@ -10,7 +10,7 @@ let ensureFieldExists = (options, field_name) => {
 
 let normalizeSocketLocation = (socket_location) => {
     // Absolute path with predefined protocol
-    if(socket_location.chatAt(0) !== "/") {
+    if(socket_location.charAt(0) !== "/") {
         return socket_location;
     }
     // Always prefer SSL-connections over non-SSL.
