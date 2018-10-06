@@ -8,16 +8,42 @@ let ensureFieldExists = (options, field_name) => {
     };
 };
 
+let absolute_protocolless_path = (location) => {
+    return location.charAt(0) === "/" && location.charAt(1) === "/";
+};
+
+let relative_path = (location) => {
+    return location.charAt(0) === "/" && location.charAt(1) !== "/";
+};
+
+let absolute_protocol_path = (location) => {
+    return location.charAt(0) !== "/";
+};
+
+let on_localhost = (location) => {
+    let location_str = absolute_protocolless_path(location) ? ("http:" + location) : location;
+    let location_url = new URL(location_str);
+    return location_url.hostname === "localhost";
+};
+
+/**
+   Only when both the application that renders this snippet,
+   as well as the Planga Chat application that socket_location refers to,
+   are hosted on 'localhost', do we allow to use a non-SSL connection.
+
+   (This is for ease of development.)
+*/
 let normalizeSocketLocation = (socket_location) => {
-    // Absolute path with predefined protocol
-    if(socket_location.charAt(0) !== "/") {
+    if(absolute_protocol_path(socket_location)) {
         return socket_location;
     }
-    // Always prefer SSL-connections over non-SSL.
-    if(socket_location.charAt(1) === "/") {
+    if(absolute_protocolless_path(socket_location)){
+        if(on_localhost(window.location.toString()) && on_localhost(socket_location)){
+            return "ws:" + socket_location;
+        }
         return "wss:" + socket_location;
     }
-    // Relative path
+    // Relative paths
     return "wss://" + location.host + socket_location;
 };
 
@@ -37,15 +63,24 @@ class Planga {
         this.socket = new Socket(this.socket_location, {params: {}});
         this.socket.connect();
 
-        if("Notification" in window){
-            Notification.requestPermission(permission => {
-                if(permission === "granted"){
-                    new Notification(this.notifications_enabled_message);
-                }
-            });
-        }
 
         this.createCommunicationSection(chat_container_elem);
+        this.requestBrowserNotifications(this.notifications_enabled_message);
+    }
+
+    requestBrowserNotifications(notifications_enabled_message){
+        // Graceful degradation
+        if("Notification" in window){
+            // Only request permission if not granted before;
+            // will make sure enabled_message is only shown when permission has been enabled.
+            if(Notification.permission !== "granted") {
+                Notification.requestPermission(permission => {
+                    if(permission === "granted"){
+                        new Notification(notifications_enabled_message);
+                    }
+                });
+            }
+        }
     }
 
     disableChatInterface (container, reason) {
