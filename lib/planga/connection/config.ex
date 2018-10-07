@@ -10,12 +10,16 @@ defmodule Planga.Connection.Config do
       {:ok, config}
     else
       _ ->
-        {:error, %{reason: "unauthorized; improper configuration"}}
+        {:error, "unauthorized; improper configuration"}
     end
   end
 
+  def public_info(secret_info) do
+    %{"current_user_name" => secret_info["current_user_name"]}
+  end
+
   def read_other_users(encrypted_info) do
-    encrypted_info["other_users"]|| [] |> parse_other_users()
+    encrypted_info["other_users"] || [] |> parse_other_users()
   end
 
   defp parse_other_users(other_users) do

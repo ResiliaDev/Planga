@@ -9,28 +9,19 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
-    {public_api_id, encrypted_conversation_info} = Planga.Connection.decode_conversation_info(qualified_conversation_info)
-    api_key_pair = Planga.Chat.get_api_key_pair_by_public_id!(public_api_id)
-    with {:ok, secret_info} = Planga.Connection.decrypt_config(encrypted_conversation_info, api_key_pair) do
-      remote_conversation_id = secret_info["conversation_id"]
-      current_user_id = secret_info["current_user_id"]
-      app_id = api_key_pair.app_id
-      user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
-      PlangaWeb.Endpoint.subscribe(static_topic(app_id, remote_conversation_id))
-      other_users = (secret_info["other_users"] || []) |> parse_other_users()
-      # socket = fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id, other_users)
+    with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}} <- Planga.Connection.connect(qualified_conversation_info) do
       socket =
-        Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)
-        |> IO.inspect
-        |> Enum.reduce(socket, fn {key, value}, socket -> IO.inspect assign(socket, key, value) end)
-
-      if secret_info["current_user_name"] do
-        Planga.Chat.update_username(user.id, secret_info["current_user_name"])
-      end
+        socket_assigns
+        |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
 
       send(self(), :after_join)
 
-      {:ok, %{"current_user_name" => secret_info["current_user_name"]}, socket}
+      {:ok, Planga.Connection.public_info(secret_info), socket}
+    else
+      {:error, reason} ->
+        {:error, %{reason: reason}}
+      _ ->
+        {:error, %{reason: "Unable to connect. Improper connection details?"}}
     end
   end
 
@@ -40,66 +31,6 @@ defmodule PlangaWeb.ChatChannel do
 
   defp static_topic(app_id, conversation_id) do
     "chat:#{app_id}#{conversation_id}"
-  end
-
-  defp jose_decrypt(encrypted_conversation_info, api_key_pair) do
-    {:ok, res} = do_jose_decrypt(encrypted_conversation_info, api_key_pair)
-
-    res
-    |> elem(0)
-    |> IO.inspect(label: "The decrypted strigifiedJSON Planga will deserialize: ")
-    |> Poison.decode!()
-  end
-
-  defp do_jose_decrypt(encrypted_conversation_info, api_key_pair) do
-    with {:ok, secret_key} <- do_jose_decode_api_key(api_key_pair) do
-      try do
-        res = JOSE.JWE.block_decrypt(secret_key, encrypted_conversation_info)
-        {:ok, res}
-      rescue
-        FunctionClauseError -> {:error, "Cannot decrypt `encrypted_conversation_info`. Either the provided public key does not match the used secret key, or the ciphertext is malformed."}
-      end
-    end
-  end
-
-  defp do_jose_decode_api_key(api_key_pair) do
-    try do
-      secret_key = JOSE.JWK.from_map(%{"k" => api_key_pair.secret_key, "kty" => "oct"})
-      {:ok, secret_key}
-    rescue
-      FunctionClauseError -> {:error, "invalid secret API key format!"}
-    end
-  end
-
-  def parse_other_users(other_users) do
-    other_users
-    |> Enum.map(fn
-      user ->
-      if Map.has_key?(user, "id") do
-        user_map = %{id: user["id"], name: user["name"]}
-        {:ok, user_map}
-      else
-        {:error, "invalid `other_users` element: missing `id` field."}
-      end
-    end)
-    |> Enum.map(&elem(&1, 1))
-  end
-
-  def public_secrets(secret_info) do
-    %{
-      current_user_name: secret_info["current_user_name"]
-    }
-  end
-
-
-  defp fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id, other_users) do
-    socket =
-      socket
-      |> assign(:user_id, user.id)
-      |> assign(:api_key_pair, api_key_pair)
-      |> assign(:app_id, app_id)
-      |> assign(:remote_conversation_id, remote_conversation_id)
-      |> assign(:other_users, other_users)
   end
 
   @doc """
