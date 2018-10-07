@@ -9,12 +9,11 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
-    with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}} <- Planga.Connection.connect(qualified_conversation_info) do
-      socket =
-        socket_assigns
-        |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
+    with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}}
+    <- Planga.Connection.connect(qualified_conversation_info) do
 
       send(self(), :after_join)
+      socket = fill_socket(socket, socket_assigns)
 
       {:ok, Planga.Connection.public_info(secret_info), socket}
     else
@@ -25,16 +24,22 @@ defmodule PlangaWeb.ChatChannel do
     end
   end
 
+  defp fill_socket(socket, socket_assigns) do
+    socket =
+      socket_assigns
+      |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
+  end
+
   def join(_, _, socket) do
     {:error, %{reason: "Improper channel format"}}
   end
 
-  defp static_topic(app_id, conversation_id) do
-    "chat:#{app_id}#{conversation_id}"
-  end
-
   @doc """
   Called immediately after joining to send latest messages to just-connected chatter.
+
+  This is a separate call, to keep the `join` as lightweight as possible,
+  since it is executed during startup of the Channel GenServer
+  (and runs synchroniously with the Browser that is waiting for a connection).
   """
   def handle_info(:after_join, socket) do
     send_previous_messages(socket)
@@ -46,29 +51,31 @@ defmodule PlangaWeb.ChatChannel do
   """
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
 
-    app_id = socket.assigns.app_id
     remote_conversation_id = socket.assigns.remote_conversation_id
     messages =
-      app_id
-      |> Planga.Chat.get_messages_by_remote_conversation_id(remote_conversation_id, sent_before_datetime)
-      |> Enum.map(&message_dict/1)
+      socket.assigns.app_id
+      |> Planga.Chat.get_messages_by_remote_conversation_id(remote_conversation_id, sent_before_datetime) # TODO Long line; rename function?
+      |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
     push socket, "messages_so_far", %{messages: messages}
   end
 
 
   @doc """
   Called whenever the chatter attempts to send a new message.
+
+  TODO Send something else (async?) when invalid message/rate-limited etc?
   """
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
 
     if Planga.Chat.Message.valid_message?(message) do
-      app_id = socket.assigns.app_id
-      remote_conversation_id = socket.assigns.remote_conversation_id
-      user_id = socket.assigns.user_id
-      other_users = socket.assigns.other_users
-      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users
-        |> Enum.map(&(&1.id)))
+      %{app_id: app_id,
+        remote_conversation_id: remote_conversation_id,
+        user_id: user_id,
+        other_users: other_users
+      } = socket.assigns
+      other_user_ids = other_users |> Enum.map(&(&1.id))
+      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
 
       Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
     end
@@ -91,24 +98,8 @@ defmodule PlangaWeb.ChatChannel do
 
   def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
     IO.inspect(payload)
-    broadcast! socket, "new_remote_message", message_dict(payload)
+    broadcast! socket, "new_remote_message", Planga.Chat.Message.Presentation.message_dict(payload)
 
     {:noreply, socket}
-  end
-
-  # Turns returned message information in a format the front-end understands.
-  defp message_dict(message) do
-    %{
-      "uuid" => message.uuid,
-      "name" => message.sender.name |> html_escape,
-      "content" => message.content |> html_escape,
-      "sent_at" => message.inserted_at
-    }
-  end
-
-  defp html_escape(unsafe_string) do
-    unsafe_string
-    |> Phoenix.HTML.html_escape
-    |> Phoenix.HTML.safe_to_string
   end
 end

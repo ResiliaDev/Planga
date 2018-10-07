@@ -29,4 +29,30 @@ defmodule Planga.Chat.Message do
   end
 
   defp empty_message?(message), do: String.trim(message) == ""
+
+
+  defmodule Presentation do
+    @moduledoc """
+    Showing Messages to the outside world.
+    TODO Move to other location?
+    """
+    @doc """
+    Turns returned message information into a format
+    that only contains the info the outside world is allowed to see.
+    """
+    def message_dict(message) do
+      %{
+        "uuid" => message.uuid,
+        "name" => message.sender.name |> html_escape,
+        "content" => message.content |> html_escape,
+        "sent_at" => message.inserted_at
+      }
+    end
+
+    defp html_escape(unsafe_string) do
+      unsafe_string
+      |> Phoenix.HTML.html_escape
+      |> Phoenix.HTML.safe_to_string
+    end
+  end
 end
