@@ -4,20 +4,38 @@ defmodule Planga.Connection.Config do
   when someone attempts to make a connection to the Planga Chatserver.
   """
 
+  @doc """
+
+  Decryps a configuration that has been encrypted using the JOSE-JWK format,
+  to a hash with string keys.
+  """
   def decrypt(encrypted_info, api_key_pair) do
     config = jose_decrypt(encrypted_info, api_key_pair.secret_key)
     with %{"conversation_id" => _remote_conversation_id, "current_user_id" => _current_user_id} = config do
       {:ok, config}
     else
       _ ->
-        {:error, "unauthorized; improper configuration"}
+        {:error, "improper configuration"}
     end
   end
 
+  @doc """
+  Returns a hash containing the information
+  that, if the secret_info was correct,
+  is now public information to be returned and used in the browser on connection success.
+
+  TODO doctests
+  """
   def public_info(secret_info) do
     %{"current_user_name" => secret_info["current_user_name"]}
   end
 
+  @doc """
+  Reads and parses the 'other_users' field of the secret_info.
+  Falls back to the default (an empty list).
+
+  TODO doctests
+  """
   def read_other_users(encrypted_info) do
     encrypted_info["other_users"] || [] |> parse_other_users()
   end
@@ -65,5 +83,4 @@ defmodule Planga.Connection.Config do
       FunctionClauseError -> {:error, "invalid secret API key format!"}
     end
   end
-
 end

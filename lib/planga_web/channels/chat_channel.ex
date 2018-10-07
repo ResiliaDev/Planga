@@ -70,7 +70,7 @@ defmodule PlangaWeb.ChatChannel do
       message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_users
         |> Enum.map(&(&1.id)))
 
-      PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "new_remote_message", message)
+      Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
     end
 
     {:noreply, socket}

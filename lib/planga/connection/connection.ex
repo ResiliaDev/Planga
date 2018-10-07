@@ -44,6 +44,10 @@ defmodule Planga.Connection do
     {api_pub_id, encrypted_conversation_info}
   end
 
+  @doc """
+  Decryps a configuration that has been encrypted using the JOSE-JWK format,
+  to a hash with string keys.
+  """
   def decrypt_config(encrypted_config, api_key_pair) do
     Planga.Connection.Config.decrypt(encrypted_config, api_key_pair)
   end
@@ -62,6 +66,10 @@ defmodule Planga.Connection do
 
   def subscribe_to_conversation(app_id, remote_conversation_id) do
     PlangaWeb.Endpoint.subscribe(static_topic(app_id, remote_conversation_id))
+  end
+
+  def broadcast_new_message!(app_id, remote_conversation_id, message) do
+    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "new_remote_message", message)
   end
 
   defp static_topic(app_id, conversation_id) do
