@@ -1,4 +1,4 @@
-defmodule Planga.Authentication.Config do
+defmodule Planga.Connection.Config do
   @moduledoc """
   This module handles the decryption and parsing of the Encrypted Configuration that is sent
   when someone attempts to make a connection to the Planga Chatserver.
@@ -13,6 +13,25 @@ defmodule Planga.Authentication.Config do
         {:error, %{reason: "unauthorized; improper configuration"}}
     end
   end
+
+  def read_other_users(encrypted_info) do
+    encrypted_info["other_users"]|| [] |> parse_other_users()
+  end
+
+  defp parse_other_users(other_users) do
+    other_users
+    |> Enum.map(fn
+      user ->
+      if Map.has_key?(user, "id") do
+        user_map = %{id: user["id"], name: user["name"]}
+        {:ok, user_map}
+      else
+        {:error, "invalid `other_users` element: missing `id` field."}
+      end
+    end)
+    |> Enum.map(&elem(&1, 1))
+  end
+
 
   defp jose_decrypt(encrypted_conversation_info, secret_key) do
     {:ok, res} = do_jose_decrypt(encrypted_conversation_info, secret_key)

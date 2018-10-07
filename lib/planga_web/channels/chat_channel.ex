@@ -9,16 +9,20 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
-    {public_api_id, encrypted_conversation_info} = Planga.Authentication.decode_conversation_info(qualified_conversation_info)
+    {public_api_id, encrypted_conversation_info} = Planga.Connection.decode_conversation_info(qualified_conversation_info)
     api_key_pair = Planga.Chat.get_api_key_pair_by_public_id!(public_api_id)
-    with {:ok, secret_info} = Planga.Authentication.decrypt_config(encrypted_conversation_info, api_key_pair) do
+    with {:ok, secret_info} = Planga.Connection.decrypt_config(encrypted_conversation_info, api_key_pair) do
       remote_conversation_id = secret_info["conversation_id"]
       current_user_id = secret_info["current_user_id"]
       app_id = api_key_pair.app_id
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
       PlangaWeb.Endpoint.subscribe(static_topic(app_id, remote_conversation_id))
       other_users = (secret_info["other_users"] || []) |> parse_other_users()
-      socket = fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id, other_users)
+      # socket = fill_socket(socket, user, api_key_pair, app_id, remote_conversation_id, other_users)
+      socket =
+        Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)
+        |> IO.inspect
+        |> Enum.reduce(socket, fn {key, value}, socket -> IO.inspect assign(socket, key, value) end)
 
       if secret_info["current_user_name"] do
         Planga.Chat.update_username(user.id, secret_info["current_user_name"])
