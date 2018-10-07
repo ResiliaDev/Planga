@@ -11,12 +11,9 @@ defmodule PlangaWeb.ChatChannel do
   def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
     {public_api_id, encrypted_conversation_info} = Planga.Authentication.decode_conversation_info(qualified_conversation_info)
     api_key_pair = Planga.Chat.get_api_key_pair_by_public_id!(public_api_id)
-    with {:ok, secret_info} = Planga.Authentication.decrypt_config(encrypted_conversation_info, api_key_pair),
-    %{
-          "conversation_id" => remote_conversation_id,
-          "current_user_id" => current_user_id
-    }  = secret_info
-      do
+    with {:ok, secret_info} = Planga.Authentication.decrypt_config(encrypted_conversation_info, api_key_pair) do
+      remote_conversation_id = secret_info["conversation_id"]
+      current_user_id = secret_info["current_user_id"]
       app_id = api_key_pair.app_id
       user = Planga.Chat.get_user_by_remote_id!(app_id, current_user_id)
       PlangaWeb.Endpoint.subscribe(static_topic(app_id, remote_conversation_id))
@@ -30,11 +27,6 @@ defmodule PlangaWeb.ChatChannel do
       send(self(), :after_join)
 
       {:ok, %{"current_user_name" => secret_info["current_user_name"]}, socket}
-
-    else
-      _ ->
-        # TODO Improve error messages in case of missing encrypted fields!
-        {:error, %{reason: "unauthorized"}}
     end
   end
 
