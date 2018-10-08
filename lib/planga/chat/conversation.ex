@@ -1,4 +1,8 @@
 defmodule Planga.Chat.Conversation do
+  @moduledoc """
+  This schema describes a single chat-conversation
+  between one or more users.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,4 +1,9 @@
 defmodule Planga.Chat.App do
+  @moduledoc """
+  This schema describes an application that uses Planga:
+  An app contains zero or more API key pairs to identify with,
+  but all of these connect to the same application.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

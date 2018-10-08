@@ -1,4 +1,15 @@
-defmodule Repository.ReleaseTasks do
+defmodule Planga.ReleaseTasks do
+  @moduledoc """
+  This module is an effort to manage migrations on top of mnesia_ecto.
+
+  Hint: It does not work very nice, and we currently do not know why.
+
+  The only way migrations seem to work in production,
+  is by running `Planga.ReleaseTasks.migrate` from within
+  the running application.
+
+  More info: https://github.com/Nebo15/ecto_mnesia/issues/56
+  """
   require Logger
   @start_apps [
     :crypto,

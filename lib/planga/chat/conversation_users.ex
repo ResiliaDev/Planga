@@ -1,4 +1,8 @@
 defmodule Planga.Chat.ConversationUser do
+  @moduledoc """
+  This schema is the relation between a user
+  and a given conversation.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

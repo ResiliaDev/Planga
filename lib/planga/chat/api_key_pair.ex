@@ -1,4 +1,9 @@
 defmodule Planga.Chat.APIKeyPair do
+  @moduledoc """
+  This schema describes a single API key pair
+  (public ID and private key) that is used for secure communication
+  by the application using Planga and the Planga Chat Server.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
