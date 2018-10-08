@@ -68,7 +68,7 @@ defmodule Planga.Connection.Config do
   TODO doctests
   """
   def read_other_users(encrypted_info) do
-    encrypted_info["other_users"] || [] |> parse_other_users()
+    encrypted_info.other_users |> parse_other_users()
   end
 
   defp parse_other_users(other_users) do
@@ -87,18 +87,32 @@ defmodule Planga.Connection.Config do
 
 
   defp jose_decrypt(encrypted_conversation_info, secret_key) do
-    {:ok, res} = do_jose_decrypt(encrypted_conversation_info, secret_key)
 
-    res
-    |> elem(0)
-    |> Poison.decode!()
-    |> from_json_hash
-    |> IO.inspect(label: "TODO: conversion into module")
+    # res
+    # |> elem(0)
+    # |> Poison.decode!()
+    # |> from_json_hash
+    # |> IO.inspect(label: "TODO: conversion into module")
+    with {:ok, {json_str, _jwk_decryption_details}} = do_jose_decrypt(encrypted_conversation_info, secret_key),
+         {:ok, json_hash} <- Poison.decode(json_str) do
+      {:ok, json_hash}
+    else
+      {:error, :invalid, _} ->
+        {:error, "Could not parse JSON in encrypted configuration."}
+      {:error, error} ->
+        {:error, "Invalid Planga configuration: #{to_string(error)}"}
+    end
 
-    res
-    |> elem(0)
-    |> IO.inspect(label: "The decrypted strigifiedJSON Planga will deserialize: ")
-    |> Poison.decode!()
+
+    # res =
+    #   |> IO.inspect(label: "The decrypted strigifiedJSON Planga will deserialize: ")
+    #   |> Poison.decode()
+    #   |> from_json_hash
+    #   |> IO.inspect(label: "TODO: conversion into module")
+    # case res do
+    #   {:ok, res} -> {:ok, res}
+    #   _ -> {:error, "Could not parse JSON in encrypted configuration."}
+    # end
   end
 
   defp do_jose_decrypt(encrypted_conversation_info, encoded_secret_key) do
