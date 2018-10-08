@@ -17,6 +17,7 @@ defmodule PlangaWeb.ChatChannel do
 
       {:ok, Planga.Connection.public_info(secret_info), socket}
     else
+        # NOTE This is a prime location to log in a way visible to the App Developer.
       {:error, reason} ->
         {:error, %{reason: reason}}
       _ ->
@@ -63,7 +64,7 @@ defmodule PlangaWeb.ChatChannel do
   @doc """
   Called whenever the chatter attempts to send a new message.
 
-  TODO Send something else (async?) when invalid message/rate-limited etc?
+  NOTE Send something else (async?) when invalid message/rate-limited etc?
   """
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
