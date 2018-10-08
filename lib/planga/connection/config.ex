@@ -4,7 +4,36 @@ defmodule Planga.Connection.Config do
   when someone attempts to make a connection to the Planga Chatserver.
   """
 
+  # @enforce_keys [:conversation_id, :current_user_id, :current_user_name]
   defstruct [:conversation_id, :current_user_id, :current_user_name, other_users: []]
+
+  @doc """
+  Transforms the JSON from the client into a Config struct.
+  Returns an {:error, string} if its syntax is not correct.
+  """
+  def from_json_hash(json_hash) do
+    types = %{conversation_id: :any, current_user_id: :any, current_user_name: :string, other_users: :any}
+    changeset =
+      {%__MODULE__{}, types}
+      |> Ecto.Changeset.cast(json_hash, Map.keys(types))
+      |> Ecto.Changeset.validate_required(Map.keys(types) -- [:other_users])
+
+    if changeset.valid? do
+      result =
+      changeset
+        |> Ecto.Changeset.apply_changes()
+        |> Map.update!(:conversation_id, &to_string/1)
+        |> Map.update!(:current_user_id, &to_string/1)
+
+      {:ok, result}
+    else
+      {:error, inspect(changeset.errors)}
+    end
+  end
+
+  defp field_to_string(struct, fieldname) do
+    %{struct | fieldname => to_string(struct.fieldname)}
+  end
 
   @doc """
 
@@ -12,16 +41,9 @@ defmodule Planga.Connection.Config do
   to a hash with string keys.
   """
   def decrypt(encrypted_info, api_key_pair) do
-    config = jose_decrypt(encrypted_info, api_key_pair.secret_key)
-    with %{"conversation_id" => _remote_conversation_id, "current_user_id" => _current_user_id} = config do
-      config =
-        config
-        |> Map.put("conversation_id", ensure_is_binary(config["conversation_id"]))
-        |> Map.put("current_user_id", ensure_is_binary(config["current_user_id"]))
+    with {:ok, json_hash} <- jose_decrypt(encrypted_info, api_key_pair.secret_key),
+         {:ok, config} <- from_json_hash(json_hash) do
       {:ok, config}
-    else
-      _ ->
-        {:error, "improper configuration"}
     end
   end
 
@@ -36,7 +58,7 @@ defmodule Planga.Connection.Config do
   TODO doctests
   """
   def public_info(secret_info) do
-    %{"current_user_name" => secret_info["current_user_name"]}
+    %{"current_user_name" => secret_info.current_user_name}
   end
 
   @doc """
@@ -66,6 +88,12 @@ defmodule Planga.Connection.Config do
 
   defp jose_decrypt(encrypted_conversation_info, secret_key) do
     {:ok, res} = do_jose_decrypt(encrypted_conversation_info, secret_key)
+
+    res
+    |> elem(0)
+    |> Poison.decode!()
+    |> from_json_hash
+    |> IO.inspect(label: "TODO: conversion into module")
 
     res
     |> elem(0)
