@@ -51,9 +51,6 @@ defmodule Planga.Connection do
   end
 
   def socket_info(user: user, api_key_pair: api_key_pair, config: config) do
-    remote_conversation_id = config.conversation_id
-    other_users = Planga.Connection.Config.read_other_users(config)
-
     [user_id: user.id,
      api_key_pair: api_key_pair,
      app_id: api_key_pair.app_id,

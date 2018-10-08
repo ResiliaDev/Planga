@@ -105,31 +105,6 @@ defmodule Planga.Connection.Config do
     %{"current_user_name" => secret_info.current_user_name}
   end
 
-  @doc """
-  Reads and parses the 'other_users' field of the secret_info.
-  Falls back to the default (an empty list).
-
-  TODO doctests
-  """
-  def read_other_users(encrypted_info) do
-    encrypted_info.other_users |> parse_other_users()
-  end
-
-  defp parse_other_users(other_users) do
-    other_users
-    |> Enum.map(fn
-      user ->
-      if Map.has_key?(user, "id") do
-        user_map = %{id: user["id"], name: user["name"]}
-        {:ok, user_map}
-      else
-        {:error, "invalid `other_users` element: missing `id` field."}
-      end
-    end)
-    |> Enum.map(&elem(&1, 1))
-  end
-
-
   defp jose_decrypt(encrypted_conversation_info, secret_key) do
 
     # res
