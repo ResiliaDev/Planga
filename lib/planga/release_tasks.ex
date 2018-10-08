@@ -44,7 +44,7 @@ defmodule Planga.ReleaseTasks do
 
   def migration() do
     Logger.info("==> Migrate all the repos")
-    IO.inspect(repos())
+    Logger.info(repos())
     Enum.each(repos(), &run_migrations_for/1)
   end
 
