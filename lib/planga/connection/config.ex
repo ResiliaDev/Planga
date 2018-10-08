@@ -7,6 +7,59 @@ defmodule Planga.Connection.Config do
   # @enforce_keys [:conversation_id, :current_user_id, :current_user_name]
   defstruct [:conversation_id, :current_user_id, :current_user_name, other_users: []]
 
+  defmodule OtherUserInfo do
+    @moduledoc """
+    Each entry in the 'other_users' field
+    """
+    defstruct [:id, :name]
+
+    def from_json_hash(json_hash) do
+      types = %{id: :any, id: :any}
+      changeset =
+      {%__MODULE__{}, types}
+      |> Ecto.Changeset.cast(json_hash, Map.keys(types))
+      |> Ecto.Changeset.validate_required(json_hash, Map.keys(types))
+
+      if changeset.valid? do
+        result =
+          changeset
+          |> Ecto.Changeset.apply_changes()
+          |> Map.update!(:id, &to_string/1)
+
+        {:ok, result}
+      else
+        {:error, inspect(changeset.errors)}
+      end
+    end
+
+    def from_list(other_users_json_list) do
+      other_users_json_list
+      |> reduce_errors(&from_json_hash/1)
+      # |> Enum.reduce({:ok []}, fn
+      #   {:error, error} _ -> {:error, error}
+      #   {:ok, list}, elem->
+      #     case from_json_hash(elem) do
+      #       {:ok, elem} -> {:ok, [elem | list]}
+      #       {:error, error} -> {:error, error}
+      #     end
+      # end)
+    end
+
+    defp reduce_errors(enumerable, function) do
+      enumerable
+      |> Enum.reduce({:ok, []}, fn
+        {:error, error}, _ -> {:error, error}
+        {:ok, list}, elem ->
+          case function.(elem) do
+            {:ok, elem} -> [elem | list]
+            {:error, error} -> {:error, error}
+          end
+      end)
+    end
+
+  end
+
+
   @doc """
   Transforms the JSON from the client into a Config struct.
   Returns an {:error, string} if its syntax is not correct.
@@ -20,10 +73,15 @@ defmodule Planga.Connection.Config do
 
     if changeset.valid? do
       result =
-      changeset
+        changeset
         |> Ecto.Changeset.apply_changes()
         |> Map.update!(:conversation_id, &to_string/1)
         |> Map.update!(:current_user_id, &to_string/1)
+
+      with {:ok, other_users} = __MODULE__.OtherUserInfo.from_list(result.other_users) do
+        result = Map.put(result, :other_users, other_users)
+        {:ok, result}
+      end
 
       {:ok, result}
     else
