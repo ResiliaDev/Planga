@@ -64,6 +64,6 @@ defmodule Repository.ReleaseTasks do
   def priv_path_for(repo, filename) do
     app = Keyword.get(repo.config, :otp_app)
     repo_underscore = repo |> Module.split() |> List.last() |> Macro.underscore()
-    Path.join([priv_dir(app), repo_underscore, filename]) |> IO.inspect(label: "priv_path_for")
+    Path.join([priv_dir(app), repo_underscore, filename])
   end
 end

@@ -1,4 +1,11 @@
 defmodule Planga.Tasks.ApiKeySync do
+  @moduledoc """
+  This module attempts to connect to a running Planga Dashboard application,
+  to sync the API key pairs of everyone who has an account there.
+
+  NOTE FOR LATER This should be split off, such that it does not get started
+  from within a self-hosted version of the Planga Chat Service.
+  """
   require Logger
   def sync_all do
     Logger.info("Fetching latest API keys!")

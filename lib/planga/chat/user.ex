@@ -1,4 +1,8 @@
 defmodule Planga.Chat.User do
+  @moduledoc """
+  This module describes the schema of a single Chat-user
+  (So someone that interacts with the chat interface)
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
