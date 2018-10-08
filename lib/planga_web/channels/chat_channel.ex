@@ -25,14 +25,14 @@ defmodule PlangaWeb.ChatChannel do
     end
   end
 
+  def join(_, _, socket) do
+    {:error, %{reason: "Improper channel format"}}
+  end
+
   defp fill_socket(socket, socket_assigns) do
     socket =
       socket_assigns
       |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
-  end
-
-  def join(_, _, socket) do
-    {:error, %{reason: "Improper channel format"}}
   end
 
   @doc """
@@ -52,7 +52,7 @@ defmodule PlangaWeb.ChatChannel do
   """
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
 
-    remote_conversation_id = socket.assigns.remote_conversation_id
+    remote_conversation_id = socket.assigns.config.conversation_id
     messages =
       socket.assigns.app_id
       |> Planga.Chat.get_messages_by_remote_conversation_id(remote_conversation_id, sent_before_datetime) # TODO Long line; rename function?
@@ -71,9 +71,8 @@ defmodule PlangaWeb.ChatChannel do
 
     if Planga.Chat.Message.valid_message?(message) do
       %{app_id: app_id,
-        remote_conversation_id: remote_conversation_id,
         user_id: user_id,
-        other_users: other_users
+        config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
       } = socket.assigns
       other_user_ids = other_users |> Enum.map(&(&1.id))
       message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)

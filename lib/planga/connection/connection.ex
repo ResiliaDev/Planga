@@ -57,8 +57,9 @@ defmodule Planga.Connection do
     [user_id: user.id,
      api_key_pair: api_key_pair,
      app_id: api_key_pair.app_id,
-     remote_conversation_id: remote_conversation_id,
-     other_users: other_users
+     # remote_conversation_id: remote_conversation_id,
+     # other_users: other_users
+     config: config
     ]
   end
 

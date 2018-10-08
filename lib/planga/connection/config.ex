@@ -35,14 +35,6 @@ defmodule Planga.Connection.Config do
     def from_list(other_users_json_list) do
       other_users_json_list
       |> reduce_errors(&from_json_hash/1)
-      # |> Enum.reduce({:ok []}, fn
-      #   {:error, error} _ -> {:error, error}
-      #   {:ok, list}, elem->
-      #     case from_json_hash(elem) do
-      #       {:ok, elem} -> {:ok, [elem | list]}
-      #       {:error, error} -> {:error, error}
-      #     end
-      # end)
     end
 
     defp reduce_errors(enumerable, function) do
