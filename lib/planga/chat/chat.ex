@@ -6,7 +6,7 @@ defmodule Planga.Chat do
   """
   import Ecto.Query, warn: false
   alias Planga.Repo
-  alias Planga.Chat.{User, Message, Conversation, App, ConversationUser, Topic, ConversationTopic, APIKeyPair}
+  alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
   @doc """
   Given a user's `remote_id`, returns the User struct.
@@ -19,13 +19,13 @@ defmodule Planga.Chat do
       if user do
         user
       else
-        user = Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
+        Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
       end
     end)
     user
   end
 
-  defp get_messages_by_conversation_id(conversation_id, sent_before_datetime \\ nil) do
+  defp get_messages_by_conversation_id(conversation_id, sent_before_datetime) do
     query = if sent_before_datetime do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 20)
     else

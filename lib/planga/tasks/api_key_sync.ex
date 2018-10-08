@@ -3,13 +3,13 @@ defmodule Planga.Tasks.ApiKeySync do
   def sync_all do
     Logger.info("Fetching latest API keys!")
     planga_dashboard_url = Application.get_env(:planga, :planga_dashboard_url)
-    json =
-      (planga_dashboard_url <> "/api_key_sync")
-      |> HTTPoison.get!(follow_redirect: true)
-      |> Map.get(:body)
-      |> decrypt
-      |> IO.inspect(label: "APIKEYSYNC")
-      |> Enum.each(&update_rails_user/1)
+
+    (planga_dashboard_url <> "/api_key_sync")
+    |> HTTPoison.get!(follow_redirect: true)
+    |> Map.get(:body)
+    |> decrypt
+    |> Enum.each(&update_rails_user/1)
+
     Logger.info("Finished fetching API keys!")
   end
 

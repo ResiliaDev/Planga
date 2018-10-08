@@ -8,7 +8,7 @@ defmodule PlangaWeb.ChatChannel do
   @doc """
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
-  def join("encrypted_chat:" <> qualified_conversation_info, payload, socket) do
+  def join("encrypted_chat:" <> qualified_conversation_info, _payload, socket) do
     with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}}
     <- Planga.Connection.connect(qualified_conversation_info) do
 
@@ -25,27 +25,15 @@ defmodule PlangaWeb.ChatChannel do
     end
   end
 
-  def join(_, _, socket) do
+  def join(_channel_name, _payload, _socket) do
     {:error, %{reason: "Improper channel format"}}
   end
 
   defp fill_socket(socket, socket_assigns) do
-    socket =
-      socket_assigns
-      |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
+    socket_assigns
+    |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
   end
 
-  @doc """
-  Called immediately after joining to send latest messages to just-connected chatter.
-
-  This is a separate call, to keep the `join` as lightweight as possible,
-  since it is executed during startup of the Channel GenServer
-  (and runs synchroniously with the Browser that is waiting for a connection).
-  """
-  def handle_info(:after_join, socket) do
-    send_previous_messages(socket)
-    {:noreply, socket}
-  end
 
   @doc """
   Called whenever chatter requires more (i.e. earlier) messages.
@@ -96,7 +84,19 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  def handle_info(event = %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
+  @doc """
+  Called immediately after joining to send latest messages to just-connected chatter.
+
+  This is a separate call, to keep the `join` as lightweight as possible,
+  since it is executed during startup of the Channel GenServer
+  (and runs synchroniously with the Browser that is waiting for a connection).
+  """
+  def handle_info(:after_join, socket) do
+    send_previous_messages(socket)
+    {:noreply, socket}
+  end
+
+  def handle_info(%Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
     IO.inspect(payload)
     broadcast! socket, "new_remote_message", Planga.Chat.Message.Presentation.message_dict(payload)
 

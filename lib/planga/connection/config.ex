@@ -14,7 +14,7 @@ defmodule Planga.Connection.Config do
     defstruct [:id, :name]
 
     def from_json_hash(json_hash) do
-      types = %{id: :any, id: :any}
+      types = %{id: :any, name: :any}
       changeset =
       {%__MODULE__{}, types}
       |> Ecto.Changeset.cast(json_hash, Map.keys(types))
@@ -81,9 +81,6 @@ defmodule Planga.Connection.Config do
     end
   end
 
-  defp field_to_string(struct, fieldname) do
-    %{struct | fieldname => to_string(struct.fieldname)}
-  end
 
   @doc """
 
@@ -96,9 +93,6 @@ defmodule Planga.Connection.Config do
       {:ok, config}
     end
   end
-
-  defp ensure_is_binary(val) when is_binary(val), do: val
-  defp ensure_is_binary(val) when not is_binary(val), do: to_string(val)
 
   @doc """
   Returns a hash containing the information
