@@ -1,4 +1,9 @@
 defmodule Planga.Application do
+  @moduledoc """
+  The Planga Chat Application.
+
+  Root of the Planga OTP App supervision tree.
+  """
   use Application
 
   # See https://hexdocs.pm/elixir/Application.html
