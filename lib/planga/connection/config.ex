@@ -4,6 +4,8 @@ defmodule Planga.Connection.Config do
   when someone attempts to make a connection to the Planga Chatserver.
   """
 
+  defstruct [:conversation_id, :current_user_id, :current_user_name, other_users: []]
+
   @doc """
 
   Decryps a configuration that has been encrypted using the JOSE-JWK format,
@@ -12,12 +14,19 @@ defmodule Planga.Connection.Config do
   def decrypt(encrypted_info, api_key_pair) do
     config = jose_decrypt(encrypted_info, api_key_pair.secret_key)
     with %{"conversation_id" => _remote_conversation_id, "current_user_id" => _current_user_id} = config do
+      config =
+        config
+        |> Map.put("conversation_id", ensure_is_binary(config["conversation_id"]))
+        |> Map.put("current_user_id", ensure_is_binary(config["current_user_id"]))
       {:ok, config}
     else
       _ ->
         {:error, "improper configuration"}
     end
   end
+
+  defp ensure_is_binary(val) when is_binary(val), do: val
+  defp ensure_is_binary(val) when not is_binary(val), do: to_string(val)
 
   @doc """
   Returns a hash containing the information
