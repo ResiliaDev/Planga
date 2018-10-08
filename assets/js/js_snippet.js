@@ -148,7 +148,7 @@ class Planga {
             })
             .receive("error", resp => {
                 if(this.debug)
-                    console.log("Unable to join Planga communication: ", resp);
+                    console.log("Unable to join Planga communication: ", resp["reason"]);
                 this.disableChatInterface(container, resp);
             });
 
