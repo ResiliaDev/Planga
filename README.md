@@ -1,4 +1,4 @@
-![Planga](logo_planga2-with-text-rainbow-black.png)
+[![Planga](https://planga.io/logo_planga2-with-text-rainbow-black.png)](https://planga.io)
 
 [![Planga](https://img.shields.io/badge/%F0%9F%98%8E%20planga-chat-ff00ff.svg)](http://www.planga.io/)
 [![Planga Docs](https://img.shields.io/badge/planga-docs-lightgrey.svg)](http://www.planga.io/docs)
