@@ -2,6 +2,7 @@
 
 [![Planga](https://img.shields.io/badge/%F0%9F%98%8E%20planga-chat-ff00ff.svg)](http://www.planga.io/)
 [![Planga Docs](https://img.shields.io/badge/planga-docs-lightgrey.svg)](http://www.planga.io/docs)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/planga.svg)
 
 [Planga](https://planga.io) is the Chat-Service that is very easy to seamlessly integrate with your existing application!
 
