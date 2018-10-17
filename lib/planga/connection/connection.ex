@@ -68,8 +68,8 @@ defmodule Planga.Connection do
     PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "new_remote_message", message)
   end
 
-  defp static_topic(app_id, conversation_id) do
-    "chat:#{app_id}#{conversation_id}"
+  defp static_topic(app_id, remote_conversation_id) do
+    "chat:#{app_id}#{remote_conversation_id}"
   end
 
   defdelegate public_info(secret_info), to: Planga.Connection.Config

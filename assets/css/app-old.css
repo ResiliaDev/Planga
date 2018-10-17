@@ -1,0 +1,116 @@
+
+/* This file is for your main application css. */
+
+.planga--chat-container {
+    margin-bottom: 50px;
+}
+.planga--chat-messages {
+    height: 400px;
+    overflow-y: scroll;
+
+    border-radius: 0.2rem;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+
+.planga--chat-message {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2.5px;
+    padding-bottom: 2.5px;
+    transition-duration: .3s;
+}
+
+
+.planga--chat-message:hover {
+    background-color: rgba(0,0,0,0.08);
+}
+
+.planga--chat-current-user-message  .planga--chat-author-wrapper {
+    color: green;
+}
+
+.planga--chat-message-sent-at-wrapper {
+    display: inline-block;
+    font-size: 0.8em;
+    opacity: 0.5;
+    float: right;
+
+    cursor: help;
+}
+
+.planga--chat-author-wrapper {
+    display: inline-block;
+    min-width: 50px;
+    font-weight: bold;
+    text-align: right;
+}
+
+
+.planga--chat-author-name::after {
+    content: ":";
+    display: inline-block;
+    padding-left: 0.1em;
+    padding-right: 0.5em;
+}
+
+.planga--chat-message-content {
+    display: inline-block;
+    margin-left: 0px;
+    word-break: break-all;
+}
+
+.planga--new-message-field-wrapper {
+    width: 100%;
+    float: left;
+    margin-right: -100px;
+    padding-right: 100px;
+}
+
+.planga--new-message-form {
+    min-height: 33px;
+}
+
+input.planga--new-message-field {
+    width: 100%;
+    height: 30px;
+    box-sizing: border-box;
+
+    border-radius: 0.2rem;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 1.19286em 1em;
+}
+
+
+input.planga--new-message-field:focus {
+    border-color: #85B7D9;
+}
+input.planga--new-message-field:focus::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    #aaa;
+}
+input.planga--new-message-field:focus:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #aaa;
+    opacity:  1;
+}
+input.planga--new-message-field:focus::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #aaa;
+    opacity:  1;
+}
+input.planga--new-message-field:focus:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color:    #aaa;
+}
+input.planga--new-message-field:focus::-ms-input-placeholder { /* Microsoft Edge */
+    color:    #aaa;
+}
+
+input.planga--new-message-field:focus::placeholder { /* Most modern browsers support this now. */
+    color:    #aaa;
+}
+
+.planga--new-message-submit-button {
+    float: right;
+    width: 80px;
+    height: 33px;
+    padding: 0px;
+    box-sizing: border-box;
+}

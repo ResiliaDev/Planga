@@ -228,7 +228,7 @@ class Planga {
                 <span class='planga--chat-message-sent-at' title='${this.styledDateTime(sent_at)}'>${this.styledTime(sent_at)}</span>
             </div>
             <div class='planga--chat-author-wrapper'>
-                <span class='planga--chat-author-name'>${author_name}</span><span class='planga--chat-message-separator'>: </span>
+                <span class='planga--chat-author-name'>${author_name}</span>
             </div>
             <div class='planga--chat-message-content' >${content}</div>
     </div>

@@ -9,7 +9,7 @@
         },
         # An example with the 'other users' field filled in:
         other_users: [
-            %{id: "1234", name: "Wiebe-Marten"}
+            %{id: "1234", name: "W-M"}
         ],
         server_location: URI.to_string(%URI{PlangaWeb.Endpoint.struct_url | scheme: nil}), # <- Line only required if non-standard server location
 

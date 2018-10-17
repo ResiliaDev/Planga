@@ -5,7 +5,7 @@
         conversation_id: "general",
         current_user: %{
             id: 1234,
-            name: "Wiebe-MartenTEST"
+            name: "W-M"
         },
         server_location: URI.to_string(%URI{PlangaWeb.Endpoint.struct_url | scheme: nil}), # <- Line only required if non-standard server location
     })
