@@ -1,18 +1,12 @@
-# Planga
+[![Planga](https://planga.io/logo_planga2-with-text-rainbow-black.png)](https://planga.io)
 
-Planga is the Chat-Service that is very easy to integrate with your existing application!
+[![Planga](https://img.shields.io/badge/%F0%9F%98%8E%20planga-chat-ff00ff.svg)](http://www.planga.io/)
+[![Planga Docs](https://img.shields.io/badge/planga-docs-lightgrey.svg)](http://www.planga.io/docs)
 
-It is currently in a relatively early alpha-stage; check back soon for more information.
+[Planga](https://planga.io) is the Chat-Service that is very easy to seamlessly integrate with your existing application!
 
-# Table of Contents
 
-<!--ts-->
-<!--te-->
-
-# Using Planga
-
-_This documentation is a work-in-progress!_
-
+It is currently in a relatively early beta-stage; check back soon for more information.
 
 
 # Running Planga Yourself
