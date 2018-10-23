@@ -27,7 +27,10 @@ exports.config = {
             // }
         },
         stylesheets: {
-            joinTo: "css/app.css"
+            joinTo: {
+                'css/app.css': "css/app.css",
+                'css/chat-style-basic.css': "css/chat-style-basic.css",
+            }
         },
         templates: {
             joinTo: "js/app.js"
