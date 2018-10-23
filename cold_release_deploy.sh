@@ -9,4 +9,5 @@ cd ../;
 MIX_ENV=prod mix do phoenix.digest, release --env=prod
 echo "Rsyncing COLD release to Planga directory..."
 sudo rsync -hvrPt --ignore-existing _build/prod/rel/planga/${relnum}/planga.tar.gz /var/www/planga/
+tar -xzf /var/www/planga/planga.tar.gz
 sudo service planga restart
