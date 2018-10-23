@@ -36,4 +36,4 @@ npm-debug.log
 /priv/DECISION_TAB.LOG
 /priv/LATEST.LOG
 /priv/schema.DAT
-/priv/backups/*.mnesia.backup
+/priv/repo/backups/*.backup
