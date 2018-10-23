@@ -8,7 +8,6 @@
 
 It is currently in a relatively early beta-stage; check back soon for more information.
 
-
 # Running Planga Yourself
 
 1. Copy this repository
