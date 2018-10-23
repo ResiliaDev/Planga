@@ -22,6 +22,10 @@ config :planga, Planga.Scheduler,
   jobs: [
     # Every minute, resync API keys
     {"* * * * *",      {Planga.Tasks.ApiKeySync, :sync_all, []}},
+    # Every hour, create normal backup
+    {"* 17 * * * *",      {Planga.Tasks.MnesiaBackup, :backup_everything, []}},
+    # At midnight, create plaintext backup
+    {"@daily",      {Planga.Tasks.MnesiaBackup, :backup_readable, []}},
   ]
 
 # Configures the endpoint
