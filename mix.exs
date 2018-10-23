@@ -39,6 +39,7 @@ defmodule Planga.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:plug_cowboy, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       # {:sqlite_ecto2, "~> 2.2"},
@@ -56,7 +57,8 @@ defmodule Planga.Mixfile do
       {:httpoison, "~> 1.0"},
       {:distillery, "~> 1.5.4", runtime: false},
 
-      {:planga_phoenix, "~> 0.1.0"},
+      # {:planga_phoenix, "~> 0.1.0"},
+      {:planga_phoenix, git: "https://github.com/ResiliaDev/planga-phoenix.git"},
 
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
       {:observer_cli, "~> 1.3"}

@@ -28,7 +28,7 @@ exports.config = {
         },
         stylesheets: {
             joinTo: {
-                'css/app.css': "css/app.css",
+                "css/app.css": /\.css$/,
                 'css/chat-style-basic.css': "css/chat-style-basic.css",
             }
         },
