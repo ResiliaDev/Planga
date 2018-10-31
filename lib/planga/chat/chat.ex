@@ -37,20 +37,6 @@ defmodule Planga.Chat do
     |> Enum.map(&put_sender/1)
   end
 
-  # @doc """
-  # Returns the latest 20 messages that are part of a conversation indicated by `app_id` + `remote_conversation_id`.
-
-  # Optionally, the argument `sent_before_datetime` can be used to look back further in history.
-  # """
-  def fetch_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime \\ nil) do
-    app = Repo.get!(App, app_id)
-    case Repo.get_by(Conversation, app_id: app.id, remote_id: remote_conversation_id) do
-      conversation = %Conversation{} ->
-        fetch_messages_by_conversation_id(conversation.id, sent_before_datetime)
-      nil ->
-        []
-    end
-  end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
   defp put_sender(message) do
