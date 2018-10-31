@@ -124,6 +124,7 @@ defmodule Planga.Chat do
       |> Ecto.Changeset.change(name: remote_user_name)
       |> Repo.update()
     end)
+    :ok
   end
 
   def fetch_api_key_pair_by_public_id!(pub_api_id) do
