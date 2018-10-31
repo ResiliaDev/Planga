@@ -25,7 +25,7 @@ defmodule Planga.Chat do
     user
   end
 
-  defp fetch_messages_by_conversation_id(conversation_id, sent_before_datetime) do
+  def fetch_messages_by_conversation_id(conversation_id, sent_before_datetime) do
     query = if sent_before_datetime do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 20)
     else
@@ -42,15 +42,15 @@ defmodule Planga.Chat do
 
   # Optionally, the argument `sent_before_datetime` can be used to look back further in history.
   # """
-  # def get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime \\ nil) do
-  #   app = Repo.get!(App, app_id)
-  #   case Repo.get_by(Conversation, app_id: app.id, remote_id: remote_conversation_id) do
-  #     conversation = %Conversation{} ->
-  #       get_messages_by_conversation_id(conversation.id, sent_before_datetime)
-  #     nil ->
-  #       []
-  #   end
-  # end
+  def fetch_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime \\ nil) do
+    app = Repo.get!(App, app_id)
+    case Repo.get_by(Conversation, app_id: app.id, remote_id: remote_conversation_id) do
+      conversation = %Conversation{} ->
+        fetch_messages_by_conversation_id(conversation.id, sent_before_datetime)
+      nil ->
+        []
+    end
+  end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
   defp put_sender(message) do
@@ -90,7 +90,7 @@ defmodule Planga.Chat do
   """
   def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
     {:ok, message} = Repo.transaction(fn ->
-      conversation = get_conversation_by_remote_id!(app_id, remote_conversation_id)
+      conversation = fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
       idempotently_add_user_to_conversation(conversation.id, user_id)
 
       other_user_ids
@@ -127,7 +127,7 @@ defmodule Planga.Chat do
   end
 
   def idempotently_add_user_with_remote_id_to_conversation(app_id, conversation_id, remote_user_id) do
-    user = get_user_by_remote_id!(app_id, remote_user_id)
+    user = fetch_user_by_remote_id!(app_id, remote_user_id)
     idempotently_add_user_to_conversation(conversation_id, user.id)
   end
 
@@ -140,7 +140,7 @@ defmodule Planga.Chat do
     end)
   end
 
-  def get_api_key_pair_by_public_id!(pub_api_id) do
+  def fetch_api_key_pair_by_public_id!(pub_api_id) do
     Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
   end
 

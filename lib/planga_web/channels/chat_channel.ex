@@ -41,11 +41,11 @@ defmodule PlangaWeb.ChatChannel do
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
 
     remote_conversation_id = socket.assigns.config.conversation_id
-    app_id = socket.assigns.config.app_id
-    {:ok, conversation_id} = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+    app_id = socket.assigns.app_id
+    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
     messages =
-      socket.assigns.app_id
-      |> Planga.Chat.fetch_messages_by_conversation_id(conversation_id, sent_before_datetime) # TODO Long line; rename function?
+      conversation.id
+      |> Planga.Chat.fetch_messages_by_conversation_id(sent_before_datetime) # TODO Long line; rename function?
       |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
     push socket, "messages_so_far", %{messages: messages}
   end
