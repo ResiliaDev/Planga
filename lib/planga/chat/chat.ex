@@ -12,7 +12,7 @@ defmodule Planga.Chat do
   Given a user's `remote_id`, returns the User struct.
   Will throw an Ecto.NoResultsError error if user could not be found.
   """
-  def get_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
+  def fetch_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
     {:ok, user} = Repo.transaction(fn ->
       app = Repo.get!(App, app_id)
       user =  Repo.get_by(User, [app_id: app.id, remote_id: remote_user_id])
@@ -25,7 +25,7 @@ defmodule Planga.Chat do
     user
   end
 
-  defp get_messages_by_conversation_id(conversation_id, sent_before_datetime) do
+  defp fetch_messages_by_conversation_id(conversation_id, sent_before_datetime) do
     query = if sent_before_datetime do
       from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 20)
     else
@@ -37,20 +37,20 @@ defmodule Planga.Chat do
     |> Enum.map(&put_sender/1)
   end
 
-  @doc """
-  Returns the latest 20 messages that are part of a conversation indicated by `app_id` + `remote_conversation_id`.
+  # @doc """
+  # Returns the latest 20 messages that are part of a conversation indicated by `app_id` + `remote_conversation_id`.
 
-  Optionally, the argument `sent_before_datetime` can be used to look back further in history.
-  """
-  def get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime \\ nil) do
-    app = Repo.get!(App, app_id)
-    case Repo.get_by(Conversation, app_id: app.id, remote_id: remote_conversation_id) do
-      conversation = %Conversation{} ->
-        get_messages_by_conversation_id(conversation.id, sent_before_datetime)
-      nil ->
-        []
-    end
-  end
+  # Optionally, the argument `sent_before_datetime` can be used to look back further in history.
+  # """
+  # def get_messages_by_remote_conversation_id(app_id, remote_conversation_id, sent_before_datetime \\ nil) do
+  #   app = Repo.get!(App, app_id)
+  #   case Repo.get_by(Conversation, app_id: app.id, remote_id: remote_conversation_id) do
+  #     conversation = %Conversation{} ->
+  #       get_messages_by_conversation_id(conversation.id, sent_before_datetime)
+  #     nil ->
+  #       []
+  #   end
+  # end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
   defp put_sender(message) do
@@ -62,7 +62,7 @@ defmodule Planga.Chat do
   Given the conversation's `remote_id` as well as the `app_id` it is part of,
   returns the `%Planga.Conversation{}` it represents.
   """
-  def get_conversation_by_remote_id!(app_id, remote_id) do
+  def fetch_conversation_by_remote_id!(app_id, remote_id) do
     {:ok, {app, conversation}} = Repo.transaction(fn ->
       app = Repo.get!(App, app_id)
       conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
