@@ -4,6 +4,7 @@ defmodule Planga.AppSettingsListener do
   (and its related API key pairs),
   """
   use GenServer
+  require Logger
 
   def start_link do
     GenServer.start_link(__MODULE__, [], [])
@@ -21,12 +22,15 @@ defmodule Planga.AppSettingsListener do
         # Be notified when the connection to RabbitMQ goes down
         Process.monitor(conn.pid)
 
-        setup_channel(conn)
+        {:ok, channel} = setup_channel(conn)
+        Logger.info "RabbitMQ connection with Ruby app established!"
+        {:ok, channel}
 
       {:error, _} ->
         # Reconnection loop
-        :timer.sleep(10_000)
-        rabbitmq_connect
+        Logger.warn "RabbitMQ connection to Ruby app failure... reconnecting in ten seconds!"
+        :timer.sleep(5_000)
+        rabbitmq_connect()
     end
   end
 
@@ -40,7 +44,8 @@ defmodule Planga.AppSettingsListener do
 
   # Reconnect on RabbitMQ failure:
   def handle_info({:DOWN, _, :process, _pid, _reason}, _) do
-    {:ok, chan} = rabbitmq_connect
+    Logger.warn "RabbitMQ connection to Ruby app just went down!"
+    {:ok, chan} = rabbitmq_connect()
     {:noreply, chan}
   end
 
@@ -82,7 +87,6 @@ defmodule Planga.AppSettingsListener do
   end
 
   defp update_credential(api_key_map) do
-    require Logger
     Planga.Repo.transaction(fn ->
 
       app =
