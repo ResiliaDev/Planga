@@ -58,8 +58,9 @@ defmodule Planga.Mixfile do
       # Communication with Ruby:
       {:amqp, "~> 1.0.3"},
       {:rabbit_common, "~> 3.7.8"},
-      {:ranch, "~> 1.4", override: true},
+      {:ranch, "~> 1.6.2", override: true},
       {:recon, "2.3.6", override: true},
+      {:ranch_proxy_protocol, "~> 2.1", override: true},
 
       # Releases: 
       {:distillery, "~> 1.5.4", runtime: false},

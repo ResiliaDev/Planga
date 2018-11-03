@@ -20,6 +20,9 @@ defmodule Planga.Application do
       # Start your own worker by calling: Planga.Worker.start_link(arg1, arg2, arg3)
       # worker(Planga.Worker, [arg1, arg2, arg3]),
       worker(Planga.Scheduler, []),
+
+      # Connects to RabbitMQ and manages changes in app settings.
+      worker(Planga.AppSettingsListener, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

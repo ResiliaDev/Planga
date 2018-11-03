@@ -37,3 +37,6 @@ npm-debug.log
 /priv/LATEST.LOG
 /priv/schema.DAT
 /priv/repo/backups/*.backup
+
+# Logfiles
+/log/
