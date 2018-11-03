@@ -41,7 +41,6 @@ defmodule Planga.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:plug_cowboy, "~> 1.0"},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
       # {:sqlite_ecto2, "~> 2.2"},
       {:ecto, "~> 2.1.6", override: true},
       # {:ecto_mnesia, "~> 0.9.0"},
@@ -55,6 +54,14 @@ defmodule Planga.Mixfile do
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
       {:httpoison, "~> 1.0"},
+
+      # Communication with Ruby:
+      {:amqp, "~> 1.0.3"},
+      {:rabbit_common, "~> 3.7.8"},
+      {:ranch, "~> 1.4", override: true},
+      {:recon, "2.3.6", override: true},
+
+      # Releases: 
       {:distillery, "~> 1.5.4", runtime: false},
 
       {:planga_phoenix, "~> 1.0.0"},
