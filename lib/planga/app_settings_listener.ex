@@ -28,9 +28,10 @@ defmodule Planga.AppSettingsListener do
         Logger.info "RabbitMQ connection with Ruby app established!"
         {:ok, channel}
 
-      {:error, _} ->
+      {:error, reason} ->
         # Reconnection loop
         Logger.warn "RabbitMQ connection to Ruby app failure... reconnecting in ten seconds!"
+        Logger.warn "Reason: #{inspect(reason)}"
         :timer.sleep(5_000)
         rabbitmq_connect()
     end
