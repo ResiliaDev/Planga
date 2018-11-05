@@ -13,7 +13,8 @@ defmodule Planga.AppSettingsListener do
   @exchange_name "planga_app_settings_updates"
 
   def init(_opts) do
-    rabbitmq_connect()
+    send(self(), :setup)
+    {:ok, nil}
   end
 
 
@@ -44,6 +45,11 @@ defmodule Planga.AppSettingsListener do
 
   defp config do
     Application.fetch_env!(:planga, :amqp_settings)
+  end
+
+  def handle_info(:setup, _) do
+    {:ok, channel} = rabbitmq_connect()
+    {:noreply, channel}
   end
 
   # Reconnect on RabbitMQ failure:
