@@ -16,8 +16,9 @@ defmodule Planga.AppSettingsListener do
     rabbitmq_connect()
   end
 
+
   defp rabbitmq_connect do
-    case AMQP.Connection.open() do # TODO Configure location
+    case AMQP.Connection.open(config()) do
       {:ok, conn} ->
         # Be notified when the connection to RabbitMQ goes down
         Process.monitor(conn.pid)
@@ -41,6 +42,9 @@ defmodule Planga.AppSettingsListener do
     {:ok, channel}
   end
 
+  defp config do
+    Application.fetch_env!(:planga, :amqp_settings)
+  end
 
   # Reconnect on RabbitMQ failure:
   def handle_info({:DOWN, _, :process, _pid, _reason}, _) do

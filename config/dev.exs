@@ -68,3 +68,10 @@ config :planga, Planga.Repo,
   # host: {:system, :atom, "MNESIA_HOST", Kernel.node()},
   host: node(),
   storage_type: :disc_copies
+
+config :planga, :amqp_settings,
+  username: "guest",
+  password: "guest",
+  host: "localhost",
+  port: 5672,
+  ssl_options: :none
