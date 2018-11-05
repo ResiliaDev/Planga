@@ -53,8 +53,9 @@ defmodule Planga.AppSettingsListener do
   end
 
   # Reconnect on RabbitMQ failure:
-  def handle_info({:DOWN, _, :process, _pid, _reason}, _) do
-    Logger.warn "RabbitMQ connection to Ruby app just went down!"
+  def handle_info({:DOWN, _, :process, _pid, reason}, _) do
+    Logger.warn "RabbitMQ connection to Ruby app just went down! Reason:"
+    Logger.warn inspect(reason)
     {:ok, chan} = rabbitmq_connect()
     {:noreply, chan}
   end
