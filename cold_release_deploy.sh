@@ -6,7 +6,7 @@ echo "Creating COLD release for version ${relnum}..."
 cd ./assets;
 ./node_modules/brunch/bin/brunch b -p ;
 cd ../;
-MIX_ENV=prod mix do phoenix.digest, release --env=prod
+MIX_ENV=prod mix do phx.digest, release --env=prod
 echo "Rsyncing COLD release to Planga directory..."
 sudo rsync -hvrPt _build/prod/rel/planga/releases/${relnum}/planga.tar.gz /var/www/planga/
 cd /var/www/planga/
