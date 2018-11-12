@@ -6,7 +6,7 @@ echo "Creating release for version ${relnum}..."
 cd ./assets;
 ./node_modules/brunch/bin/brunch b -p ;
 cd ../;
-MIX_ENV=prod mix do phoenix.digest, release --env=prod --upgrade
+MIX_ENV=prod mix do phx.digest, release --env=prod --upgrade
 echo "Done!"
 echo "Continuing to upload release to local server..."
 # echo "Enter your sudo-password to copy-over the application and hot-upgrade the application to ${relnum}."
