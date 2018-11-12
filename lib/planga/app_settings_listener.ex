@@ -90,60 +90,9 @@ defmodule Planga.AppSettingsListener do
     {:ok, _consumer_tag} = AMQP.Basic.consume(channel, queue_name, nil, no_ack: true)
   end
 
-  @doc """
-  Currently, the Rails system works with 'users', so this is how we are managing individual applications,
-  using the user ID as app name.
-  """
-  @deprecated
-  defp update_rails_user(user_map) do
-    Planga.Repo.transaction(fn ->
-      user_map["api_credentials"]
-      |> Enum.each(&update_credential/1)
-    end)
-  end
 
-  @deprecated
-  defp update_credential(api_key_map) do
-    Planga.Repo.transaction(fn ->
-
-      app =
-        case Planga.Repo.get_by(Planga.Chat.App, name: to_string(api_key_map["public_id"])) do
-          nil ->
-            Logger.info("Creating new app #{api_key_map["public_id"]}")
-            %Planga.Chat.App{name: api_key_map["public_id"]}
-          existing ->
-            Logger.info("Updating existing app #{api_key_map["public_id"]}")
-            existing
-        end
-
-      app =
-        app
-        |> Planga.Chat.App.from_json(api_key_map)
-        |> Planga.Repo.insert_or_update!
-
-
-      api_key_pair =
-        case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_map["public_id"]) do
-          nil ->
-            Logger.info("Creating new key #{api_key_map["public_id"]}")
-            %Planga.Chat.APIKeyPair{public_id: api_key_map["public_id"]}
-          existing ->
-            Logger.info("Updating existing key #{api_key_map["public_id"]}")
-            existing
-      end
-
-      api_key_map =
-        Map.merge(api_key_map, %{"app_id" => app.id})
-
-      api_key_pair
-      |> Planga.Chat.APIKeyPair.from_json(api_key_map)
-      |> Planga.Repo.insert_or_update!
-      Logger.info("Done with key #{api_key_map["public_id"]}!")
-    end)
-  end
-
-
-
+  # Updates the local Planga.Chat.App using the remote data
+  # from Rails to properly configure it.
   defp update_rails_app(app_map) do
     Planga.Repo.transaction(fn ->
       app_log_name = "#{app_map["id"]}/`#{app_map["name"]}`"
@@ -172,9 +121,7 @@ defmodule Planga.AppSettingsListener do
 
 
   defp update_credential2(api_key_map, app) do
-    # TODO
-
-    # Planga.Repo.transaction(fn ->
+    Planga.Repo.transaction(fn ->
       api_key_pair =
         case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_map["public_id"]) do
           nil ->
@@ -192,6 +139,6 @@ defmodule Planga.AppSettingsListener do
       |> Planga.Chat.APIKeyPair.from_json(api_key_map)
       |> Planga.Repo.insert_or_update!
       Logger.info("Done with key #{api_key_map["public_id"]}!")
-    # end)
+    end)
   end
 end
