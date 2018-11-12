@@ -25,8 +25,18 @@ defmodule Planga.Chat.App do
     |> validate_required([:name])
   end
 
+  @deprecated
   def from_json(app \\ %__MODULE__{}, json) do
     app
     |> changeset(%{name: to_string(json["public_id"])})
+  end
+
+  def from_hash(app \\ %__MODULE__{}, hash) do
+    app
+    |> changeset(
+      %{
+        id: hash["id"],
+        name: to_string(hash["name"])
+      })
   end
 end

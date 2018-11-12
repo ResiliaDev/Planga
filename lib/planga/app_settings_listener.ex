@@ -70,7 +70,7 @@ defmodule Planga.AppSettingsListener do
   end
 
   def handle_info({:basic_deliver, payload_binary, %{delivery_tag: tag, redelivered: redelivered}}, channel) do
-    payload = :erlang.binary_to_term(payload_binary)
+    payload = :erlang.binary_to_term(payload_binary, safe: true)
     Task.start(fn ->
       IO.puts "Received message: #{inspect(payload)}"
       update_rails_user(payload)
@@ -91,6 +91,7 @@ defmodule Planga.AppSettingsListener do
   Currently, the Rails system works with 'users', so this is how we are managing individual applications,
   using the user ID as app name.
   """
+  @deprecated
   defp update_rails_user(user_map) do
     Planga.Repo.transaction(fn ->
       user_map["api_credentials"]
@@ -98,7 +99,8 @@ defmodule Planga.AppSettingsListener do
     end)
   end
 
-  defp update_credential(api_key_map) do
+  @deprecated
+  defp update_credential(api_key_map, app) do
     Planga.Repo.transaction(fn ->
 
       app =
@@ -137,4 +139,48 @@ defmodule Planga.AppSettingsListener do
     end)
   end
 
+
+
+  defp update_rails_app(app_map) do
+    Planga.Repo.transaction(fn ->
+      app = case Planga.Repo.get_by(Planga.Chat.App, id: app_map["id"]) do
+              nil ->
+                Logger.info("Creating new app #{api_key_map["id"]}/#{api_keymap["name"]}")
+                %Planga.Chat.App()
+              existing ->
+                Logger.info("Updating existing app #{api_key_map["public_id"]}")
+                existing
+            end
+            |> Planga.Chat.App.from_hash(app_map)
+            |> Planga.Repo.insert_or_update!()
+
+      app_map["api_credentials"]
+      |> Enum.each(&update_credential2(&1, app))
+    end)
+  end
+
+
+  defp update_credential2(api_key_map, app) do
+    # TODO
+
+    Planga.Repo.transaction(fn ->
+      api_key_pair =
+        case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_map["public_id"]) do
+          nil ->
+            Logger.info("Creating new key #{api_key_map["public_id"]}")
+            %Planga.Chat.APIKeyPair{public_id: api_key_map["public_id"]}
+          existing ->
+            Logger.info("Updating existing key #{api_key_map["public_id"]}")
+            existing
+        end
+
+      api_key_map =
+        Map.merge(api_key_map, %{"app_id" => app.id})
+
+      api_key_pair
+      |> Planga.Chat.APIKeyPair.from_json(api_key_map)
+      |> Planga.Repo.insert_or_update!
+      Logger.info("Done with key #{api_key_map["public_id"]}!")
+    end
+  end
 end
