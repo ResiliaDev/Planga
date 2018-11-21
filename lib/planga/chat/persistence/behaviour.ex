@@ -18,7 +18,7 @@ defmodule Planga.Chat.Persistence.Behaviour do
   @doc """
   Hides message by setting `deleted_at`
   """
-  @callback hide_message(message_id :: any) :: :ok | {:error, any}
+  @callback hide_message(conversation_id :: integer, message_uuid :: String.t) :: {:ok, updated_message :: %Planga.Chat.Message{}} | {:error, any}
 
   @doc """
   Bans chatter in app.
@@ -27,7 +27,7 @@ defmodule Planga.Chat.Persistence.Behaviour do
 
   Should only be called by persons that have correct rights.
   """
-  @callback ban_chatter(convesation_id :: integer, user_id :: integer, duration :: integer) :: :ok | {:error, any}
+  @callback ban_chatter(convesation_id :: integer, user_id :: integer, duration_minutes :: integer) :: :ok | {:error, any}
 
   @doc """
   Looks at current role a certain user has.

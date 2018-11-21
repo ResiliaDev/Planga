@@ -68,6 +68,11 @@ defmodule Planga.Connection do
     PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "new_remote_message", message)
   end
 
+  def broadcast_changed_message!(app_id, remote_conversation_id, changed_message) do
+    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "changed_message", changed_message)
+  end
+
+
   defp static_topic(app_id, remote_conversation_id) do
     "chat:#{app_id}#{remote_conversation_id}"
   end

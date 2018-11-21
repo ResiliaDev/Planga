@@ -133,13 +133,14 @@ defmodule Planga.Chat.Persistence.Mnesia do
     :ok
   end
 
-  def hide_message(message_id) do
+  def hide_message(conversation_id, message_uuid) do
     safe(fn ->
       Repo.transaction(fn ->
         Message
-        |> Repo.get!(message_id)
+        |> Repo.get_by!(conversation_id: conversation_id, uuid: message_uuid)
         |> Ecto.Changeset.change(deleted_at: DateTime.utc_now)
         |> Repo.update!()
+        |> put_sender()
       end)
     end).()
     |> to_tagged_status
@@ -150,6 +151,18 @@ defmodule Planga.Chat.Persistence.Mnesia do
       Repo.transaction(fn ->
         Planga.Chat.ConversationUser
         |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
+      end)
+    end).()
+    |> to_tagged_status
+  end
+
+  def set_role(conversation_id, user_id, role) do
+    safe(fn ->
+      Repo.transaction(fn ->
+        Planga.Chat.ConversationUser
+        |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
+        |> Ecto.Changeset.change(role: role)
+        |> Repo.update!()
       end)
     end).()
     |> to_tagged_status
