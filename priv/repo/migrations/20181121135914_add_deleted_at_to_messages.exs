@@ -3,7 +3,7 @@ defmodule Planga.Repo.Migrations.AddDeletedAtToMessages do
 
   def change do
     alter table(:message) do
-      add :deleted_at, :datetime, default: nil
+      add :deleted_at, :utc_datetime
     end
   end
 end

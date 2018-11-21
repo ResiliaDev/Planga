@@ -87,7 +87,7 @@ defmodule Planga.Chat.Persistence.Mnesia do
         id: Snowflakex.new!(),
         content: message,
         conversation_id: conversation.id,
-        sender_id: user_id
+        sender_id: user_id,
       }
       |> Message.changeset
       |> Repo.insert!()
