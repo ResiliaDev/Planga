@@ -1,3 +1,9 @@
+.planga--chat-container, .planga--chat-container * {
+    box-sizing: border-box;
+    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+    font-size: 14px;
+}
+
 .planga--chat-container {
   margin-bottom: 50px; }
 
@@ -18,7 +24,9 @@
   background-color: rgba(0, 0, 0, 0.08); }
 
 .planga--chat-current-user-message .planga--chat-author-wrapper {
-  color: green; }
+    color: green;
+    padding-right: 0.5em;
+}
 
 .planga--chat-message-sent-at-wrapper {
   display: inline-block;
@@ -32,12 +40,6 @@
   min-width: 50px;
   font-weight: bold;
   text-align: right; }
-
-.planga--chat-author-name::after {
-  content: ":";
-  display: inline-block;
-  padding-left: 0.1em;
-  padding-right: 0.5em; }
 
 .planga--chat-message-content {
   display: inline-block;
