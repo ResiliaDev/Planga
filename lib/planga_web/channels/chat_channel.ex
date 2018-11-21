@@ -57,6 +57,7 @@ defmodule PlangaWeb.ChatChannel do
   NOTE Send something else (async?) when invalid message/rate-limited etc?
   """
   def handle_in("new_message", payload, socket) do
+    require Logger
     message = payload["message"]
 
 
@@ -68,7 +69,9 @@ defmodule PlangaWeb.ChatChannel do
 
       conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
       {:ok, conversation_user_info} = Planga.Chat.Persistence.Mnesia.fetch_conversation_user_info(conversation.id, user_id)
+      Logger.info(inspect(conversation_user_info))
       if conversation_user_info.banned_until && DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
+        Logger.debug("Received message from banned user.")
         {:reply, %{"status" => "error", "data" => "Banned until #{conversation_user_info.banned_until}"}}
       else
         other_user_ids = other_users |> Enum.map(&(&1.id))
