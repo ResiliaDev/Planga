@@ -31,10 +31,8 @@ defmodule Planga.Chat.Persistence.Behaviour do
 
   @doc """
   Looks at current role a certain user has.
-
-  Should only be called by persons that have correct rights.
   """
-  @callback fetch_role(conversation_id :: integer, user_id :: any) :: {:ok, role :: String.t} | {:error, any}
+  @callback fetch_conversation_user_info(conversation_id :: integer, user_id :: any) :: {:ok, role :: %Planga.Chat.ConversationUser{}} | {:error, any}
 
   @doc """
   Updates the current role a certain user has.

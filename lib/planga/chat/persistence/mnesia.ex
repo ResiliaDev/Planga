@@ -144,4 +144,14 @@ defmodule Planga.Chat.Persistence.Mnesia do
     end).()
     |> to_tagged_status
   end
+
+  def fetch_conversation_user_info(conversation_id, user_id) do
+    safe(fn ->
+      Repo.transaction(fn ->
+        Planga.Chat.ConversationUser
+        |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
+      end)
+    end).()
+    |> to_tagged_status
+  end
 end
