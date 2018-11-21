@@ -28,6 +28,18 @@
     padding-right: 0.5em;
 }
 
+.planga--chat-deleted-message {
+    font-style: italic;
+    opacity: 0.5;
+}
+
+.planga--chat-message-options {
+    display: inline-block;
+    float: right;
+    padding-left: 0.5em;
+    cursor: pointer;
+}
+
 .planga--chat-message-sent-at-wrapper {
   display: inline-block;
   font-size: 0.8em;
