@@ -1,4 +1,6 @@
 defmodule Planga.Chat.Persistence.Mnesia do
+  use Exceptional, only: :named_functions
+
   @moduledoc """
   Uses Mnesia (using the EctoMnesia-wrapper) to persist chats and messages.
   """
@@ -131,4 +133,15 @@ defmodule Planga.Chat.Persistence.Mnesia do
     :ok
   end
 
+  def hide_message(message_id) do
+    safe(fn ->
+      Repo.transaction(fn ->
+        Message
+        |> Repo.get!(message_id)
+        |> Ecto.Changeset.change(deleted_at: DateTime.utc_now)
+        |> Repo.update!()
+      end)
+    end).()
+    |> to_tagged_status
+  end
 end

@@ -54,6 +54,7 @@ defmodule Planga.Mixfile do
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
       {:httpoison, "~> 1.0"},
+      {:exceptional, "~> 2.1"},
 
       # Communication with Ruby:
       {:amqp, "~> 1.0.3"},

@@ -14,4 +14,32 @@ defmodule Planga.Chat.Persistence.Behaviour do
   @callback create_message(app_id :: String.t, remote_conversation_id :: String.t, user_id :: integer,  message :: String.t, other_user_ids :: [integer]) :: %Planga.Chat.Message{}
 
   @callback update_username(user_id :: integer, remote_user_name :: String.t) :: :ok
+
+  @doc """
+  Hides message by setting `deleted_at`
+  """
+  @callback hide_message(message_id :: any) :: :ok | {:error, any}
+
+  @doc """
+  Bans chatter in app.
+
+  `duration` is time in minutes.
+
+  Should only be called by persons that have correct rights.
+  """
+  @callback ban_chatter(convesation_id :: integer, user_id :: integer, duration :: integer) :: :ok | {:error, any}
+
+  @doc """
+  Looks at current role a certain user has.
+
+  Should only be called by persons that have correct rights.
+  """
+  @callback fetch_role(conversation_id :: integer, user_id :: any) :: {:ok, role :: String.t} | {:error, any}
+
+  @doc """
+  Updates the current role a certain user has.
+
+  Should only be called by persons that have correct rights.
+  """
+  @callback set_role(conversation_id :: integer, user_id :: any, role :: String.t) :: :ok | {:error, any}
 end
