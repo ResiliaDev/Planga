@@ -11,6 +11,7 @@ defmodule Planga.Chat.ConversationUser do
     field :conversation_id, :integer
     field :user_id, :integer
     field :role, :string, default: ""
+    field :banned_until, :utc_datetime
 
     timestamps()
   end

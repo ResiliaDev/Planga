@@ -59,15 +59,23 @@ defmodule PlangaWeb.ChatChannel do
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
 
+
     if Planga.Chat.Message.valid_message?(message) do
       %{app_id: app_id,
         user_id: user_id,
         config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
       } = socket.assigns
-      other_user_ids = other_users |> Enum.map(&(&1.id))
-      message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
 
-      Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
+      conversation = fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+      conversation_user_info = Planga.Chat.Persistence.Mnesia.fetch_conversation_user_info(conversation.id, user_id)
+      if DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
+        {:reply, {:error, "Banned until #{conversation_user_info.banned_until}"}}
+      else
+        other_user_ids = other_users |> Enum.map(&(&1.id))
+        message = Planga.Chat.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
+
+        Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
+      end
     end
 
     {:noreply, socket}
