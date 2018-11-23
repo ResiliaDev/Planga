@@ -22,4 +22,15 @@ defmodule Planga.Chat.ConversationUser do
     |> cast(attrs, [:conversation_id, :user_id])
     |> validate_required([:conversation_id, :user_id])
   end
+
+
+  defmodule Presentation do
+
+    def conversation_user_dict(conversation_user) do
+      %{
+        "role" => conversation_user.role,
+        "banned_until" => conversation_user.banned_until
+      }
+    end
+  end
 end

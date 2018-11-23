@@ -36,22 +36,6 @@ defmodule PlangaWeb.ChatChannel do
 
 
   @doc """
-  Called whenever chatter requires more (i.e. earlier) messages.
-  """
-  def send_previous_messages(socket, sent_before_datetime \\ nil) do
-
-    remote_conversation_id = socket.assigns.config.conversation_id
-    app_id = socket.assigns.app_id
-    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-    messages =
-      conversation.id
-      |> Planga.Chat.fetch_messages_by_conversation_id(sent_before_datetime) # TODO Long line; rename function?
-      |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
-    push socket, "messages_so_far", %{messages: messages}
-  end
-
-
-  @doc """
   Called whenever the chatter attempts to send a new message.
 
   NOTE Send something else (async?) when invalid message/rate-limited etc?
@@ -132,6 +116,7 @@ defmodule PlangaWeb.ChatChannel do
   (and runs synchroniously with the Browser that is waiting for a connection).
   """
   def handle_info(:after_join, socket) do
+    send_connection_user_info(socket)
     send_previous_messages(socket)
     {:noreply, socket}
   end
@@ -148,4 +133,29 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
+
+  @doc """
+  Called whenever chatter requires more (i.e. earlier) messages.
+  """
+  def send_previous_messages(socket, sent_before_datetime \\ nil) do
+
+    remote_conversation_id = socket.assigns.config.conversation_id
+    app_id = socket.assigns.app_id
+    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+    messages =
+      conversation.id
+      |> Planga.Chat.fetch_messages_by_conversation_id(sent_before_datetime)
+      |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
+    push socket, "messages_so_far", %{messages: messages}
+  end
+
+  def send_connection_user_info(socket) do
+    app_id = socket.assigns.app_id
+    config = socket.assigns[:config]
+
+    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, config.conversation_id)
+    {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, socket.assigns.user_id)
+    broadcast! socket, "changed_conversation_user_info", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(conversation_user_info)
+    {:noreply, socket}
+  end
 end
