@@ -38,12 +38,19 @@ defmodule Planga.Chat.Persistence.Mnesia do
     query
     |> Repo.all()
     |> Enum.map(&put_sender/1)
+    |> Enum.map(&put_conversation_user/1)
   end
 
   # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
   defp put_sender(message) do
     sender = Repo.get(User, message.sender_id)
     %Message{message | sender: sender}
+  end
+
+  defp put_conversation_user(message) do
+    IO.inspect(message)
+    conversation_user = Repo.get(ConversationUser, message.conversation_user_id)
+    %Message{message | conversation_user: conversation_user}
   end
 
   @doc """
@@ -80,7 +87,7 @@ defmodule Planga.Chat.Persistence.Mnesia do
   def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
     {:ok, message} = Repo.transaction(fn ->
       conversation = fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-      idempotently_add_user_to_conversation(conversation.id, user_id)
+      {:ok, conversation_user} = idempotently_add_user_to_conversation(conversation.id, user_id)
 
       other_user_ids
       |> Enum.each(&idempotently_add_user_with_remote_id_to_conversation(app_id, conversation.id, &1))
@@ -90,10 +97,12 @@ defmodule Planga.Chat.Persistence.Mnesia do
         content: message,
         conversation_id: conversation.id,
         sender_id: user_id,
+        conversation_user_id: conversation_user.id
       }
       |> Message.changeset
       |> Repo.insert!()
       |> Repo.preload(:sender)
+      |> Repo.preload(:conversation_user)
     end)
 
     message
@@ -111,14 +120,17 @@ defmodule Planga.Chat.Persistence.Mnesia do
   # Calling this function multiple times has no (extra) effect.
   # """
   defp idempotently_add_user_to_conversation(conversation_id, user_id) do
-    {:ok, _user} = Repo.transaction(fn ->
-      user = Repo.get_by(ConversationUser, conversation_id: conversation_id, user_id: user_id)
+    safe(fn ->
+      Repo.transaction(fn ->
+      user = Repo.get_by!(ConversationUser, conversation_id: conversation_id, user_id: user_id)
       if user do
         user
       else
         Repo.insert!(%ConversationUser{conversation_id: conversation_id, user_id: user_id})
       end
-    end)
+      end)
+    end).()
+    |> to_tagged_status
   end
 
 
@@ -141,6 +153,7 @@ defmodule Planga.Chat.Persistence.Mnesia do
         |> Ecto.Changeset.change(deleted_at: DateTime.utc_now)
         |> Repo.update!()
         |> put_sender()
+        |> put_conversation_user()
       end)
     end).()
     |> to_tagged_status
@@ -162,6 +175,20 @@ defmodule Planga.Chat.Persistence.Mnesia do
         Planga.Chat.ConversationUser
         |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
         |> Ecto.Changeset.change(role: role)
+        |> Repo.update!()
+      end)
+    end).()
+    |> to_tagged_status
+  end
+
+  def ban_chatter(conversation_id, user_id, duration_minutes) do
+    now = DateTime.utc_now
+    ban_end = Timex.add(now, Timex.Duration.from_minutes(duration_minutes))
+    safe(fn ->
+      Repo.transaction(fn ->
+        Planga.Chat.ConversationUser
+        |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
+        |> Ecto.Changeset.change(banned_until: ban_end)
         |> Repo.update!()
       end)
     end).()

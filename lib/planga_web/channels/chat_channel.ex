@@ -116,10 +116,11 @@ defmodule PlangaWeb.ChatChannel do
   (and runs synchroniously with the Browser that is waiting for a connection).
   """
   def handle_info(:after_join, socket) do
-    send_connection_user_info(socket)
+    send_conversation_user_info(socket)
     send_previous_messages(socket)
     {:noreply, socket}
   end
+
 
   def handle_info(%Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
     broadcast! socket, "new_remote_message", Planga.Chat.Message.Presentation.message_dict(payload)
@@ -149,7 +150,7 @@ defmodule PlangaWeb.ChatChannel do
     push socket, "messages_so_far", %{messages: messages}
   end
 
-  def send_connection_user_info(socket) do
+  def send_conversation_user_info(socket) do
     app_id = socket.assigns.app_id
     config = socket.assigns[:config]
 
@@ -159,3 +160,4 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 end
+

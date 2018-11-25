@@ -6,6 +6,7 @@ defmodule Planga.Chat.Message do
   schema "message" do
     belongs_to :sender, Planga.Chat.User
     belongs_to :conversation, Planga.Chat.Conversation
+    belongs_to :conversation_user, Planga.Chat.ConversationUser
     field :content, :string
     field :uuid, Ecto.UUID # Public unique reference, so when message is updated (like content filter), it can be re-loaded, overriding old thing in interface.
     field :deleted_at, :utc_datetime
@@ -44,7 +45,8 @@ defmodule Planga.Chat.Message do
     def message_dict(message) do
       %{
         "uuid" => message.uuid,
-        "name" => message.sender.name |> html_escape,
+        "author_name" => message.sender.name |> html_escape,
+        "author_role" => message.conversation_user.role,
         "content" => message.content |> html_escape,
         "sent_at" => message.inserted_at,
         "deleted_at" => message.deleted_at

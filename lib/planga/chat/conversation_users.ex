@@ -29,7 +29,10 @@ defmodule Planga.Chat.ConversationUser do
     def conversation_user_dict(conversation_user) do
       %{
         "role" => conversation_user.role,
-        "banned_until" => conversation_user.banned_until
+        "banned_until" => case conversation_user.banned_until do
+                            nil -> nil
+                            datetime -> DateTime.to_unix(datetime)
+                          end
       }
     end
   end
