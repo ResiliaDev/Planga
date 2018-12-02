@@ -49,7 +49,8 @@ defmodule Planga.Chat.Message do
         "author_role" => message.conversation_user.role,
         "content" => message.content |> html_escape,
         "sent_at" => message.inserted_at,
-        "deleted_at" => message.deleted_at
+        "deleted_at" => message.deleted_at,
+
       }
     end
 
