@@ -72,8 +72,8 @@ defmodule Planga.Connection do
     PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "changed_message", changed_message)
   end
 
-  def broadcast_changed_user!(app_id, remote_conversation_id, changed_user) do
-    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "changed_user", changed_user)
+  def broadcast_changed_conversation_user!(app_id, remote_conversation_id, changed_conversation_user) do
+    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "changed_conversation_user", changed_conversation_user)
   end
 
 

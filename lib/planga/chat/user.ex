@@ -24,4 +24,5 @@ defmodule Planga.Chat.User do
     |> cast(attrs, [:name, :remote_id])
     |> validate_required([:name, :remote_id])
   end
+
 end

@@ -28,6 +28,7 @@ defmodule Planga.Chat.ConversationUser do
 
     def conversation_user_dict(conversation_user) do
       %{
+        "user_id" => conversation_user.user_id,
         "role" => conversation_user.role,
         "banned_until" =>
           case conversation_user.banned_until do

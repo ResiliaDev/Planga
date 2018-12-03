@@ -109,7 +109,7 @@ defmodule PlangaWeb.ChatChannel do
     end
   end
 
-  def handle_in("ban_user", %{"user_uuid" => user_to_ban_id}, socket) do
+  def handle_in("ban_user", %{"user_uuid" => user_to_ban_id, "duration_minutes" => duration_minutes}, socket) do
     require Logger
     Logger.info "Request to ban user with ID #{user_to_ban_id}; Socket assigns: #{inspect(socket.assigns)}"
 
@@ -125,11 +125,11 @@ defmodule PlangaWeb.ChatChannel do
       {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
     else
 
-      case Planga.Chat.ban_chatter(conversation.id, author_id) do
+      case Planga.Chat.ban_chatter(conversation.id, user_to_ban_id, duration_minutes) do
         {:error, error} ->
           {:reply, %{"data" => error}, socket}
         {:ok, updated_user} ->
-          Planga.Connection.broadcast_changed_user!(app_id, remote_conversation_id, updated_user)
+          Planga.Connection.broadcast_changed_conversation_user!(app_id, remote_conversation_id, updated_user)
           {:noreply, socket}
       end
     end
@@ -161,8 +161,8 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  def handle_info(%Phoenix.Socket.Broadcast{event: "changed_user", payload: payload}, socket) do
-    broadcast! socket, "changed_user", Planga.Chat.User.Presentation.user_dict(payload)
+  def handle_info(%Phoenix.Socket.Broadcast{event: "changed_conversation_user", payload: payload}, socket) do
+    broadcast! socket, "changed_conversation_user", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(payload)
 
     {:noreply, socket}
   end
