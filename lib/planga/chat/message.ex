@@ -45,8 +45,10 @@ defmodule Planga.Chat.Message do
     def message_dict(message) do
       %{
         "uuid" => message.uuid,
+        # TODO: Too many fields related to author. Should be moved to substructure instead.
         "author_name" => message.sender.name |> html_escape,
         "author_role" => message.conversation_user.role,
+        "author_uuid" => "#{message.conversation_user.id}",
         "content" => message.content |> html_escape,
         "sent_at" => message.inserted_at,
         "deleted_at" => message.deleted_at,

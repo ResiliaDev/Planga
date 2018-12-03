@@ -91,6 +91,7 @@ defmodule PlangaWeb.ChatChannel do
     } = socket.assigns
 
 
+    # TODO Split off in its own function
     conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
     {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, user_id)
     if conversation_user_info.role != "moderator" do
@@ -103,6 +104,32 @@ defmodule PlangaWeb.ChatChannel do
         {:ok, updated_message} ->
 
           Planga.Connection.broadcast_changed_message!(app_id, remote_conversation_id, updated_message)
+          {:noreply, socket}
+      end
+    end
+  end
+
+  def handle_in("ban_user", %{"user_uuid" => user_to_ban_id}, socket) do
+    require Logger
+    Logger.info "Request to ban user with ID #{user_to_ban_id}; Socket assigns: #{inspect(socket.assigns)}"
+
+    %{app_id: app_id,
+      user_id: user_id,
+      config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
+    } = socket.assigns
+
+    # TODO Split off in its own function
+    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+    {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, user_id)
+    if conversation_user_info.role != "moderator" do
+      {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
+    else
+
+      case Planga.Chat.ban_chatter(conversation.id, author_id) do
+        {:error, error} ->
+          {:reply, %{"data" => error}, socket}
+        {:ok, updated_user} ->
+          Planga.Connection.broadcast_changed_user!(app_id, remote_conversation_id, updated_user)
           {:noreply, socket}
       end
     end
@@ -133,6 +160,13 @@ defmodule PlangaWeb.ChatChannel do
 
     {:noreply, socket}
   end
+
+  def handle_info(%Phoenix.Socket.Broadcast{event: "changed_user", payload: payload}, socket) do
+    broadcast! socket, "changed_user", Planga.Chat.User.Presentation.user_dict(payload)
+
+    {:noreply, socket}
+  end
+
 
 
   @doc """
