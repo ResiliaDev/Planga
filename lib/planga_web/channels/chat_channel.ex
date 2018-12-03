@@ -100,7 +100,7 @@ defmodule PlangaWeb.ChatChannel do
 
       case Planga.Chat.hide_message(conversation.id, message_uuid) do
         {:error, error} ->
-          {:reply, %{"data" => error}, socket}
+          {:reply, {:error, %{"data" => error}}, socket}
         {:ok, updated_message} ->
 
           Planga.Connection.broadcast_changed_message!(app_id, remote_conversation_id, updated_message)
@@ -127,7 +127,7 @@ defmodule PlangaWeb.ChatChannel do
 
       case Planga.Chat.ban_chatter(conversation.id, user_to_ban_id, duration_minutes) do
         {:error, error} ->
-          {:reply, %{"data" => error}, socket}
+          {:reply, {:error, %{"data" => error}}, socket}
         {:ok, updated_user} ->
           Planga.Connection.broadcast_changed_conversation_user!(app_id, remote_conversation_id, updated_user)
           {:noreply, socket}

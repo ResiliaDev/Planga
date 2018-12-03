@@ -23,9 +23,7 @@ defmodule Planga.Chat.ConversationUser do
     |> validate_required([:conversation_id, :user_id])
   end
 
-
   defmodule Presentation do
-
     def conversation_user_dict(conversation_user) do
       %{
         "user_id" => conversation_user.user_id,
