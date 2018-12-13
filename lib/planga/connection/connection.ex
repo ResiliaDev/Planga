@@ -51,6 +51,8 @@ defmodule Planga.Connection do
   end
 
   def socket_info(user: user, api_key_pair: api_key_pair, config: config) do
+    # The reason the conversation_id is not in here,
+    # is because it might not be created yet, as it is created lazily, once the first user sends a message in it.
     [user_id: user.id,
      api_key_pair: api_key_pair,
      app_id: api_key_pair.app_id,

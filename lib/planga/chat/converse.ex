@@ -9,8 +9,8 @@ defmodule Planga.Chat.Converse do
 
     if Planga.Chat.Message.valid_message?(message) do
 
-      conversation = Planga.Chat.Converse.Persistence.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.fetch_conversation_user_info(conversation.id, user_id)
+      conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
+      {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.find_or_create_conversation_user_info(conversation.id, user_id)
       Logger.info(inspect(conversation_user_info))
       if conversation_user_info.banned_until && DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
         Logger.debug("Received message from banned user.")
@@ -31,7 +31,7 @@ defmodule Planga.Chat.Converse do
   """
   def previous_messages(%{app_id: app_id, config: %Planga.Connection.Config{conversation_id: remote_conversation_id}}, sent_before_datetime \\ nil) do
 
-    conversation = Planga.Chat.Converse.Persistence.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+    conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
     messages =
       conversation.id
       |> Planga.Chat.Converse.Persistence.fetch_messages_by_conversation_id(sent_before_datetime)
@@ -39,8 +39,8 @@ defmodule Planga.Chat.Converse do
   end
 
   def fetch_conversation_user_info(%{app_id: app_id, user_id: user_id, config: %Planga.Connection.Config{conversation_id: remote_conversation_id}}) do
-
-    conversation = Planga.Chat.Converse.Persistence.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+    # TODO Ensure conversation is not made as soon as user connects, but only after first message was sent
+    conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
     {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.fetch_conversation_user_info(conversation.id, user_id)
 
     conversation_user_info

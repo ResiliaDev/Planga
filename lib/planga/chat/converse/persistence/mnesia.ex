@@ -39,7 +39,7 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   Given the conversation's `remote_id` as well as the `app_id` it is part of,
   returns the `%Planga.Conversation{}` it represents.
   """
-  def fetch_conversation_by_remote_id!(app_id, remote_id) do
+  def find_or_create_conversation_by_remote_id!(app_id, remote_id) do
     {:ok, {app, conversation}} = Repo.transaction(fn ->
       app = Repo.get!(App, app_id)
       conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
@@ -54,6 +54,18 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
       conversation
     else
       Repo.get_by!(Conversation, app_id: app.id, remote_id: remote_id)
+    end
+  end
+
+  def find_conversation_by_remote_id(app_id, remote_id) do
+    {:ok, res} = Repo.transaction(fn ->
+      app = Repo.get!(App, app_id)
+      conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
+      conversation
+    end)
+    case res do
+      nil -> {:error, :not_found}
+      conversation -> {:ok, conversation}
     end
   end
 
