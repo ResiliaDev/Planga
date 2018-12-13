@@ -50,29 +50,6 @@ defmodule PlangaWeb.ChatChannel do
       :ok ->
         {:noreply, socket}
     end
-
-
-    # if Planga.Chat.Message.valid_message?(message) do
-    #   %{app_id: app_id,
-    #     user_id: user_id,
-    #     config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
-    #   } = socket.assigns
-
-    #   conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-    #   {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, user_id)
-    #   Logger.info(inspect(conversation_user_info))
-    #   if conversation_user_info.banned_until && DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
-    #     Logger.debug("Received message from banned user.")
-    #     {:reply, {:error, %{"data" => "Banned until #{conversation_user_info.banned_until}"}, socket}}
-    #   else
-    #     other_user_ids = other_users |> Enum.map(&(&1.id))
-    #     message = Planga.Chat.Converse.Persistence.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
-
-        # Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
-    #   end
-    # end
-
-    # {:noreply, socket}
   end
 
   @doc """
@@ -180,34 +157,17 @@ defmodule PlangaWeb.ChatChannel do
     {:noreply, socket}
   end
 
-  # def handle_info(%Phoenix.Socket.Broadcast{event: "changed_your_conversation_user", payload: payload}, socket) do
-  #   broadcast! socket, "changed_your_conversation_user", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(payload)
-
-  #   {:noreply, socket}
-  # end
-
   @doc """
   Called whenever chatter requires more (i.e. earlier) messages.
   """
   def send_previous_messages(socket, sent_before_datetime \\ nil) do
-
-    remote_conversation_id = socket.assigns.config.conversation_id
-    app_id = socket.assigns.app_id
-    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-    messages =
-      conversation.id
-      |> Planga.Chat.fetch_messages_by_conversation_id(sent_before_datetime)
-      |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
+    messages = Planga.Chat.Converse.previous_messages(socket.assigns, sent_before_datetime)
     push socket, "messages_so_far", %{messages: messages}
   end
 
   def send_connecting_conversation_user_info(socket) do
-    app_id = socket.assigns.app_id
-    config = socket.assigns[:config]
-
-    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, config.conversation_id)
-    {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, socket.assigns.user_id)
-    broadcast! socket, "changed_your_conversation_user_info", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(conversation_user_info)
+    presentable_conversation_user_info = Planga.Chat.Converse.fetch_conversation_user_info(socket.assigns)
+    broadcast! socket, "changed_your_conversation_user_info", presentable_conversation_user_info
     {:noreply, socket}
   end
 end
