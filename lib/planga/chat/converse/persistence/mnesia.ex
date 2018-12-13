@@ -70,42 +70,41 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   The to-be-sent message will be `message`.
 
   """
-  def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
+  def create_message(app_id, remote_conversation_id, user_id, message_content, other_user_ids) do
     {:ok, message} = Repo.transaction(fn ->
       conversation = find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {:ok, conversation_user} = idempotently_add_user_to_conversation(conversation.id, user_id)
+      {:ok, conversation_user} = ensure_user_partakes_in_conversation(conversation.id, user_id)
 
       other_user_ids
-      |> Enum.each(&idempotently_add_user_with_remote_id_to_conversation(app_id, conversation.id, &1))
+      |> Enum.map(&fetch_user_by_remote_id!(app_id, &1))
+      |> Enum.each(&ensure_user_partakes_in_conversation(conversation.id, &1))
 
-      %Message{
-        id: Snowflakex.new!(),
-        content: message,
-        conversation_id: conversation.id,
-        sender_id: user_id,
-        conversation_user_id: conversation_user.id
-      }
-      |> Message.changeset
-      |> Repo.insert!()
-      |> Repo.preload(:sender)
-      |> Repo.preload(:conversation_user)
+      do_create_message(message_content, conversation.id, user_id, conversation_user.id)
     end)
-
     message
   end
 
-
-  defp idempotently_add_user_with_remote_id_to_conversation(app_id, conversation_id, remote_user_id) do
-    user = fetch_user_by_remote_id!(app_id, remote_user_id)
-    idempotently_add_user_to_conversation(conversation_id, user.id)
+  defp do_create_message(message, conversation_id, sender_id, conversation_user_id) do
+    %Message{
+      id: Snowflakex.new!(),
+      content: message,
+      conversation_id: conversation_id,
+      sender_id: sender_id,
+      conversation_user_id: conversation_user_id
+    }
+    |> Message.changeset
+    |> Repo.insert!()
+    |> Repo.preload(:sender)
+    |> Repo.preload(:conversation_user)
   end
+
 
   # @doc """
   # Adds a user to a conversation.
   #
   # Calling this function multiple times has no (extra) effect.
   # """
-  defp idempotently_add_user_to_conversation(conversation_id, user_id) do
+  defp ensure_user_partakes_in_conversation(conversation_id, user_id) do
     safe(fn ->
       Repo.transaction(fn ->
       user = Repo.get_by!(ConversationUser, conversation_id: conversation_id, user_id: user_id)
@@ -118,6 +117,7 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
     end).()
     |> to_tagged_status
   end
+
 
   # Given a user's `remote_id`, returns the User struct.
   # Will throw an Ecto.NoResultsError error if user could not be found.

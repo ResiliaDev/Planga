@@ -131,7 +131,6 @@ defmodule Planga.Chat.Persistence.Mnesia do
   end
 
 
-
   def update_username(user_id, remote_user_name) do
     Repo.transaction(fn ->
       User
