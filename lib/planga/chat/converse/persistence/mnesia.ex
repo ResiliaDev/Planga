@@ -40,27 +40,19 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   returns the `%Planga.Conversation{}` it represents.
   """
   def find_or_create_conversation_by_remote_id!(app_id, remote_id) do
-    {:ok, {app, conversation}} = Repo.transaction(fn ->
-      app = Repo.get!(App, app_id)
-      conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
-      if conversation do
-        {app, conversation}
-      else
-        conversation = Repo.insert!(%Conversation{app_id: app.id, remote_id: remote_id})
-        {app, conversation}
+    {:ok, conversation} = Repo.transaction(fn ->
+      case Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id) do
+        nil ->
+          Repo.insert!(%Conversation{app_id: app_id, remote_id: remote_id})
+        conversation -> conversation
       end
     end)
-    if conversation.id != nil do
-      conversation
-    else
-      Repo.get_by!(Conversation, app_id: app.id, remote_id: remote_id)
-    end
+    conversation
   end
 
   def find_conversation_by_remote_id(app_id, remote_id) do
     {:ok, res} = Repo.transaction(fn ->
-      app = Repo.get!(App, app_id)
-      conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
+      conversation = Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id)
       conversation
     end)
     case res do

@@ -14,15 +14,15 @@ defmodule Planga.Chat.Persistence.Mnesia do
   @doc """
   Given a user's `remote_id`, returns the User struct.
   Will throw an Ecto.NoResultsError error if user could not be found.
+
+  TODO move username to different function
   """
   def fetch_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
     {:ok, user} = Repo.transaction(fn ->
-      app = Repo.get!(App, app_id)
-      user =  Repo.get_by(User, [app_id: app.id, remote_id: remote_user_id])
-      if user do
-        user
-      else
-        Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
+      case Repo.get_by(User, [app_id: app_id, remote_id: remote_user_id]) do
+        nil ->
+          Repo.insert!(%User{app_id: app_id, remote_id: remote_user_id, name: user_name})
+        user -> user
       end
     end)
     user
@@ -58,21 +58,19 @@ defmodule Planga.Chat.Persistence.Mnesia do
   returns the `%Planga.Conversation{}` it represents.
   """
   def fetch_conversation_by_remote_id!(app_id, remote_id) do
-    {:ok, {app, conversation}} = Repo.transaction(fn ->
-      app = Repo.get!(App, app_id)
-      conversation = Repo.get_by(Conversation, app_id: app.id, remote_id: remote_id)
-      if conversation do
-        {app, conversation}
-      else
-        conversation = Repo.insert!(%Conversation{app_id: app.id, remote_id: remote_id})
-        {app, conversation}
+    {:ok, conversation} = Repo.transaction(fn ->
+      case Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id) do
+        nil ->
+          Repo.insert!(%Conversation{app_id: app_id, remote_id: remote_id})
+        conversation -> conversation
       end
     end)
-    if conversation.id != nil do
-      conversation
-    else
-      Repo.get_by!(Conversation, app_id: app.id, remote_id: remote_id)
-    end
+    conversation
+    # if conversation.id != nil do
+    #   conversation
+    # else
+    #   Repo.get_by!(Conversation, app_id: app_id, remote_id: remote_id)
+    # end
   end
 
 
@@ -84,42 +82,41 @@ defmodule Planga.Chat.Persistence.Mnesia do
   The to-be-sent message will be `message`.
 
   """
-  def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
+  def create_message(app_id, remote_conversation_id, user_id, message_content, other_user_ids) do
     {:ok, message} = Repo.transaction(fn ->
       conversation = fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {:ok, conversation_user} = idempotently_add_user_to_conversation(conversation.id, user_id)
+      {:ok, conversation_user} = ensure_user_partakes_in_conversation(conversation.id, user_id)
 
       other_user_ids
-      |> Enum.each(&idempotently_add_user_with_remote_id_to_conversation(app_id, conversation.id, &1))
+      |> Enum.map(&fetch_user_by_remote_id!(app_id, &1))
+      |> Enum.each(&ensure_user_partakes_in_conversation(conversation.id, &1))
 
-      %Message{
-        id: Snowflakex.new!(),
-        content: message,
-        conversation_id: conversation.id,
-        sender_id: user_id,
-        conversation_user_id: conversation_user.id
-      }
-      |> Message.changeset
-      |> Repo.insert!()
-      |> Repo.preload(:sender)
-      |> Repo.preload(:conversation_user)
+      do_create_message(message_content, conversation.id, user_id, conversation_user.id)
     end)
-
     message
   end
 
-
-  defp idempotently_add_user_with_remote_id_to_conversation(app_id, conversation_id, remote_user_id) do
-    user = fetch_user_by_remote_id!(app_id, remote_user_id)
-    idempotently_add_user_to_conversation(conversation_id, user.id)
+  defp do_create_message(message, conversation_id, sender_id, conversation_user_id) do
+    %Message{
+      id: Snowflakex.new!(),
+      content: message,
+      conversation_id: conversation_id,
+      sender_id: sender_id,
+      conversation_user_id: conversation_user_id
+    }
+    |> Message.changeset
+    |> Repo.insert!()
+    |> Repo.preload(:sender)
+    |> Repo.preload(:conversation_user)
   end
+
 
   # @doc """
   # Adds a user to a conversation.
   #
   # Calling this function multiple times has no (extra) effect.
   # """
-  defp idempotently_add_user_to_conversation(conversation_id, user_id) do
+  defp ensure_user_partakes_in_conversation(conversation_id, user_id) do
     safe(fn ->
       Repo.transaction(fn ->
       user = Repo.get_by!(ConversationUser, conversation_id: conversation_id, user_id: user_id)

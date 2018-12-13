@@ -8,15 +8,15 @@ defmodule Planga.Connection.Persistence.Mnesia do
   @doc """
   Given a user's `remote_id`, returns the User struct.
   Will throw an Ecto.NoResultsError error if user could not be found.
+
+  TODO move username to different function
   """
   def fetch_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
     {:ok, user} = Repo.transaction(fn ->
-      app = Repo.get!(App, app_id)
-      user =  Repo.get_by(User, [app_id: app.id, remote_id: remote_user_id])
-      if user do
-        user
-      else
-        Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
+      case Repo.get_by(User, [app_id: app_id, remote_id: remote_user_id]) do
+        nil ->
+          Repo.insert!(%User{app_id: app_id, remote_id: remote_user_id, name: user_name})
+        user -> user
       end
     end)
     user
