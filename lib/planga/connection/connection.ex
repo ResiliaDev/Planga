@@ -5,15 +5,15 @@ defmodule Planga.Connection do
   """
   def connect(qualified_conversation_info) do
     {public_api_id, encrypted_conversation_info} = Planga.Connection.decode_conversation_info(qualified_conversation_info)
-    api_key_pair = Planga.Chat.fetch_api_key_pair_by_public_id!(public_api_id)
+    api_key_pair = Planga.Connection.Persistence.fetch_api_key_pair_by_public_id!(public_api_id)
     with {:ok, secret_info} = Planga.Connection.decrypt_config(encrypted_conversation_info, api_key_pair) do
       remote_conversation_id = secret_info.conversation_id
       current_user_id = secret_info.current_user_id
       app_id = api_key_pair.app_id
-      user = Planga.Chat.fetch_user_by_remote_id!(app_id, current_user_id)
+      user = Planga.Connection.Persistence.fetch_user_by_remote_id!(app_id, current_user_id)
       Planga.Connection.subscribe_to_conversation(app_id, remote_conversation_id)
 
-      Planga.Chat.update_username(user.id, secret_info.current_user_name)
+      Planga.Connection.Persistence.update_username(user.id, secret_info.current_user_name)
 
       socket_assigns = Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)
 
