@@ -82,7 +82,7 @@ defmodule PlangaWeb.ChatChannel do
       {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
     else
 
-      case Planga.Chat.hide_message(conversation.id, message_uuid) do
+      case Planga.Chat.Moderation.Persistence.hide_message(conversation.id, message_uuid) do
         {:error, error} ->
           {:reply, {:error, %{"data" => error}}, socket}
         {:ok, updated_message} ->
@@ -109,7 +109,7 @@ defmodule PlangaWeb.ChatChannel do
       {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
     else
 
-      case Planga.Chat.ban_chatter(conversation.id, user_to_ban_id, duration_minutes) do
+      case Planga.Chat.Moderation.Persistence.ban_chatter(conversation.id, user_to_ban_id, duration_minutes) do
         {:error, error} ->
           {:reply, {:error, %{"data" => error}}, socket}
         {:ok, updated_user} ->
