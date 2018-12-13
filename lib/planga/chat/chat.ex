@@ -128,6 +128,10 @@ defmodule Planga.Chat do
   #   :ok
   # end
 
+  # TODO This concern is far too big. Split into:
+  # - 'Converse': For the actual reading/writing of messages.
+  # - 'Moderation': For restricting/limiting/retrofixing the actions users do.
+  # - 'Lookup': (Maybe better name?) For finding out more about certain things, and receiving handles to pass to other calls.
   persistence_implementation = Planga.Chat.Persistence.Mnesia
 
   defdelegate fetch_user_by_remote_id!(app_id, remote_user_id), to: persistence_implementation

@@ -141,14 +141,16 @@ defmodule PlangaWeb.ChatChannel do
   This is a separate call, to keep the `join` as lightweight as possible,
   since it is executed during startup of the Channel GenServer
   (and runs synchroniously with the Browser that is waiting for a connection).
+
   """
   def handle_info(:after_join, socket) do
-    send_conversation_user_info(socket)
+    send_connecting_conversation_user_info(socket)
     send_previous_messages(socket)
     {:noreply, socket}
   end
 
 
+  # TODO There is a lot of seeming repetition here. Maybe create presentation-protocol, and iterate over these message clauses at compile-time?
   def handle_info(%Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
     broadcast! socket, "new_remote_message", Planga.Chat.Message.Presentation.message_dict(payload)
 
@@ -162,12 +164,20 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def handle_info(%Phoenix.Socket.Broadcast{event: "changed_conversation_user", payload: payload}, socket) do
-    broadcast! socket, "changed_conversation_user", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(payload)
+    if socket.assigns.user_id == payload.user_id do
+      broadcast! socket, "changed_your_conversation_user_info", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(payload)
+    else
+      broadcast! socket, "changed_conversation_user_info", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(payload)
+    end
 
     {:noreply, socket}
   end
 
+  # def handle_info(%Phoenix.Socket.Broadcast{event: "changed_your_conversation_user", payload: payload}, socket) do
+  #   broadcast! socket, "changed_your_conversation_user", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(payload)
 
+  #   {:noreply, socket}
+  # end
 
   @doc """
   Called whenever chatter requires more (i.e. earlier) messages.
@@ -184,13 +194,13 @@ defmodule PlangaWeb.ChatChannel do
     push socket, "messages_so_far", %{messages: messages}
   end
 
-  def send_conversation_user_info(socket) do
+  def send_connecting_conversation_user_info(socket) do
     app_id = socket.assigns.app_id
     config = socket.assigns[:config]
 
     conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, config.conversation_id)
     {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, socket.assigns.user_id)
-    broadcast! socket, "changed_conversation_user_info", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(conversation_user_info)
+    broadcast! socket, "changed_your_conversation_user_info", Planga.Chat.ConversationUser.Presentation.conversation_user_dict(conversation_user_info)
     {:noreply, socket}
   end
 end

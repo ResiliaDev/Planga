@@ -188,7 +188,7 @@ defmodule Planga.Chat.Persistence.Mnesia do
     safe(fn ->
       Repo.transaction(fn ->
         Planga.Chat.ConversationUser
-        bannable_conversation_users = from cu in Planga.Chat.ConversationUser, where: is_nil(cu.role)
+        bannable_conversation_users = Planga.Chat.ConversationUser #from cu in Planga.Chat.ConversationUser, where: is_nil(cu.role)
 
         bannable_conversation_users
         |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
