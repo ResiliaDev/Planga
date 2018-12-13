@@ -10,7 +10,7 @@ defmodule Planga.Chat.Converse do
     if Planga.Chat.Message.valid_message?(message) do
 
       conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.find_or_create_conversation_user_info(conversation.id, user_id)
+      {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.fetch_conversation_user_info(conversation.id, user_id)
       Logger.info(inspect(conversation_user_info))
       if conversation_user_info.banned_until && DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
         Logger.debug("Received message from banned user.")

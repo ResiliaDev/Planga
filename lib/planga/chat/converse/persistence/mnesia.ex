@@ -80,7 +80,7 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   """
   def create_message(app_id, remote_conversation_id, user_id, message, other_user_ids) do
     {:ok, message} = Repo.transaction(fn ->
-      conversation = fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+      conversation = find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
       {:ok, conversation_user} = idempotently_add_user_to_conversation(conversation.id, user_id)
 
       other_user_ids
