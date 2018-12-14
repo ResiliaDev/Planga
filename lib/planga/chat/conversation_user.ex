@@ -24,12 +24,14 @@ defmodule Planga.Chat.ConversationUser do
   end
 
   def ban(conversation_user = %__MODULE__{}, duration_minutes, ban_start_time = %DateTime{} \\ DateTime.utc_now) when is_integer(duration_minutes) and duration_minutes > 0 do
+    require Logger
+
     now = DateTime.utc_now
     ban_end = Timex.add(now, Timex.Duration.from_minutes(duration_minutes))
 
     case bannable?(conversation_user) do
       false ->
-        # TODO log this?
+        Logger.warn "Someone attempted to ban unbannable user #{inspect(conversation_user)}"
         conversation_user
       true ->
         conversation_user

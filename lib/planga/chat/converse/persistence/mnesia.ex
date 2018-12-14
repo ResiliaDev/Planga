@@ -85,14 +85,20 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   end
 
   defp do_create_message(message, conversation_id, sender_id, conversation_user_id) do
-    %Message{
-      id: Snowflakex.new!(),
+    # %Message{
+    #   id: Snowflakex.new!(),
+    #   content: message,
+    #   conversation_id: conversation_id,
+    #   sender_id: sender_id,
+    #   conversation_user_id: conversation_user_id
+    # }
+    Message.new(
       content: message,
       conversation_id: conversation_id,
       sender_id: sender_id,
       conversation_user_id: conversation_user_id
-    }
-    |> Message.changeset
+    )
+    # |> Message.changeset
     |> Repo.insert!()
     |> Repo.preload(:sender)
     |> Repo.preload(:conversation_user)

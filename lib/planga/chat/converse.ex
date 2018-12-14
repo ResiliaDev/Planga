@@ -23,6 +23,8 @@ defmodule Planga.Chat.Converse do
 
         :ok
       end
+    else
+      {:error, "invalid message"}
     end
   end
 

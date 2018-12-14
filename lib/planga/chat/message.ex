@@ -15,12 +15,16 @@ defmodule Planga.Chat.Message do
   end
 
   @doc false
-  def changeset(message, attrs \\ %{}) do
-    message
-    |> change(uuid: (message.uuid || Ecto.UUID.autogenerate)) # Not auto-handled by Ecto.Mnesia
-    |> cast(attrs, [:sender_id, :content])
-    |> validate_required([:sender_id, :content, :uuid, :conversation_id])
-    |> validate_change(:content, fn :content, message -> valid_message?(message.content) end)
+  def new(attrs \\ %{}) do
+    %__MODULE__{id: Snowflakex.new!(), uuid: Ecto.UUID.autogenerate}
+    |> cast(Map.new(attrs), [:content, :conversation_id, :sender_id, :conversation_user_id])
+    |> validate_required([:id, :content, :conversation_id, :sender_id, :conversation_user_id])
+    |> validate_change(:content, fn :content, content ->
+      case valid_message?(content) do
+        true -> []
+        false -> [content: :invalid_message]
+      end
+    end)
   end
 
   @doc """
