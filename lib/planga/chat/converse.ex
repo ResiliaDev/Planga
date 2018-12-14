@@ -32,10 +32,10 @@ defmodule Planga.Chat.Converse do
   def previous_messages(%{app_id: app_id, config: %Planga.Connection.Config{conversation_id: remote_conversation_id}}, sent_before_datetime \\ nil) do
 
     conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
-    messages =
-      conversation.id
-      |> Planga.Chat.Converse.Persistence.fetch_messages_by_conversation_id(sent_before_datetime)
-      |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
+
+    conversation.id
+    |> Planga.Chat.Converse.Persistence.fetch_messages_by_conversation_id(sent_before_datetime)
+    |> Enum.map(&Planga.Chat.Message.Presentation.message_dict/1)
   end
 
   def fetch_conversation_user_info(%{app_id: app_id, user_id: user_id, config: %Planga.Connection.Config{conversation_id: remote_conversation_id}}) do

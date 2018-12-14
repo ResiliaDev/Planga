@@ -23,6 +23,34 @@ defmodule Planga.Chat.ConversationUser do
     |> validate_required([:conversation_id, :user_id])
   end
 
+  def ban(conversation_user = %__MODULE__{}, duration_minutes, ban_start_time = %DateTime{} \\ DateTime.utc_now) when is_integer(duration_minutes) and duration_minutes > 0 do
+    now = DateTime.utc_now
+    ban_end = Timex.add(now, Timex.Duration.from_minutes(duration_minutes))
+
+    case bannable?(conversation_user) do
+      false ->
+        # TODO log this?
+        conversation_user
+      true ->
+        conversation_user
+        |> change(banned_until: ban_end)
+    end
+  end
+
+  defp bannable?(conversation_user = %__MODULE__{}) do
+    conversation_user.role == nil
+  end
+
+  def unban(conversation_user = %__MODULE__{}) do
+    conversation_user
+    |> change(banned_until: nil)
+  end
+
+  def set_role(conversation_user = %__MODULE__{}, role) when role in [nil, "moderator"] do
+    conversation_user
+    |> change(role: role)
+  end
+
   defmodule Presentation do
     def conversation_user_dict(conversation_user) do
       %{

@@ -12,24 +12,16 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
   alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
 
-  def set_role(conversation_id, user_id, role) do
-    safe(fn ->
-      Repo.transaction(fn ->
-        Planga.Chat.ConversationUser
-        |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
-        |> Ecto.Changeset.change(role: role)
-        |> Repo.update!()
-      end)
-    end).()
-    |> to_tagged_status
+  def hide_message(conversation_id, message_uuid) do
+    update_message(conversation_id, message_uuid, &Planga.Chat.Message.hide_message/1)
   end
 
-  def hide_message(conversation_id, message_uuid) do
+  defp update_message(conversation_id, message_uuid, update_function) do
     safe(fn ->
       Repo.transaction(fn ->
         Message
         |> Repo.get_by!(conversation_id: conversation_id, uuid: message_uuid)
-        |> Ecto.Changeset.change(deleted_at: DateTime.utc_now)
+        |> update_function.()
         |> Repo.update!()
         |> put_sender()
         |> put_conversation_user()
@@ -38,18 +30,21 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
     |> to_tagged_status
   end
 
+  def set_role(conversation_id, user_id, role) do
+    update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.set_role(&1, role))
+  end
+
+
   def ban_chatter(conversation_id, user_id, duration_minutes) do
-    import Ecto.Query
-    now = DateTime.utc_now
-    ban_end = Timex.add(now, Timex.Duration.from_minutes(duration_minutes))
+    update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.ban(&1, duration_minutes))
+  end
+
+  defp update_conversation_user(conversation_id, user_id, update_function) do
     safe(fn ->
       Repo.transaction(fn ->
         Planga.Chat.ConversationUser
-        bannable_conversation_users = Planga.Chat.ConversationUser #from cu in Planga.Chat.ConversationUser, where: is_nil(cu.role)
-
-        bannable_conversation_users
         |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
-        |> Ecto.Changeset.change(banned_until: ban_end)
+        |> update_function.()
         |> Repo.update!()
       end)
     end).()

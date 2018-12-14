@@ -39,7 +39,6 @@ defmodule PlangaWeb.ChatChannel do
   Called whenever the chatter attempts to send a new message.
 
   NOTE Send something else (async?) when invalid message/rate-limited etc?
-  TODO Move to separate abstraction layer!
   """
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
