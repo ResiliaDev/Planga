@@ -67,31 +67,6 @@ defmodule PlangaWeb.ChatChannel do
 
 
   def handle_in("hide_message", %{"message_uuid" => message_uuid}, socket) do
-    # require Logger
-    # Logger.info "Request to remove message with UUID `#{message_uuid}`; Socket assigns: #{inspect(socket.assigns)}"
-    # %{app_id: app_id,
-    #   user_id: user_id,
-    #   config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
-    # } = socket.assigns
-
-
-    # # TODO Split off in its own function
-    # conversation = Planga.Chat.Converse.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
-    # {:ok, conversation_user_info} = Planga.Chat.Converse.fetch_conversation_user_info(conversation.id, user_id)
-    # if conversation_user_info.role != "moderator" do
-    #   {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
-    # else
-
-    #   case Planga.Chat.Moderation.Persistence.hide_message(conversation.id, message_uuid) do
-    #     {:error, error} ->
-    #       {:reply, {:error, %{"data" => error}}, socket}
-    #     {:ok, updated_message} ->
-
-    #       Planga.Connection.broadcast_changed_message!(app_id, remote_conversation_id, updated_message)
-    #       {:noreply, socket}
-    #   end
-    # end
-
     case Planga.Chat.Moderation.hide_message(message_uuid, socket.assigns) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
@@ -102,29 +77,6 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def handle_in("ban_user", %{"user_uuid" => user_to_ban_id, "duration_minutes" => duration_minutes}, socket) do
-    # require Logger
-    # Logger.info "Request to ban user with ID #{user_to_ban_id}; Socket assigns: #{inspect(socket.assigns)}"
-
-    # %{app_id: app_id,
-    #   user_id: user_id,
-    #   config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
-    # } = socket.assigns
-
-    # # TODO Split off in its own function
-    # conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-    # {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, user_id)
-    # if conversation_user_info.role != "moderator" do
-    #   {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
-    # else
-
-    #   case Planga.Chat.Moderation.Persistence.ban_chatter(conversation.id, user_to_ban_id, duration_minutes) do
-    #     {:error, error} ->
-    #       {:reply, {:error, %{"data" => error}}, socket}
-    #     {:ok, updated_user} ->
-    #       Planga.Connection.broadcast_changed_conversation_user!(app_id, remote_conversation_id, updated_user)
-    #       {:noreply, socket}
-    #   end
-    # end
     case Planga.Chat.Moderation.ban_user(user_to_ban_id, duration_minutes, socket.assigns) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
@@ -149,7 +101,7 @@ defmodule PlangaWeb.ChatChannel do
   end
 
 
-  # TODO There is a lot of seeming repetition here. Maybe create presentation-protocol, and iterate over these message clauses at compile-time?
+  # NOTE There is a lot of seeming repetition here. Maybe create presentation-protocol, and iterate over these message clauses at compile-time?
   def handle_info(%Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload}, socket) do
     broadcast! socket, "new_remote_message", Planga.Chat.Message.Presentation.message_dict(payload)
 
