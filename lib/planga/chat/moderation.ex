@@ -6,14 +6,15 @@ defmodule Planga.Chat.Moderation do
 
     conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
     with :ok <- ensure_moderator!(conversation.id, user_id) do
-      Planga.Chat.Moderation.Persistence.hide_message(conversation.id, message_uuid)
+
+      Planga.Chat.Moderation.Persistence.update_message(conversation.id, message_uuid, &Planga.Chat.Message.hide_message/1)
     end
   end
 
   def ban_user(user_to_ban_id, duration_minutes, socket_assigns = %{app_id: app_id, user_id: user_id, config: %Planga.Connection.Config{conversation_id: remote_conversation_id}}) do
     Logger.info "Request to ban user with ID #{user_to_ban_id}; Socket assigns: #{inspect(socket_assigns)}"
 
-    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
+    conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
     with :ok <- ensure_moderator!(conversation.id, user_id) do
       Planga.Chat.Moderation.Persistence.ban_chatter(conversation.id, user_to_ban_id, duration_minutes)
     end

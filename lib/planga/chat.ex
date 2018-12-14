@@ -132,22 +132,22 @@ defmodule Planga.Chat do
   # - 'Converse': For the actual reading/writing of messages.
   # - 'Moderation': For restricting/limiting/retrofixing the actions users do.
   # - 'Lookup': (Maybe better name?) For finding out more about certain things, and receiving handles to pass to other calls.
-  persistence_implementation = Planga.Chat.Persistence.Mnesia
+  # persistence_implementation = Planga.Chat.Persistence.Mnesia
 
-  defdelegate fetch_user_by_remote_id!(app_id, remote_user_id), to: persistence_implementation
-  defdelegate fetch_user_by_remote_id!(app_id, remote_user_id, user_name), to: persistence_implementation
-  defdelegate fetch_messages_by_conversation_id(conversation_id, sent_before_datetime), to: persistence_implementation
-  defdelegate fetch_conversation_by_remote_id!(app_id, remote_id), to: persistence_implementation
+  # defdelegate fetch_user_by_remote_id!(app_id, remote_user_id), to: persistence_implementation
+  # defdelegate fetch_user_by_remote_id!(app_id, remote_user_id, user_name), to: persistence_implementation
+  # defdelegate fetch_messages_by_conversation_id(conversation_id, sent_before_datetime), to: persistence_implementation
+  # defdelegate fetch_conversation_by_remote_id!(app_id, remote_id), to: persistence_implementation
 
-  defdelegate create_message(app_id, remote_conversation_id, user_id, message, other_user_ids), to: persistence_implementation
-  defdelegate update_username(user_id, remote_user_name), to: persistence_implementation
+  # defdelegate create_message(app_id, remote_conversation_id, user_id, message, other_user_ids), to: persistence_implementation
+  # defdelegate update_username(user_id, remote_user_name), to: persistence_implementation
 
-  defdelegate hide_message(conversation_id, message_uuid), to: persistence_implementation
-  defdelegate ban_chatter(conversation_id, user_id, duration_minutes), to: persistence_implementation
-  defdelegate fetch_conversation_user_info(conversation_id, user_id), to: persistence_implementation
-  defdelegate set_role(conversation_id, user_id, role), to: persistence_implementation
+  # defdelegate hide_message(conversation_id, message_uuid), to: persistence_implementation
+  # defdelegate ban_chatter(conversation_id, user_id, duration_minutes), to: persistence_implementation
+  # defdelegate fetch_conversation_user_info(conversation_id, user_id), to: persistence_implementation
+  # defdelegate set_role(conversation_id, user_id, role), to: persistence_implementation
 
-  def fetch_api_key_pair_by_public_id!(pub_api_id) do
-    Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
-  end
+  # def fetch_api_key_pair_by_public_id!(pub_api_id) do
+  #   Planga.Repo.get_by!(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
+  # end
 end

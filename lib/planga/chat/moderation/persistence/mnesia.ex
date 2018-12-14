@@ -12,11 +12,11 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
   alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
 
-  def hide_message(conversation_id, message_uuid) do
-    update_message(conversation_id, message_uuid, &Planga.Chat.Message.hide_message/1)
-  end
+  # def hide_message(conversation_id, message_uuid) do
+  #   update_message(conversation_id, message_uuid, &Planga.Chat.Message.hide_message/1)
+  # end
 
-  defp update_message(conversation_id, message_uuid, update_function) do
+  def update_message(conversation_id, message_uuid, update_function) do
     safe(fn ->
       Repo.transaction(fn ->
         Message

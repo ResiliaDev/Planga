@@ -8,5 +8,5 @@ defmodule Planga.Chat.Converse.Persistence do
 
   defdelegate fetch_conversation_user_info(conversation_id, user_id), to: persistence_implementation
 
-  defdelegate find_conversation_by_remote_id, to: persistence_implementation
+  defdelegate find_conversation_by_remote_id(app_id, remote_conversation_id), to: persistence_implementation
 end
