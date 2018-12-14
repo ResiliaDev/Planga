@@ -30,14 +30,14 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
     |> to_tagged_status
   end
 
-  def set_role(conversation_id, user_id, role) do
-    update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.set_role(&1, role))
-  end
+  # def set_role(conversation_id, user_id, role) do
+  #   update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.set_role(&1, role))
+  # end
 
 
-  def ban_chatter(conversation_id, user_id, duration_minutes) do
-    update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.ban(&1, duration_minutes))
-  end
+  # def ban_chatter(conversation_id, user_id, duration_minutes) do
+  #   update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.ban(&1, duration_minutes))
+  # end
 
   defp update_conversation_user(conversation_id, user_id, update_function) do
     safe(fn ->

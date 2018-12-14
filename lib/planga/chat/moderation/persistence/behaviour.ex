@@ -8,19 +8,19 @@ defmodule Planga.Chat.Moderation.Persistence.Behaviour do
   # """
   # @callback hide_message(conversation_id :: integer, message_uuid :: String.t) :: {:ok, updated_message :: %Planga.Chat.Message{}} | {:error, any}
 
-  @doc """
-  Bans chatter in app.
+  # @doc """
+  # Bans chatter in app.
 
-  `duration` is time in minutes.
+  # `duration` is time in minutes.
 
-  Should only be called by persons that have correct rights.
-  """
-  @callback ban_chatter(convesation_id :: integer, user_id :: integer, duration_minutes :: integer) :: :ok | {:error, any}
+  # Should only be called by persons that have correct rights.
+  # """
+  # @callback ban_chatter(convesation_id :: integer, user_id :: integer, duration_minutes :: integer) :: :ok | {:error, any}
 
-  @doc """
-  Updates the current role a certain user has.
+  # @doc """
+  # Updates the current role a certain user has.
 
-  Should only be called by persons that have correct rights.
-  """
-  @callback set_role(conversation_id :: integer, user_id :: any, role :: String.t) :: :ok | {:error, any}
+  # Should only be called by persons that have correct rights.
+  # """
+  # @callback set_role(conversation_id :: integer, user_id :: any, role :: String.t) :: :ok | {:error, any}
 end

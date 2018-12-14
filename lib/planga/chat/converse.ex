@@ -7,25 +7,40 @@ defmodule Planga.Chat.Converse do
     }) do
     require Logger
 
-    if Planga.Chat.Message.valid_message?(message) do
 
-      conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.fetch_conversation_user_info(conversation.id, user_id)
-      Logger.info(inspect(conversation_user_info))
-      if conversation_user_info.banned_until && DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
-        Logger.debug("Received message from banned user.")
-        {:error, "Banned until #{conversation_user_info.banned_until}"}
-      else
-        other_user_ids = other_users |> Enum.map(&(&1.id))
-        message = Planga.Chat.Converse.Persistence.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
+    case Planga.Chat.Message.valid_message?(message) do
+      false ->
+        {:error, "invalid message"}
+      true ->
 
-        Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
+        conversation = Planga.Chat.Converse.Persistence.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
+        {:ok, conversation_user_info} = Planga.Chat.Converse.Persistence.fetch_conversation_user_info(conversation.id, user_id)
+        # Logger.info(inspect(conversation_user_info))
+        case Planga.Chat.ConversationUser.banned?(conversation_user_info) do
+          true ->
+            Logger.debug("Received message from banned user.")
+            {:error, "Banned until #{conversation_user_info.banned_until}"}
+          false ->
+            other_user_ids = other_users |> Enum.map(&(&1.id))
+            message = Planga.Chat.Converse.Persistence.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
 
-        :ok
-      end
-    else
-      {:error, "invalid message"}
+            Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
+        end
     end
+      # if conversation_user_info.banned_until && DateTime.compare(DateTime.utc_now, conversation_user_info.banned_until) == :lt do
+      #   Logger.debug("Received message from banned user.")
+      #   {:error, "Banned until #{conversation_user_info.banned_until}"}
+      # else
+      #   other_user_ids = other_users |> Enum.map(&(&1.id))
+      #   message = Planga.Chat.Converse.Persistence.create_message(app_id, remote_conversation_id, user_id, message, other_user_ids)
+
+      #   Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
+
+      #   :ok
+      # end
+    # else
+    #   {:error, "invalid message"}
+    # end
   end
 
   @doc """
