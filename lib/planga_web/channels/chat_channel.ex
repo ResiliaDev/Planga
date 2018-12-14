@@ -67,29 +67,37 @@ defmodule PlangaWeb.ChatChannel do
 
 
   def handle_in("hide_message", %{"message_uuid" => message_uuid}, socket) do
-    require Logger
-    Logger.info "Request to remove message with UUID `#{message_uuid}`; Socket assigns: #{inspect(socket.assigns)}"
-    %{app_id: app_id,
-      user_id: user_id,
-      config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
-    } = socket.assigns
+    # require Logger
+    # Logger.info "Request to remove message with UUID `#{message_uuid}`; Socket assigns: #{inspect(socket.assigns)}"
+    # %{app_id: app_id,
+    #   user_id: user_id,
+    #   config: %Planga.Connection.Config{conversation_id: remote_conversation_id, other_users: other_users}
+    # } = socket.assigns
 
 
-    # TODO Split off in its own function
-    conversation = Planga.Chat.fetch_conversation_by_remote_id!(app_id, remote_conversation_id)
-    {:ok, conversation_user_info} = Planga.Chat.fetch_conversation_user_info(conversation.id, user_id)
-    if conversation_user_info.role != "moderator" do
-      {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
-    else
+    # # TODO Split off in its own function
+    # conversation = Planga.Chat.Converse.find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
+    # {:ok, conversation_user_info} = Planga.Chat.Converse.fetch_conversation_user_info(conversation.id, user_id)
+    # if conversation_user_info.role != "moderator" do
+    #   {:reply, {:error, %{"data" => "You are not allowed to perform this action"}}, socket}
+    # else
 
-      case Planga.Chat.Moderation.Persistence.hide_message(conversation.id, message_uuid) do
-        {:error, error} ->
-          {:reply, {:error, %{"data" => error}}, socket}
-        {:ok, updated_message} ->
+    #   case Planga.Chat.Moderation.Persistence.hide_message(conversation.id, message_uuid) do
+    #     {:error, error} ->
+    #       {:reply, {:error, %{"data" => error}}, socket}
+    #     {:ok, updated_message} ->
 
-          Planga.Connection.broadcast_changed_message!(app_id, remote_conversation_id, updated_message)
-          {:noreply, socket}
-      end
+    #       Planga.Connection.broadcast_changed_message!(app_id, remote_conversation_id, updated_message)
+    #       {:noreply, socket}
+    #   end
+    # end
+
+    case Planga.Chat.Moderation.hide_message(message_uuid, socket.assigns) do
+      {:error, error_message} ->
+        {:reply, {:error, %{"data" => error_message}}, socket}
+      {:ok, updated_message} ->
+        Planga.Connection.broadcast_changed_message!(socket.assigns.app_id, socket.assigns.config.conversation_id, updated_message)
+        {:noreply, socket}
     end
   end
 
