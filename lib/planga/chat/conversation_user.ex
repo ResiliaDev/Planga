@@ -33,6 +33,7 @@ defmodule Planga.Chat.ConversationUser do
       false ->
         Logger.warn "Someone attempted to ban unbannable user #{inspect(conversation_user)}"
         conversation_user
+        |> change()
       true ->
         conversation_user
         |> change(banned_until: ban_end)
