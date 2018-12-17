@@ -1,7 +1,12 @@
 defmodule TeaVent.Example do
   alias TeaVent.Event
-  def run(event, state) do
-    TeaVent.dispatch(event, reducer: &reduce/2, context_provider: injected_context_provider(state))
+
+  def dispatch(topic, name, data, state) do
+    dispatch_event(TeaVent.Event.new(topic, name, data), state)
+  end
+
+  def dispatch_event(event, state) do
+    TeaVent.dispatch_event(event, reducer: &reduce/2, context_provider: injected_context_provider(state))
     receive do
       new_state -> new_state
     end
