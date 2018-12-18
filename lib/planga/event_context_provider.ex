@@ -9,7 +9,7 @@ defmodule Planga.EventContextProvider do
 
     ecto_multi =
       Ecto.Multi.new()
-      |> Ecto.Multi.merge(fn _ -> IO.inspect("FOO"); fetch_creator(event) |> IO.inspect(label: "bar") end)
+      |> Ecto.Multi.merge(fn _ -> fetch_creator(event) end)
       |> Ecto.Multi.append(db_preparation)
       |> Ecto.Multi.run(:subject, fn multi_info ->
         case subject_fun.(multi_info) do
@@ -81,7 +81,7 @@ defmodule Planga.EventContextProvider do
         remote_user_id: remote_user_id
       }) do
     {ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
-     fn %{conversation: conversation} ->
+     fn _ ->
        {:ok, nil}
      end}
   end
@@ -104,9 +104,13 @@ defmodule Planga.EventContextProvider do
     {
       ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
       fn %{conversation: conversation} ->
-        Repo.fetch_by(Planga.Chat.Message, conversation_id: conversation.id, uuid: message_uuid)
-        |> Repo.preload(:sender)
-        |> Repo.preload(:conversation_user)
+        with {:ok, message} <- Repo.fetch_by(Planga.Chat.Message, conversation_id: conversation.id, uuid: message_uuid) do
+          {:ok,
+           message
+           |> Repo.preload(:sender)
+           |> Repo.preload(:conversation_user)
+          }
+        end
       end
     }
   end

@@ -39,13 +39,11 @@ defmodule Planga.Chat.Message do
   defp empty_message?(message), do: String.trim(message) == ""
 
   def hide_message(message = %__MODULE__{}, hidden_time = %DateTime{} \\ DateTime.utc_now()) do
-    message
-    |> change(deleted_at: hidden_time)
+    %__MODULE__{message | deleted_at: hidden_time}
   end
 
   def show_message(message = %__MODULE__{}) do
-    message
-    |> change(deleted_at: nil)
+    %__MODULE__{message | deleted_at: nil}
   end
 
   defmodule Presentation do

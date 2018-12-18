@@ -45,11 +45,9 @@ defmodule PlangaWeb.ChatChannel do
 
     %{
       app_id: app_id,
-      # user_id: user_id,
       config: %Planga.Connection.Config{
         current_user_id: remote_user_id,
         conversation_id: remote_conversation_id,
-        # other_users: other_users
       }
     } = socket.assigns
 
@@ -81,11 +79,20 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def handle_in("hide_message", %{"message_uuid" => message_uuid}, socket) do
-    case Planga.Chat.Moderation.hide_message(message_uuid, socket.assigns) do
+    %{
+      app_id: app_id,
+      config: %Planga.Connection.Config{
+        current_user_id: remote_user_id,
+        conversation_id: remote_conversation_id,
+      }
+    } = socket.assigns
+
+    case Planga.EventReducer.dispatch([:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid], :hide_message, %{}, %{}, remote_user_id) do
+      # case Planga.Chat.Moderation.hide_message(message_uuid, socket.assigns) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
-      {:ok, updated_message} ->
+      {:ok, %TeaVent.Event{changed_subject: updated_message}} ->
         Planga.Connection.broadcast_changed_message!(
           socket.assigns.app_id,
           socket.assigns.config.conversation_id,

@@ -50,17 +50,17 @@ defmodule Planga.EventReducer do
         name: name,
         meta: %{creator: conversation_user}
       })
-      when name in [:hide, :show] do
+  when name in [:hide_message, :show_message] do
     case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
       false ->
         {:error, "You are not allowed to perform this action"}
 
       true ->
         case name do
-          :hide ->
+          :hide_message ->
             {:ok, Planga.Chat.Message.hide_message(message)}
 
-          :show ->
+          :show_message ->
             {:ok, Planga.Chat.Message.show_message(message)}
         end
     end
