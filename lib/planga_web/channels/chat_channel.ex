@@ -43,11 +43,24 @@ defmodule PlangaWeb.ChatChannel do
   def handle_in("new_message", payload, socket) do
     message = payload["message"]
 
-    case Planga.Chat.Converse.try_create_message(message, socket.assigns) do
+    %{
+      app_id: app_id,
+      # user_id: user_id,
+      config: %Planga.Connection.Config{
+        current_user_id: remote_user_id,
+        conversation_id: remote_conversation_id,
+        # other_users: other_users
+      }
+    } = socket.assigns
+
+    # case Planga.Chat.Converse.try_create_message(message, socket.assigns) do
+    case Planga.EventReducer.dispatch([:apps, app_id, :conversations, remote_conversation_id, :messages], :new_message, %{message: message}, %{}, remote_user_id) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
-      :ok ->
+      {:ok, event = %TeaVent.Event{changed_subject: message}} ->
+        IO.inspect(event, label: "ChatChannel event broadcast")
+        Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
         {:noreply, socket}
     end
   end
@@ -122,6 +135,11 @@ defmodule PlangaWeb.ChatChannel do
         %Phoenix.Socket.Broadcast{event: "new_remote_message", payload: payload},
         socket
       ) do
+    payload =
+      payload
+      |> put_sender
+      |> put_conversation_user
+
     broadcast!(
       socket,
       "new_remote_message",
@@ -173,4 +191,17 @@ defmodule PlangaWeb.ChatChannel do
     broadcast!(socket, "changed_your_conversation_user_info", presentable_conversation_user_info)
     {:noreply, socket}
   end
+
+  # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
+  defp put_sender(message) do
+    sender = Planga.Repo.get(Planga.Chat.User, message.sender_id)
+    %Planga.Chat.Message{message | sender: sender}
+  end
+
+  defp put_conversation_user(message) do
+    conversation_user = Planga.Repo.get(Planga.Chat.ConversationUser, message.conversation_user_id)
+    %Planga.Chat.Message{message | conversation_user: conversation_user}
+  end
+
+
 end

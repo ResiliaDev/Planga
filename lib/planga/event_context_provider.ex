@@ -105,6 +105,8 @@ defmodule Planga.EventContextProvider do
       ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
       fn %{conversation: conversation} ->
         Repo.fetch_by(Planga.Chat.Message, conversation_id: conversation.id, uuid: message_uuid)
+        |> Repo.preload(:sender)
+        |> Repo.preload(:conversation_user)
       end
     }
   end
@@ -172,4 +174,16 @@ defmodule Planga.EventContextProvider do
       )
     end)
   end
+
+  # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
+  defp put_sender(message) do
+    sender = Repo.get(User, message.sender_id)
+    %Planga.Chat.Message{message | sender: sender}
+  end
+
+  defp put_conversation_user(message) do
+    conversation_user = Repo.get(ConversationUser, message.conversation_user_id)
+    %Planga.Chat.Message{message | conversation_user: conversation_user}
+  end
+
 end
