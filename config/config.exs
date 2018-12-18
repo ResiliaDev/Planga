@@ -23,9 +23,9 @@ config :planga, Planga.Scheduler,
     # Every minute, resync API keys
     # {"* * * * *",      {Planga.Tasks.ApiKeySync, :sync_all, []}},
     # Every hour, create normal backup
-    {"@daily",      {Planga.Tasks.MnesiaBackup, :backup_everything, []}},
+    {"@daily", {Planga.Tasks.MnesiaBackup, :backup_everything, []}},
     # At midnight, create plaintext backup
-    {"@weekly",      {Planga.Tasks.MnesiaBackup, :backup_readable, []}},
+    {"@weekly", {Planga.Tasks.MnesiaBackup, :backup_readable, []}}
   ]
 
 # Configures the endpoint
@@ -33,8 +33,7 @@ config :planga, PlangaWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "dgTIYvEjoRnW2skBhpjBpxCeR0TqB51dcAl0+CTWfpm9eKAThxdLSv4N2hVxWif7",
   render_errors: [view: PlangaWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Planga.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Planga.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -47,10 +46,11 @@ config :ecto_mnesia,
   storage_type: :disc_copies
 
 config :mnesia,
-  dir: 'priv/' # Make sure this directory exists
+  # Make sure this directory exists
+  dir: 'priv/'
 
 config :snowflakex, machine_id: 42
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

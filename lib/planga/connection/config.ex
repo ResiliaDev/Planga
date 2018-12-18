@@ -15,10 +15,11 @@ defmodule Planga.Connection.Config do
 
     def from_json_hash(json_hash) do
       types = %{id: :any, name: :any}
+
       changeset =
-      {%__MODULE__{}, types}
-      |> Ecto.Changeset.cast(json_hash, Map.keys(types))
-      |> Ecto.Changeset.validate_required(json_hash, Map.keys(types))
+        {%__MODULE__{}, types}
+        |> Ecto.Changeset.cast(json_hash, Map.keys(types))
+        |> Ecto.Changeset.validate_required(json_hash, Map.keys(types))
 
       if changeset.valid? do
         result =
@@ -40,7 +41,9 @@ defmodule Planga.Connection.Config do
     defp reduce_errors(enumerable, function) do
       enumerable
       |> Enum.reduce({:ok, []}, fn
-        {:error, error}, _ -> {:error, error}
+        {:error, error}, _ ->
+          {:error, error}
+
         {:ok, list}, elem ->
           case function.(elem) do
             {:ok, elem} -> [elem | list]
@@ -48,16 +51,20 @@ defmodule Planga.Connection.Config do
           end
       end)
     end
-
   end
-
 
   @doc """
   Transforms the JSON from the client into a Config struct.
   Returns an {:error, string} if its syntax is not correct.
   """
   def from_json_hash(json_hash) do
-    types = %{conversation_id: :any, current_user_id: :any, current_user_name: :string, other_users: :any}
+    types = %{
+      conversation_id: :any,
+      current_user_id: :any,
+      current_user_name: :string,
+      other_users: :any
+    }
+
     changeset =
       {%__MODULE__{}, types}
       |> Ecto.Changeset.cast(json_hash, Map.keys(types))
@@ -80,7 +87,6 @@ defmodule Planga.Connection.Config do
       {:error, inspect(changeset.errors)}
     end
   end
-
 
   @doc """
 
@@ -106,22 +112,22 @@ defmodule Planga.Connection.Config do
   end
 
   defp jose_decrypt(encrypted_conversation_info, secret_key) do
-
     # res
     # |> elem(0)
     # |> Poison.decode!()
     # |> from_json_hash
     # |> IO.inspect(label: "TODO: conversion into module")
-    with {:ok, {json_str, _jwk_decryption_details}} = do_jose_decrypt(encrypted_conversation_info, secret_key),
+    with {:ok, {json_str, _jwk_decryption_details}} =
+           do_jose_decrypt(encrypted_conversation_info, secret_key),
          {:ok, json_hash} <- Poison.decode(json_str) do
       {:ok, json_hash}
     else
       {:error, :invalid, _} ->
         {:error, "Could not parse JSON in encrypted configuration."}
+
       {:error, error} ->
         {:error, "Invalid Planga configuration: #{to_string(error)}"}
     end
-
 
     # res =
     #   |> IO.inspect(label: "The decrypted strigifiedJSON Planga will deserialize: ")
@@ -140,7 +146,9 @@ defmodule Planga.Connection.Config do
         res = JOSE.JWE.block_decrypt(secret_key, encrypted_conversation_info)
         {:ok, res}
       rescue
-        FunctionClauseError -> {:error, "Cannot decrypt `encrypted_conversation_info`. Either the provided public key does not match the used secret key, or the ciphertext is malformed."}
+        FunctionClauseError ->
+          {:error,
+           "Cannot decrypt `encrypted_conversation_info`. Either the provided public key does not match the used secret key, or the ciphertext is malformed."}
       end
     end
   end

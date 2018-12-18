@@ -37,7 +37,6 @@ defmodule Planga.Chat do
   #   |> Enum.map(&put_sender/1)
   # end
 
-
   # # Temporary function until EctoMnesia supports `Ecto.Query.preload` statements.
   # defp put_sender(message) do
   #   sender = Repo.get(User, message.sender_id)

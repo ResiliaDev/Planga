@@ -11,7 +11,6 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
   alias Planga.Repo
   alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
-
   # def hide_message(conversation_id, message_uuid) do
   #   update_message(conversation_id, message_uuid, &Planga.Chat.Message.hide_message/1)
   # end
@@ -29,9 +28,10 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
     # end).()
     # |> to_tagged_status
     Repo.transaction(fn ->
-      with {:ok, message}     <- Repo.fetch_by(Message, conversation_id: conversation_id, uuid: message_uuid),
-           new_message        <- update_function.(message),
-           {:ok, result}      <- Repo.update(new_message) do
+      with {:ok, message} <-
+             Repo.fetch_by(Message, conversation_id: conversation_id, uuid: message_uuid),
+           new_message <- update_function.(message),
+           {:ok, result} <- Repo.update(new_message) do
         result
         |> put_sender()
         |> put_conversation_user()
@@ -56,7 +56,6 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
   #   update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.set_role(&1, role))
   # end
 
-
   # def ban_chatter(conversation_id, user_id, duration_minutes) do
   #   update_conversation_user(conversation_id, user_id, &Planga.Chat.ConversationUser.ban(&1, duration_minutes))
   # end
@@ -72,9 +71,10 @@ defmodule Planga.Chat.Moderation.Persistence.Mnesia do
     # end).()
     # |> to_tagged_status
     Repo.transaction(fn ->
-      with {:ok, conversation_user} <- Repo.fetch_by(ConversationUser, conversation_id: conversation_id, user_id: user_id),
-           new_conversation_user    <- update_function.(conversation_user),
-           {:ok, result}            <- Repo.update(new_conversation_user) do
+      with {:ok, conversation_user} <-
+             Repo.fetch_by(ConversationUser, conversation_id: conversation_id, user_id: user_id),
+           new_conversation_user <- update_function.(conversation_user),
+           {:ok, result} <- Repo.update(new_conversation_user) do
         result
       else
         {:error, failure} -> Repo.rollback(failure)

@@ -11,8 +11,6 @@ defmodule PlangaWeb.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id,
-      name: user.name,
-      remote_id: user.remote_id}
+    %{id: user.id, name: user.name, remote_id: user.remote_id}
   end
 end

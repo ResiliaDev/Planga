@@ -21,12 +21,12 @@ config :planga, PlangaWeb.Endpoint,
   # url: [host: "localhost", port: {:system, "PORT"}],
   server: true,
   root: ".",
-  version: Mix.Project.config[:version],
+  version: Mix.Project.config()[:version],
   cache_static_manifest: "priv/static/manifest.json",
-  check_origin: false # Allow socket/channel connections from anywhere
+  # Allow socket/channel connections from anywhere
+  check_origin: false
 
-config :planga,
-  planga_dashboard_url: "https://planga.io"
+config :planga, planga_dashboard_url: "https://planga.io"
 
 # Do not print debug messages in production
 config :logger, level: :info

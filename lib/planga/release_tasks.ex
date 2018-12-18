@@ -11,6 +11,7 @@ defmodule Planga.ReleaseTasks do
   More info: https://github.com/Nebo15/ecto_mnesia/issues/56
   """
   require Logger
+
   @start_apps [
     :crypto,
     :ssl,
@@ -27,18 +28,18 @@ defmodule Planga.ReleaseTasks do
 
   def migrate do
     Application.load(:planga)
-    IO.puts "Starting dependencies.."
+    IO.puts("Starting dependencies..")
     # Start apps necessary for executing migrations
     Enum.each(@start_apps, &Application.ensure_all_started/1)
 
     try do
-      Logger.info "Mnesia status:"
-      Logger.info inspect(:mnesia.system_info())
+      Logger.info("Mnesia status:")
+      Logger.info(inspect(:mnesia.system_info()))
       migration()
     rescue
       error ->
-        Logger.warn inspect(error)
-        Logger.warn inspect(System.stacktrace)
+        Logger.warn(inspect(error))
+        Logger.warn(inspect(System.stacktrace()))
     end
   end
 
@@ -59,10 +60,9 @@ defmodule Planga.ReleaseTasks do
     ]
 
     case repo.__adapter__().storage_up(config) do
-
       :ok -> Logger.info("Success creating DB")
       {:error, :already_up} -> Logger.info("DB was already created before.")
-      {:error, unknown_error} -> Logger.error("Unknown error: #{inspect unknown_error}")
+      {:error, unknown_error} -> Logger.error("Unknown error: #{inspect(unknown_error)}")
     end
 
     app = Keyword.get(repo.config, :otp_app)

@@ -4,6 +4,5 @@ defmodule Planga.Scheduler do
   to schedule tasks that are supposed to happen in a fixed interval,
   a lá CRON (but self-contained).
   """
-  use Quantum.Scheduler,
-  otp_app: :planga
+  use Quantum.Scheduler, otp_app: :planga
 end

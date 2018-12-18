@@ -7,6 +7,7 @@ defmodule Planga.Tasks.ApiKeySync do
   from within a self-hosted version of the Planga Chat Service.
   """
   require Logger
+
   def sync_all do
     Logger.info("Fetching latest API keys!")
     planga_dashboard_url = Application.get_env(:planga, :planga_dashboard_url)
@@ -21,7 +22,11 @@ defmodule Planga.Tasks.ApiKeySync do
   end
 
   defp decrypt(text) do
-    secret_key = JOSE.JWK.from_map(%{"k" => Application.get_env(:planga, :planga_api_key_sync_password), "kty" => "oct"})
+    secret_key =
+      JOSE.JWK.from_map(%{
+        "k" => Application.get_env(:planga, :planga_api_key_sync_password),
+        "kty" => "oct"
+      })
 
     secret_key
     |> JOSE.JWE.block_decrypt(text)
@@ -42,12 +47,12 @@ defmodule Planga.Tasks.ApiKeySync do
 
   def update_credential(api_key_json) do
     Planga.Repo.transaction(fn ->
-
       app =
         case Planga.Repo.get_by(Planga.Chat.App, name: to_string(api_key_json["public_id"])) do
           nil ->
             Logger.info("Creating new app #{api_key_json["public_id"]}")
             %Planga.Chat.App{name: api_key_json["public_id"]}
+
           existing ->
             Logger.info("Updating existing app #{api_key_json["public_id"]}")
             existing
@@ -56,25 +61,25 @@ defmodule Planga.Tasks.ApiKeySync do
       app =
         app
         |> Planga.Chat.App.from_json(api_key_json)
-        |> Planga.Repo.insert_or_update!
-
+        |> Planga.Repo.insert_or_update!()
 
       api_key_pair =
         case Planga.Repo.get(Planga.Chat.APIKeyPair, api_key_json["public_id"]) do
           nil ->
             Logger.info("Creating new key #{api_key_json["public_id"]}")
             %Planga.Chat.APIKeyPair{public_id: api_key_json["public_id"]}
+
           existing ->
             Logger.info("Updating existing key #{api_key_json["public_id"]}")
             existing
-      end
+        end
 
-      api_key_json =
-        Map.merge(api_key_json, %{"app_id" => app.id})
+      api_key_json = Map.merge(api_key_json, %{"app_id" => app.id})
 
       api_key_pair
       |> Planga.Chat.APIKeyPair.from_json(api_key_json)
-      |> Planga.Repo.insert_or_update!
+      |> Planga.Repo.insert_or_update!()
+
       Logger.info("Done with key #{api_key_json["public_id"]}!")
     end)
   end

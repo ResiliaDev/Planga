@@ -6,12 +6,11 @@ defmodule Planga.Chat.ConversationUser do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "conversations_users" do
-    field :conversation_id, :integer
-    field :user_id, :integer
-    field :role, :string, default: ""
-    field :banned_until, :utc_datetime
+    field(:conversation_id, :integer)
+    field(:user_id, :integer)
+    field(:role, :string, default: "")
+    field(:banned_until, :utc_datetime)
 
     timestamps()
   end
@@ -23,17 +22,24 @@ defmodule Planga.Chat.ConversationUser do
     |> validate_required([:conversation_id, :user_id])
   end
 
-  def ban(conversation_user = %__MODULE__{}, duration_minutes, ban_start_time = %DateTime{} \\ DateTime.utc_now) when is_integer(duration_minutes) and duration_minutes > 0 do
+  def ban(
+        conversation_user = %__MODULE__{},
+        duration_minutes,
+        ban_start_time = %DateTime{} \\ DateTime.utc_now()
+      )
+      when is_integer(duration_minutes) and duration_minutes > 0 do
     require Logger
 
-    now = DateTime.utc_now
+    now = DateTime.utc_now()
     ban_end = Timex.add(now, Timex.Duration.from_minutes(duration_minutes))
 
     case bannable?(conversation_user) do
       false ->
-        Logger.warn "Someone attempted to ban unbannable user #{inspect(conversation_user)}"
+        Logger.warn("Someone attempted to ban unbannable user #{inspect(conversation_user)}")
+
         conversation_user
         |> change()
+
       true ->
         conversation_user
         |> change(banned_until: ban_end)
@@ -44,9 +50,13 @@ defmodule Planga.Chat.ConversationUser do
     conversation_user.role == nil
   end
 
-  def banned?(conversation_user, current_datetime \\ DateTime.utc_now)
+  def banned?(conversation_user, current_datetime \\ DateTime.utc_now())
   def banned?(conversation_user = %__MODULE__{banned_until: nil}, current_datetime), do: false
-  def banned?(conversation_user = %__MODULE__{banned_until: banned_until = %DateTime{}}, current_datetime) do
+
+  def banned?(
+        conversation_user = %__MODULE__{banned_until: banned_until = %DateTime{}},
+        current_datetime
+      ) do
     DateTime.compare(current_datetime, banned_until) == :lt
   end
 
@@ -58,6 +68,10 @@ defmodule Planga.Chat.ConversationUser do
   def set_role(conversation_user = %__MODULE__{}, role) when role in [nil, "moderator"] do
     conversation_user
     |> change(role: role)
+  end
+
+  def is_moderator?(conversation_user = %__MODULE__{}) do
+    conversation_user.role == "moderator"
   end
 
   defmodule Presentation do

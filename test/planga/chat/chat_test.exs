@@ -216,7 +216,9 @@ defmodule Planga.ChatTest do
     end
 
     test "create_conversation_users/1 with valid data creates a conversation_users" do
-      assert {:ok, %ConversationUsers{} = conversation_users} = Chat.create_conversation_users(@valid_attrs)
+      assert {:ok, %ConversationUsers{} = conversation_users} =
+               Chat.create_conversation_users(@valid_attrs)
+
       assert conversation_users.conversation_id == 42
       assert conversation_users.user_id == 42
     end
@@ -227,7 +229,10 @@ defmodule Planga.ChatTest do
 
     test "update_conversation_users/2 with valid data updates the conversation_users" do
       conversation_users = conversation_users_fixture()
-      assert {:ok, conversation_users} = Chat.update_conversation_users(conversation_users, @update_attrs)
+
+      assert {:ok, conversation_users} =
+               Chat.update_conversation_users(conversation_users, @update_attrs)
+
       assert %ConversationUsers{} = conversation_users
       assert conversation_users.conversation_id == 43
       assert conversation_users.user_id == 43
@@ -235,14 +240,20 @@ defmodule Planga.ChatTest do
 
     test "update_conversation_users/2 with invalid data returns error changeset" do
       conversation_users = conversation_users_fixture()
-      assert {:error, %Ecto.Changeset{}} = Chat.update_conversation_users(conversation_users, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Chat.update_conversation_users(conversation_users, @invalid_attrs)
+
       assert conversation_users == Chat.get_conversation_users!(conversation_users.id)
     end
 
     test "delete_conversation_users/1 deletes the conversation_users" do
       conversation_users = conversation_users_fixture()
       assert {:ok, %ConversationUsers{}} = Chat.delete_conversation_users(conversation_users)
-      assert_raise Ecto.NoResultsError, fn -> Chat.get_conversation_users!(conversation_users.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Chat.get_conversation_users!(conversation_users.id)
+      end
     end
 
     test "change_conversation_users/1 returns a conversation_users changeset" do
@@ -400,7 +411,8 @@ defmodule Planga.ChatTest do
     end
 
     test "create_conversation_topic/1 with valid data creates a conversation_topic" do
-      assert {:ok, %ConversationTopic{} = conversation_topic} = Chat.create_conversation_topic(@valid_attrs)
+      assert {:ok, %ConversationTopic{} = conversation_topic} =
+               Chat.create_conversation_topic(@valid_attrs)
     end
 
     test "create_conversation_topic/1 with invalid data returns error changeset" do
@@ -409,20 +421,29 @@ defmodule Planga.ChatTest do
 
     test "update_conversation_topic/2 with valid data updates the conversation_topic" do
       conversation_topic = conversation_topic_fixture()
-      assert {:ok, conversation_topic} = Chat.update_conversation_topic(conversation_topic, @update_attrs)
+
+      assert {:ok, conversation_topic} =
+               Chat.update_conversation_topic(conversation_topic, @update_attrs)
+
       assert %ConversationTopic{} = conversation_topic
     end
 
     test "update_conversation_topic/2 with invalid data returns error changeset" do
       conversation_topic = conversation_topic_fixture()
-      assert {:error, %Ecto.Changeset{}} = Chat.update_conversation_topic(conversation_topic, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Chat.update_conversation_topic(conversation_topic, @invalid_attrs)
+
       assert conversation_topic == Chat.get_conversation_topic!(conversation_topic.id)
     end
 
     test "delete_conversation_topic/1 deletes the conversation_topic" do
       conversation_topic = conversation_topic_fixture()
       assert {:ok, %ConversationTopic{}} = Chat.delete_conversation_topic(conversation_topic)
-      assert_raise Ecto.NoResultsError, fn -> Chat.get_conversation_topic!(conversation_topic.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Chat.get_conversation_topic!(conversation_topic.id)
+      end
     end
 
     test "change_conversation_topic/1 returns a conversation_topic changeset" do

@@ -2,21 +2,22 @@ defmodule Planga.Chat.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "message" do
-    belongs_to :sender, Planga.Chat.User
-    belongs_to :conversation, Planga.Chat.Conversation
-    belongs_to :conversation_user, Planga.Chat.ConversationUser
-    field :content, :string
-    field :uuid, Ecto.UUID # Public unique reference, so when message is updated (like content filter), it can be re-loaded, overriding old thing in interface.
-    field :deleted_at, :utc_datetime
+    belongs_to(:sender, Planga.Chat.User)
+    belongs_to(:conversation, Planga.Chat.Conversation)
+    belongs_to(:conversation_user, Planga.Chat.ConversationUser)
+    field(:content, :string)
+
+    # Public unique reference, so when message is updated (like content filter), it can be re-loaded, overriding old thing in interface.
+    field(:uuid, Ecto.UUID)
+    field(:deleted_at, :utc_datetime)
 
     timestamps()
   end
 
   @doc false
   def new(attrs \\ %{}) do
-    %__MODULE__{id: Snowflakex.new!(), uuid: Ecto.UUID.autogenerate}
+    %__MODULE__{id: Snowflakex.new!(), uuid: Ecto.UUID.autogenerate()}
     |> cast(Map.new(attrs), [:content, :conversation_id, :sender_id, :conversation_user_id])
     |> validate_required([:id, :content, :conversation_id, :sender_id, :conversation_user_id])
     |> validate_change(:content, fn :content, content ->
@@ -36,7 +37,7 @@ defmodule Planga.Chat.Message do
 
   defp empty_message?(message), do: String.trim(message) == ""
 
-  def hide_message(message = %__MODULE__{}, hidden_time = %DateTime{} \\ DateTime.utc_now) do
+  def hide_message(message = %__MODULE__{}, hidden_time = %DateTime{} \\ DateTime.utc_now()) do
     message
     |> change(deleted_at: hidden_time)
   end
@@ -45,7 +46,6 @@ defmodule Planga.Chat.Message do
     message
     |> change(deleted_at: nil)
   end
-
 
   defmodule Presentation do
     @moduledoc """
@@ -65,15 +65,14 @@ defmodule Planga.Chat.Message do
         "author_uuid" => "#{message.conversation_user.id}",
         "content" => message.content |> html_escape,
         "sent_at" => message.inserted_at,
-        "deleted_at" => message.deleted_at,
-
+        "deleted_at" => message.deleted_at
       }
     end
 
     defp html_escape(unsafe_string) do
       unsafe_string
-      |> Phoenix.HTML.html_escape
-      |> Phoenix.HTML.safe_to_string
+      |> Phoenix.HTML.html_escape()
+      |> Phoenix.HTML.safe_to_string()
     end
   end
 end

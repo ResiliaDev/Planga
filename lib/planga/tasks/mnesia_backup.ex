@@ -16,16 +16,18 @@ defmodule Planga.Tasks.MnesiaBackup do
   """
   def backup_everything do
     Logger.info("Creating normal Mnesia backup...")
+
     res =
       "normal"
       |> backup_name()
       |> String.to_charlist()
       |> :mnesia.backup()
+
     Logger.info("Done with normal Mnesia backup. Result code: `#{res}`")
   end
 
   defp backup_name(backup_type) do
-    now = DateTime.utc_now
+    now = DateTime.utc_now()
     backup_name = "planga-#{DateTime.to_iso8601(now)}-#{backup_type}.mnesia.backup"
     backup_folder = "priv/repo/backups/"
     backup_folder <> backup_name
@@ -42,11 +44,13 @@ defmodule Planga.Tasks.MnesiaBackup do
   """
   def backup_readable do
     Logger.info("Creating readable Mnesia backup...")
+
     res =
       "readable_text"
       |> backup_name()
       |> String.to_charlist()
       |> :mnesia.dump_to_textfile()
+
     Logger.info("Done with readable Mnesia backup. Result code: `#{res}`")
   end
 end

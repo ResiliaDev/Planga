@@ -12,11 +12,22 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
 
   def fetch_messages_by_conversation_id(conversation_id, sent_before_datetime) do
-    query = if sent_before_datetime do
-      from(m in Message, where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime, order_by: [desc: :id], limit: 20)
-    else
-      from(Message, where: [conversation_id: ^conversation_id], order_by: [desc: :id], limit: 20)
-    end
+    query =
+      if sent_before_datetime do
+        from(
+          m in Message,
+          where: m.conversation_id == ^conversation_id and m.inserted_at < ^sent_before_datetime,
+          order_by: [desc: :id],
+          limit: 20
+        )
+      else
+        from(
+          Message,
+          where: [conversation_id: ^conversation_id],
+          order_by: [desc: :id],
+          limit: 20
+        )
+      end
 
     query
     |> Repo.all()
@@ -40,27 +51,32 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   returns the `%Planga.Conversation{}` it represents.
   """
   def find_or_create_conversation_by_remote_id!(app_id, remote_id) do
-    {:ok, conversation} = Repo.transaction(fn ->
-      case Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id) do
-        nil ->
-          Repo.insert!(%Conversation{app_id: app_id, remote_id: remote_id})
-        conversation -> conversation
-      end
-    end)
+    {:ok, conversation} =
+      Repo.transaction(fn ->
+        case Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id) do
+          nil ->
+            Repo.insert!(%Conversation{app_id: app_id, remote_id: remote_id})
+
+          conversation ->
+            conversation
+        end
+      end)
+
     conversation
   end
 
   def find_conversation_by_remote_id(app_id, remote_id) do
-    {:ok, res} = Repo.transaction(fn ->
-      conversation = Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id)
-      conversation
-    end)
+    {:ok, res} =
+      Repo.transaction(fn ->
+        conversation = Repo.get_by(Conversation, app_id: app_id, remote_id: remote_id)
+        conversation
+      end)
+
     case res do
       nil -> {:error, :not_found}
       conversation -> {:ok, conversation}
     end
   end
-
 
   @doc """
   Creates a Message struct and stores it in the application,
@@ -71,16 +87,18 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
 
   """
   def create_message(app_id, remote_conversation_id, user_id, message_content, other_user_ids) do
-    {:ok, message} = Repo.transaction(fn ->
-      conversation = find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
-      {:ok, conversation_user} = ensure_user_partakes_in_conversation(conversation.id, user_id)
+    {:ok, message} =
+      Repo.transaction(fn ->
+        conversation = find_or_create_conversation_by_remote_id!(app_id, remote_conversation_id)
+        {:ok, conversation_user} = ensure_user_partakes_in_conversation(conversation.id, user_id)
 
-      other_user_ids
-      |> Enum.map(&fetch_user_by_remote_id!(app_id, &1))
-      |> Enum.each(&ensure_user_partakes_in_conversation(conversation.id, &1))
+        other_user_ids
+        |> Enum.map(&fetch_user_by_remote_id!(app_id, &1))
+        |> Enum.each(&ensure_user_partakes_in_conversation(conversation.id, &1))
 
-      do_create_message(message_content, conversation.id, user_id, conversation_user.id)
-    end)
+        do_create_message(message_content, conversation.id, user_id, conversation_user.id)
+      end)
+
     message
   end
 
@@ -92,18 +110,17 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
     #   sender_id: sender_id,
     #   conversation_user_id: conversation_user_id
     # }
+    # |> Message.changeset
     Message.new(
       content: message,
       conversation_id: conversation_id,
       sender_id: sender_id,
       conversation_user_id: conversation_user_id
     )
-    # |> Message.changeset
     |> Repo.insert!()
     |> Repo.preload(:sender)
     |> Repo.preload(:conversation_user)
   end
-
 
   # @doc """
   # Adds a user to a conversation.
@@ -113,30 +130,33 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   defp ensure_user_partakes_in_conversation(conversation_id, user_id) do
     safe(fn ->
       Repo.transaction(fn ->
-      user = Repo.get_by!(ConversationUser, conversation_id: conversation_id, user_id: user_id)
-      if user do
-        user
-      else
-        Repo.insert!(%ConversationUser{conversation_id: conversation_id, user_id: user_id})
-      end
+        user = Repo.get_by!(ConversationUser, conversation_id: conversation_id, user_id: user_id)
+
+        if user do
+          user
+        else
+          Repo.insert!(%ConversationUser{conversation_id: conversation_id, user_id: user_id})
+        end
       end)
     end).()
     |> to_tagged_status
   end
 
-
   # Given a user's `remote_id`, returns the User struct.
   # Will throw an Ecto.NoResultsError error if user could not be found.
   defp fetch_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
-    {:ok, user} = Repo.transaction(fn ->
-      app = Repo.get!(App, app_id)
-      user =  Repo.get_by(User, [app_id: app.id, remote_id: remote_user_id])
-      if user do
-        user
-      else
-        Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
-      end
-    end)
+    {:ok, user} =
+      Repo.transaction(fn ->
+        app = Repo.get!(App, app_id)
+        user = Repo.get_by(User, app_id: app.id, remote_id: remote_user_id)
+
+        if user do
+          user
+        else
+          Repo.insert!(%User{app_id: app.id, remote_id: remote_user_id, name: user_name})
+        end
+      end)
+
     user
   end
 

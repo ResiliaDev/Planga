@@ -12,13 +12,17 @@ defmodule Planga.Connection.Persistence.Mnesia do
   TODO move username to different function
   """
   def fetch_user_by_remote_id!(app_id, remote_user_id, user_name \\ nil) do
-    {:ok, user} = Repo.transaction(fn ->
-      case Repo.get_by(User, [app_id: app_id, remote_id: remote_user_id]) do
-        nil ->
-          Repo.insert!(%User{app_id: app_id, remote_id: remote_user_id, name: user_name})
-        user -> user
-      end
-    end)
+    {:ok, user} =
+      Repo.transaction(fn ->
+        case Repo.get_by(User, app_id: app_id, remote_id: remote_user_id) do
+          nil ->
+            Repo.insert!(%User{app_id: app_id, remote_id: remote_user_id, name: user_name})
+
+          user ->
+            user
+        end
+      end)
+
     user
   end
 
@@ -29,6 +33,7 @@ defmodule Planga.Connection.Persistence.Mnesia do
       |> Ecto.Changeset.change(name: remote_user_name)
       |> Repo.update()
     end)
+
     :ok
   end
 

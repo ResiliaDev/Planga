@@ -7,13 +7,12 @@ defmodule Planga.Chat.App do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "apps" do
-    field :name, :string
-    has_many :api_key_pairs, Planga.Chat.APIKeyPair
+    field(:name, :string)
+    has_many(:api_key_pairs, Planga.Chat.APIKeyPair)
 
-    has_many :conversations, Planga.Chat.Conversation
-    has_many :users, Planga.Chat.User
+    has_many(:conversations, Planga.Chat.Conversation)
+    has_many(:users, Planga.Chat.User)
 
     timestamps()
   end
@@ -33,10 +32,9 @@ defmodule Planga.Chat.App do
 
   def from_hash(app \\ %__MODULE__{}, hash) do
     app
-    |> changeset(
-      %{
-        id: hash["id"],
-        name: to_string(hash["name"])
-      })
+    |> changeset(%{
+      id: hash["id"],
+      name: to_string(hash["name"])
+    })
   end
 end

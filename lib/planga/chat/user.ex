@@ -6,14 +6,13 @@ defmodule Planga.Chat.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   schema "users" do
-    belongs_to :app, Planga.Chat.App
-    field :name, :string
-    field :remote_id, :string
+    belongs_to(:app, Planga.Chat.App)
+    field(:name, :string)
+    field(:remote_id, :string)
 
-    has_many :sent_messages, Planga.Chat.Message
-    many_to_many :conversations, Planga.Chat.Conversation, join_through: "conversations_users"
+    has_many(:sent_messages, Planga.Chat.Message)
+    many_to_many(:conversations, Planga.Chat.Conversation, join_through: "conversations_users")
 
     timestamps()
   end
@@ -24,5 +23,4 @@ defmodule Planga.Chat.User do
     |> cast(attrs, [:name, :remote_id])
     |> validate_required([:name, :remote_id])
   end
-
 end

@@ -11,8 +11,6 @@ defmodule PlangaWeb.AppView do
   end
 
   def render("app.json", %{app: app}) do
-    %{id: app.id,
-      name: app.name,
-      secret_api_key: app.secret_api_key}
+    %{id: app.id, name: app.name, secret_api_key: app.secret_api_key}
   end
 end

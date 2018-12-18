@@ -7,12 +7,11 @@ defmodule Planga.Chat.APIKeyPair do
   use Ecto.Schema
   import Ecto.Changeset
 
-
   @primary_key {:public_id, :string, []}
   schema "api_key_pairs" do
-    field :secret_key, :string
-    field :enabled, :boolean
-    belongs_to :app, Planga.Chat.App
+    field(:secret_key, :string)
+    field(:enabled, :boolean)
+    belongs_to(:app, Planga.Chat.App)
 
     timestamps()
   end
@@ -26,13 +25,11 @@ defmodule Planga.Chat.APIKeyPair do
 
   def from_json(api_key_pair \\ %__MODULE__{}, json) do
     api_key_pair
-    |> changeset(
-      %{
-        enabled: json["active"],
-        public_id: json["public_id"],
-        secret_key: json["private_key"],
-        app_id: json["app_id"]
-      }
-    )
+    |> changeset(%{
+      enabled: json["active"],
+      public_id: json["public_id"],
+      secret_key: json["private_key"],
+      app_id: json["app_id"]
+    })
   end
 end

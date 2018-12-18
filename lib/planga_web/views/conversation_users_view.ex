@@ -11,8 +11,10 @@ defmodule PlangaWeb.ConversationUsersView do
   end
 
   def render("conversation_users.json", %{conversation_users: conversation_users}) do
-    %{id: conversation_users.id,
+    %{
+      id: conversation_users.id,
       conversation_id: conversation_users.conversation_id,
-      user_id: conversation_users.user_id}
+      user_id: conversation_users.user_id
+    }
   end
 end

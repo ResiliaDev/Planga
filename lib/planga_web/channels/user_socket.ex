@@ -5,11 +5,10 @@ defmodule PlangaWeb.UserSocket do
   # channel "room:*", PlangaWeb.RoomChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
-  transport :longpoll, Phoenix.Transports.LongPoll
+  transport(:websocket, Phoenix.Transports.WebSocket)
+  transport(:longpoll, Phoenix.Transports.LongPoll)
 
-  channel "encrypted_chat:*", PlangaWeb.ChatChannel
-
+  channel("encrypted_chat:*", PlangaWeb.ChatChannel)
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

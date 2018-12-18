@@ -1,8 +1,19 @@
 defmodule Planga.Chat.Moderation.Persistence.Behaviour do
+  @callback update_message(
+              conversation_id :: integer,
+              message_uuid :: String.t(),
+              update_function ::
+                (%Planga.Chat.Message{} -> Ecto.Changeset.t(%Planga.Chat.Message{}))
+            ) :: {:ok, updated_message :: %Planga.Chat.Message{}} | {:error, any}
 
-  @callback update_message(conversation_id :: integer, message_uuid :: String.t, update_function :: (%Planga.Chat.Message{} -> Ecto.Changeset.t(%Planga.Chat.Message{}))) :: {:ok, updated_message :: %Planga.Chat.Message{}} | {:error, any}
-
-  @callback update_conversation_user(conversation_id :: integer, user_id :: integer, update_function :: (%Planga.Chat.ConversationUser{} -> Ecto.Changeset.t(%Planga.Chat.ConversationUser{}))) :: {:ok, updated_conversation_user :: %Planga.Chat.ConversationUser{}} | {:error, any}
+  @callback update_conversation_user(
+              conversation_id :: integer,
+              user_id :: integer,
+              update_function ::
+                (%Planga.Chat.ConversationUser{} ->
+                   Ecto.Changeset.t(%Planga.Chat.ConversationUser{}))
+            ) ::
+              {:ok, updated_conversation_user :: %Planga.Chat.ConversationUser{}} | {:error, any}
   # @doc """
   # Hides message by setting `deleted_at`
   # """

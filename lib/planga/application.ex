@@ -22,7 +22,7 @@ defmodule Planga.Application do
       worker(Planga.Scheduler, []),
 
       # Connects to RabbitMQ and manages changes in app settings.
-      worker(Planga.AppSettingsListener, []),
+      worker(Planga.AppSettingsListener, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

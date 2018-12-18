@@ -6,9 +6,9 @@ defmodule Planga.Mixfile do
       app: :planga,
       version: "0.7.1",
       elixir: "~> 1.4",
-      elixirc_paths: elixirc_paths(Mix.env),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
     ]
@@ -26,7 +26,7 @@ defmodule Planga.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -55,6 +55,7 @@ defmodule Planga.Mixfile do
       {:timex, "~> 3.0"},
       {:httpoison, "~> 1.0"},
       {:exceptional, "~> 2.1"},
+      {:tea_vent, git: "https://github.com/Qqwy/elixir-tea_vent.git", branch: "master"},
 
       # Communication with Ruby:
       {:amqp, "~> 1.0.3"},
@@ -65,7 +66,6 @@ defmodule Planga.Mixfile do
 
       # Releases: 
       {:distillery, "~> 1.5.4", runtime: false},
-
       {:planga_phoenix, "~> 1.0.0"},
       # {:planga_phoenix, git: "https://github.com/ResiliaDev/planga-phoenix.git"},
 
@@ -84,7 +84,7 @@ defmodule Planga.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end

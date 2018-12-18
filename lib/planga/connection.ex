@@ -4,9 +4,13 @@ defmodule Planga.Connection do
   (Regardless of transport layer)
   """
   def connect(qualified_conversation_info) do
-    {public_api_id, encrypted_conversation_info} = Planga.Connection.decode_conversation_info(qualified_conversation_info)
+    {public_api_id, encrypted_conversation_info} =
+      Planga.Connection.decode_conversation_info(qualified_conversation_info)
+
     api_key_pair = Planga.Connection.Persistence.fetch_api_key_pair_by_public_id!(public_api_id)
-    with {:ok, secret_info} = Planga.Connection.decrypt_config(encrypted_conversation_info, api_key_pair) do
+
+    with {:ok, secret_info} =
+           Planga.Connection.decrypt_config(encrypted_conversation_info, api_key_pair) do
       remote_conversation_id = secret_info.conversation_id
       current_user_id = secret_info.current_user_id
       app_id = api_key_pair.app_id
@@ -15,13 +19,12 @@ defmodule Planga.Connection do
 
       Planga.Connection.Persistence.update_username(user.id, secret_info.current_user_name)
 
-      socket_assigns = Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)
+      socket_assigns =
+        Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)
 
       {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}}
     end
   end
-
-
 
   @doc """
   Transforms a string like "foobar#bazqux",
@@ -53,12 +56,13 @@ defmodule Planga.Connection do
   def socket_info(user: user, api_key_pair: api_key_pair, config: config) do
     # The reason the conversation_id is not in here,
     # is because it might not be created yet, as it is created lazily, once the first user sends a message in it.
-    [user_id: user.id,
-     api_key_pair: api_key_pair,
-     app_id: api_key_pair.app_id,
-     # remote_conversation_id: remote_conversation_id,
-     # other_users: other_users
-     config: config
+    [
+      user_id: user.id,
+      api_key_pair: api_key_pair,
+      app_id: api_key_pair.app_id,
+      # remote_conversation_id: remote_conversation_id,
+      # other_users: other_users
+      config: config
     ]
   end
 
@@ -67,17 +71,32 @@ defmodule Planga.Connection do
   end
 
   def broadcast_new_message!(app_id, remote_conversation_id, message) do
-    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "new_remote_message", message)
+    PlangaWeb.Endpoint.broadcast!(
+      static_topic(app_id, remote_conversation_id),
+      "new_remote_message",
+      message
+    )
   end
 
   def broadcast_changed_message!(app_id, remote_conversation_id, changed_message) do
-    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "changed_message", changed_message)
+    PlangaWeb.Endpoint.broadcast!(
+      static_topic(app_id, remote_conversation_id),
+      "changed_message",
+      changed_message
+    )
   end
 
-  def broadcast_changed_conversation_user!(app_id, remote_conversation_id, changed_conversation_user) do
-    PlangaWeb.Endpoint.broadcast!(static_topic(app_id, remote_conversation_id), "changed_conversation_user", changed_conversation_user)
+  def broadcast_changed_conversation_user!(
+        app_id,
+        remote_conversation_id,
+        changed_conversation_user
+      ) do
+    PlangaWeb.Endpoint.broadcast!(
+      static_topic(app_id, remote_conversation_id),
+      "changed_conversation_user",
+      changed_conversation_user
+    )
   end
-
 
   defp static_topic(app_id, remote_conversation_id) do
     "chat:#{app_id}#{remote_conversation_id}"

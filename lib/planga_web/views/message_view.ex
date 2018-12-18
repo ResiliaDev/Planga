@@ -11,9 +11,11 @@ defmodule PlangaWeb.MessageView do
   end
 
   def render("message.json", %{message: message}) do
-    %{id: message.id,
+    %{
+      id: message.id,
       sender_id: message.sender_id,
       content: message.content,
-      channel_id: message.channel_id}
+      channel_id: message.channel_id
+    }
   end
 end
