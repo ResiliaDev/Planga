@@ -48,22 +48,34 @@ defmodule Planga.EventContextProvider do
     {:ok, %TeaVent.Event{event | meta: new_meta}}
   end
 
-  def fetch_creator(event = %Event{topic: [:apps, app_id, :conversations, remote_conversation_id | _], meta: %{remote_user_id: remote_user_id}}) do
-    ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id, "creator")
-    |> Ecto.Multi.run(:creator, &({:ok, Map.get(&1, :creator_conversation_user)}))
+  def fetch_creator(
+        event = %Event{
+          topic: [:apps, app_id, :conversations, remote_conversation_id | _],
+          meta: %{remote_user_id: remote_user_id}
+        }
+      ) do
+    ensure_user_partakes_in_conversation(
+      app_id,
+      remote_conversation_id,
+      remote_user_id,
+      "creator"
+    )
+    |> Ecto.Multi.run(:creator, &{:ok, Map.get(&1, :creator_conversation_user)})
     |> IO.inspect(label: "Case 1")
-
   end
 
-  def fetch_creator(event = %Event{topic: [:apps, app_id | _], meta: %{remote_user_id: remote_user_id}}) do
-    fetch_or_create_user(app_id, remote_user_id, "creator")
+  def fetch_creator(
+        event = %Event{topic: [:apps, app_id | _], meta: %{remote_user_id: remote_user_id}}
+      ) do
     # |> Ecto.Multi.run(:creator, &({:ok, Map.get(&1, :creator_user)}))
+    fetch_or_create_user(app_id, remote_user_id, "creator")
     |> IO.inspect(label: "Case 2")
-
   end
 
-  def fetch_creator(event = %Event{}), do: Ecto.Multi.new |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end) |> IO.inspect(label: "Case 3")
-
+  def fetch_creator(event = %Event{}),
+    do:
+      Ecto.Multi.new() |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end)
+      |> IO.inspect(label: "Case 3")
 
   def hydrate([:apps, app_id], _) do
     {Ecto.Multi.new(),
@@ -86,7 +98,7 @@ defmodule Planga.EventContextProvider do
      end}
   end
 
-  def hydrate([:apps, app_id, :conversations, remote_conversation_id, :users, remote_user_id]) do
+  def hydrate([:apps, app_id, :conversations, remote_conversation_id, :users, remote_user_id], _) do
     {ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
      fn %{conversation_user: conversation_user} ->
        {:ok, conversation_user}
@@ -104,12 +116,16 @@ defmodule Planga.EventContextProvider do
     {
       ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
       fn %{conversation: conversation} ->
-        with {:ok, message} <- Repo.fetch_by(Planga.Chat.Message, conversation_id: conversation.id, uuid: message_uuid) do
+        with {:ok, message} <-
+               Repo.fetch_by(
+                 Planga.Chat.Message,
+                 conversation_id: conversation.id,
+                 uuid: message_uuid
+               ) do
           {:ok,
            message
            |> Repo.preload(:sender)
-           |> Repo.preload(:conversation_user)
-          }
+           |> Repo.preload(:conversation_user)}
         end
       end
     }
@@ -137,7 +153,11 @@ defmodule Planga.EventContextProvider do
     |> IO.inspect()
   end
 
-  defp fetch_or_create_conversation_by_remote_id(app_id, remote_conversation_id, field_name \\ "conversation") do
+  defp fetch_or_create_conversation_by_remote_id(
+         app_id,
+         remote_conversation_id,
+         field_name \\ "conversation"
+       ) do
     fetch_or_create_structure(
       field_name,
       Planga.Chat.Conversation,
@@ -147,14 +167,25 @@ defmodule Planga.EventContextProvider do
   end
 
   defp fetch_or_create_user(app_id, remote_user_id, field_name \\ "user") do
-    fetch_or_create_structure(field_name, Planga.Chat.User, app_id: app_id, remote_id: remote_user_id)
+    fetch_or_create_structure(
+      field_name,
+      Planga.Chat.User,
+      app_id: app_id,
+      remote_id: remote_user_id
+    )
   end
 
-  defp ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id, field_name_prefix \\ "") do
+  defp ensure_user_partakes_in_conversation(
+         app_id,
+         remote_conversation_id,
+         remote_user_id,
+         field_name_prefix \\ ""
+       ) do
     field_name =
       case field_name_prefix do
         "" ->
           fn name -> :"#{name}" end
+
         other ->
           fn name -> :"#{field_name_prefix}_#{name}" end
       end
@@ -163,9 +194,14 @@ defmodule Planga.EventContextProvider do
     field_name_user = field_name.("user")
     field_name_conversation_user = field_name.("conversation_user")
 
-    multi_a = fetch_or_create_conversation_by_remote_id(app_id, remote_conversation_id, field_name_conversation)
-    multi_b = fetch_or_create_user(app_id, remote_user_id, field_name_user)
+    multi_a =
+      fetch_or_create_conversation_by_remote_id(
+        app_id,
+        remote_conversation_id,
+        field_name_conversation
+      )
 
+    multi_b = fetch_or_create_user(app_id, remote_user_id, field_name_user)
 
     multi_a
     |> Ecto.Multi.append(multi_b)
@@ -189,5 +225,4 @@ defmodule Planga.EventContextProvider do
     conversation_user = Repo.get(ConversationUser, message.conversation_user_id)
     %Planga.Chat.Message{message | conversation_user: conversation_user}
   end
-
 end

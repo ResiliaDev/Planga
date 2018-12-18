@@ -47,19 +47,20 @@ defmodule PlangaWeb.ChatChannel do
       app_id: app_id,
       config: %Planga.Connection.Config{
         current_user_id: remote_user_id,
-        conversation_id: remote_conversation_id,
+        conversation_id: remote_conversation_id
       }
     } = socket.assigns
 
-    # case Planga.Chat.Converse.try_create_message(message, socket.assigns) do
-    case Planga.EventReducer.dispatch([:apps, app_id, :conversations, remote_conversation_id, :messages], :new_message, %{message: message}, %{}, remote_user_id) do
+    case Planga.EventReducer.dispatch(
+           [:apps, app_id, :conversations, remote_conversation_id, :messages],
+           :new_message,
+           %{message: message},
+           remote_user_id
+         ) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
       {:ok, _} ->
-      # {:ok, event = %TeaVent.Event{changed_subject: message}} ->
-        # IO.inspect(event, label: "ChatChannel event broadcast")
-        # Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
         {:noreply, socket}
     end
   end
@@ -84,21 +85,20 @@ defmodule PlangaWeb.ChatChannel do
       app_id: app_id,
       config: %Planga.Connection.Config{
         current_user_id: remote_user_id,
-        conversation_id: remote_conversation_id,
+        conversation_id: remote_conversation_id
       }
     } = socket.assigns
 
-    case Planga.EventReducer.dispatch([:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid], :hide_message, %{}, %{}, remote_user_id) do
+    case Planga.EventReducer.dispatch(
+           [:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid],
+           :hide_message,
+           %{},
+           remote_user_id
+         ) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
       {:ok, _} ->
-        # {:ok, %TeaVent.Event{changed_subject: updated_message}} ->
-        # Planga.Connection.broadcast_changed_message!(
-        #   app_id,
-        #   remote_conversation_id,
-        #   updated_message
-        # )
         {:noreply, socket}
     end
   end
@@ -108,17 +108,24 @@ defmodule PlangaWeb.ChatChannel do
         %{"user_uuid" => user_to_ban_id, "duration_minutes" => duration_minutes},
         socket
       ) do
-    case Planga.Chat.Moderation.ban_user(user_to_ban_id, duration_minutes, socket.assigns) do
+    %{
+      app_id: app_id,
+      config: %Planga.Connection.Config{
+        current_user_id: remote_user_id,
+        conversation_id: remote_conversation_id
+      }
+    } = socket.assigns
+
+    case Planga.EventReducer.dispatch(
+           [:apps, app_id, :conversations, remote_conversation_id, :users, user_to_ban_id],
+           :ban,
+           %{duration_minutes: duration_minutes},
+           remote_user_id
+         ) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
-      {:ok, updated_user_conversation_info} ->
-        Planga.Connection.broadcast_changed_conversation_user!(
-          socket.assigns.app_id,
-          socket.assigns.config.conversation_id,
-          updated_user_conversation_info
-        )
-
+      {:ok, _} ->
         {:noreply, socket}
     end
   end
@@ -206,9 +213,9 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   defp put_conversation_user(message) do
-    conversation_user = Planga.Repo.get(Planga.Chat.ConversationUser, message.conversation_user_id)
+    conversation_user =
+      Planga.Repo.get(Planga.Chat.ConversationUser, message.conversation_user_id)
+
     %Planga.Chat.Message{message | conversation_user: conversation_user}
   end
-
-
 end

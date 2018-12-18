@@ -38,11 +38,9 @@ defmodule Planga.Chat.ConversationUser do
         Logger.warn("Someone attempted to ban unbannable user #{inspect(conversation_user)}")
 
         conversation_user
-        |> change()
 
       true ->
-        conversation_user
-        |> change(banned_until: ban_end)
+        %__MODULE__{conversation_user | banned_until: ban_end}
     end
   end
 
@@ -61,8 +59,7 @@ defmodule Planga.Chat.ConversationUser do
   end
 
   def unban(conversation_user = %__MODULE__{}) do
-    conversation_user
-    |> change(banned_until: nil)
+    %__MODULE__{conversation_user | banned_until: nil}
   end
 
   def set_role(conversation_user = %__MODULE__{}, role) when role in [nil, "moderator"] do
