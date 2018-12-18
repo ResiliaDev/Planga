@@ -22,7 +22,7 @@ defmodule Planga.EventReducer do
   def reducer(structure, event)
 
   def reducer(_, %Event{
-        topic: [:app, app_id, :conversation, conversation_id, :messages],
+        topic: [:apps, app_id, :conversations, conversation_id, :messages],
         name: :new_message,
         meta: %{creator: conversation_user},
         data: data
@@ -43,30 +43,23 @@ defmodule Planga.EventReducer do
   end
 
   def reducer(message, %Event{
-        topic: [:app, app_id, :conversation, conversation_id, :messages, _message_id],
-        name: :hide,
+        topic: [:apps, app_id, :conversations, conversation_id, :messages, _message_id],
+        name: name,
         meta: %{creator: conversation_user}
-      }) do
+      })
+      when name in [:hide, :show] do
     case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
       false ->
         {:error, "You are not allowed to perform this action"}
 
       true ->
-        {:ok, Planga.Chat.Message.hide_message(message)}
-    end
-  end
+        case name do
+          :hide ->
+            {:ok, Planga.Chat.Message.hide_message(message)}
 
-  def reducer(message, %Event{
-        topic: [:app, app_id, :conversation, conversation_id, :messages, _message_id],
-        name: :show,
-        meta: %{creator: conversation_user}
-      }) do
-    case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
-      false ->
-        {:error, "You are not allowed to perform this action"}
-
-      true ->
-        {:ok, Planga.Chat.Message.show_message(message)}
+          :show ->
+            {:ok, Planga.Chat.Message.show_message(message)}
+        end
     end
   end
 
