@@ -10,10 +10,18 @@ defmodule Planga.EventContextProvider do
     ecto_multi =
       Ecto.Multi.new()
       |> Ecto.Multi.append(db_preparation)
-      |> Ecto.Multi.run(:subject, subject_fun)
+      |> Ecto.Multi.run(:subject, fn multi_info ->
+      case subject_fun.(multi_info) do
+        {:ok, res} -> {:ok, res}
+        {:error, failure} -> {:error, failure}
+      end
+    end)
       |> Ecto.Multi.run(:reducer, fn %{subject: subject} ->
       IO.inspect(subject, label: :reducer)
-        reducer.(subject)
+      case reducer.(subject) do
+        {:ok, res} -> {:ok, res}
+        {:error, failure} -> {:error, failure}
+      end
       end)
       |> Ecto.Multi.merge(fn %{reducer: event_result} ->
         changes =
@@ -67,6 +75,16 @@ defmodule Planga.EventContextProvider do
      fn %{conversation: conversation} -> {:ok, conversation} end}
   end
 
+  def hydrate([:app, app_id, :conversation, remote_conversation_id, :messages], %{
+                remote_user_id: remote_user_id
+              }) do
+    {ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
+     fn %{conversation: conversation} ->
+       {:ok, conversation}
+     end
+    }
+  end
+
   def hydrate([:app, app_id, :conversation, remote_conversation_id, :messages], _),
     do:
       {fetch_or_create_conversation_by_remote_id(app_id, remote_conversation_id),
@@ -114,13 +132,14 @@ defmodule Planga.EventContextProvider do
   end
 
   defp fetch_or_create_user(app_id, remote_user_id) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.run(:pre_insertion_user, fn _ ->
-      case Repo.get_by(Planga.Chat.User, app_id: app_id, remote_id: remote_user_id) do
-        nil -> %Planga.Chat.User{app_id: app_id, remote_id: remote_user_id}
-      end
-    end)
-    |> Ecto.Multi.insert_or_update(:user, fn %{pre_insertion_user: user} -> user end)
+    fetch_or_create_structure("user", Planga.Chat.User, app_id: app_id, remote_id: remote_user_id)
+    # Ecto.Multi.new()
+    # |> Ecto.Multi.run(:pre_insertion_user, fn _ ->
+    #   case Repo.get_by(Planga.Chat.User, app_id: app_id, remote_id: remote_user_id) do
+    #     nil -> %Planga.Chat.User{app_id: app_id, remote_id: remote_user_id}
+    #   end
+    # end)
+    # |> Ecto.Multi.insert_or_update(:user, fn %{pre_insertion_user: user} -> user end)
   end
 
   defp ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id) do
@@ -130,23 +149,24 @@ defmodule Planga.EventContextProvider do
     multi_a
     |> Ecto.Multi.append(multi_b)
     |> Ecto.Multi.merge(fn %{conversation: conversation, user: user} ->
-      Ecto.Multi.new()
-      |> Ecto.Multi.run(:pre_insertion_user, fn _ ->
-        case Repo.get_by(
-               Planga.Chat.ConversationUser,
-               conversation_id: conversation.id,
-               user_id: user.id
-             ) do
-          nil -> %Planga.Chat.User{app_id: app_id, remote_id: remote_user_id}
-          conversation_user -> conversation_user
-        end
-      end)
-      |> Ecto.Multi.insert_or_update(:conversation_user, fn %{
-                                                              pre_insertion_conversation_user:
-                                                                conversation_user
-                                                            } ->
-        conversation_user
-      end)
+      fetch_or_create_structure(:conversation_user, Planga.Chat.ConversationUser, conversation_id: conversation.id, user_id: user.id)
+      # Ecto.Multi.new()
+      # |> Ecto.Multi.run(:pre_insertion_user, fn _ ->
+      #   case Repo.get_by(
+      #          Planga.Chat.ConversationUser,
+      #          conversation_id: conversation.id,
+      #          user_id: user.id
+      #        ) do
+      #     nil -> %Planga.Chat.User{app_id: app_id, remote_id: remote_user_id}
+      #     conversation_user -> conversation_user
+      #   end
+      # end)
+      # |> Ecto.Multi.insert_or_update(:conversation_user, fn %{
+      #                                                         pre_insertion_conversation_user:
+      #                                                           conversation_user
+      #                                                       } ->
+      #   conversation_user
+      # end)
     end)
   end
 end
