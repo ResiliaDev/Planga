@@ -25,6 +25,7 @@ defmodule Planga.Event.Middleware do
     fn event ->
       updated_meta = Map.put(event.meta, :started_at, DateTime.utc_now())
       event = %Event{event | meta: updated_meta}
+
       with {:ok, result_event} = next_stage.(event) do
         updated_meta = Map.put(event.meta, :finished_at, DateTime.utc_now())
         result_event = %Event{result_event | meta: updated_meta}

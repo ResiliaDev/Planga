@@ -24,8 +24,7 @@ defmodule Planga.Event.ContextProvider.Hydration do
   end
 
   def fetch_creator(event = %Event{}),
-    do:
-      Ecto.Multi.new() |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end)
+    do: Ecto.Multi.new() |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end)
 
   def hydrate([:apps, app_id], _) do
     {Ecto.Multi.new(),
@@ -92,7 +91,6 @@ defmodule Planga.Event.ContextProvider.Hydration do
       end
     end)
     |> Ecto.Multi.merge(fn %{^atomname => structure} ->
-
       Ecto.Multi.new()
       |> Ecto.Multi.insert_or_update(:"#{structure_name}", structure |> Ecto.Changeset.change())
     end)

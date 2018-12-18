@@ -13,9 +13,8 @@ defmodule Planga.Event.ContextProvider do
       |> Ecto.Multi.run(:reducer_result, &run_reducer(event, reducer, &1))
       |> Ecto.Multi.merge(&persist_reducer_result/1)
 
-    new_meta = Map.put(event.meta, :ecto_multi, ecto_multi)
-
-    {:ok, %TeaVent.Event{event | meta: new_meta}}
+    event = put_in(event.meta[:ecto_multi], ecto_multi)
+    {:ok, event}
   end
 
   defp fill_subject(subject_fun, multi_info) do
