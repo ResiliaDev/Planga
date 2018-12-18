@@ -29,7 +29,7 @@ defmodule Planga.Event.Reducer do
   def reducer(message = %Planga.Chat.Message{}, %Event{
         topic: [:apps, app_id, :conversations, conversation_id, :messages, _message_id],
         name: name,
-        meta: %{creator: conversation_user}
+        meta: %{creator: conversation_user, started_at: started_at}
       })
       when name in [:hide_message, :show_message] do
     case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
@@ -39,7 +39,7 @@ defmodule Planga.Event.Reducer do
       true ->
         case name do
           :hide_message ->
-            {:ok, Planga.Chat.Message.hide_message(message)}
+            {:ok, Planga.Chat.Message.hide_message(message, started_at)}
 
           :show_message ->
             {:ok, Planga.Chat.Message.show_message(message)}
@@ -50,7 +50,7 @@ defmodule Planga.Event.Reducer do
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
         topic: [:apps, app_id, :conversations, conversation_id, :users, _remote_user_id],
         name: name,
-        meta: %{creator: conversation_user},
+        meta: %{creator: conversation_user, started_at: started_at},
         data: data
       })
       when name in [:ban, :unban] do
@@ -61,7 +61,7 @@ defmodule Planga.Event.Reducer do
       true ->
         case name do
           :ban ->
-            {:ok, Planga.Chat.ConversationUser.ban(subject, data.duration_minutes)}
+            {:ok, Planga.Chat.ConversationUser.ban(subject, data.duration_minutes, started_at)}
 
           :unban ->
             {:ok, Planga.Chat.Message.unban(subject)}

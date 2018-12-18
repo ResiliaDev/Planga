@@ -11,7 +11,7 @@ defmodule Planga.Event do
         [
           context_provider: &Planga.Event.ContextProvider.run/2,
           reducer: &Planga.Event.Reducer.reducer/2,
-          middleware: [&Planga.Event.Middleware.repo_transaction/1]
+          middleware: [&Planga.Event.Middleware.fill_time/1, &Planga.Event.Middleware.repo_transaction/1]
         ]
 
     meta = Map.put(event.meta, :remote_user_id, remote_user_id)

@@ -15,21 +15,17 @@ defmodule Planga.Event.ContextProvider.Hydration do
       "creator"
     )
     |> Ecto.Multi.run(:creator, &{:ok, Map.get(&1, :creator_conversation_user)})
-    |> IO.inspect(label: "Case 1")
   end
 
   def fetch_creator(
         event = %Event{topic: [:apps, app_id | _], meta: %{remote_user_id: remote_user_id}}
       ) do
-    # |> Ecto.Multi.run(:creator, &({:ok, Map.get(&1, :creator_user)}))
     fetch_or_create_user(app_id, remote_user_id, "creator")
-    |> IO.inspect(label: "Case 2")
   end
 
   def fetch_creator(event = %Event{}),
     do:
       Ecto.Multi.new() |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end)
-      |> IO.inspect(label: "Case 3")
 
   def hydrate([:apps, app_id], _) do
     {Ecto.Multi.new(),
@@ -86,7 +82,6 @@ defmodule Planga.Event.ContextProvider.Hydration do
   end
 
   defp fetch_or_create_structure(structure_name, schema, kvs) do
-    IO.inspect([structure_name, schema, kvs])
     atomname = :"pre_insertion_#{structure_name}"
 
     Ecto.Multi.new()
@@ -96,15 +91,11 @@ defmodule Planga.Event.ContextProvider.Hydration do
         result -> {:ok, result}
       end
     end)
-    |> IO.inspect()
     |> Ecto.Multi.merge(fn %{^atomname => structure} ->
-      IO.inspect(structure)
 
-      res =
-        Ecto.Multi.new()
-        |> Ecto.Multi.insert_or_update(:"#{structure_name}", structure |> Ecto.Changeset.change())
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert_or_update(:"#{structure_name}", structure |> Ecto.Changeset.change())
     end)
-    |> IO.inspect()
   end
 
   defp fetch_or_create_conversation_by_remote_id(
