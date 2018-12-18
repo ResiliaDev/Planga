@@ -24,7 +24,7 @@ defmodule Planga.EventContextProvider do
         IO.inspect(subject, label: :reducer)
         IO.inspect(event, label: :event_before_calling_reducer)
 
-        case reducer.(subject, event) do
+        case reducer.(subject, event) |> IO.inspect(label: :reducer_result) do
           {:ok, res} -> {:ok, res}
           {:error, failure} -> {:error, failure}
         end
@@ -82,7 +82,7 @@ defmodule Planga.EventContextProvider do
       }) do
     {ensure_user_partakes_in_conversation(app_id, remote_conversation_id, remote_user_id),
      fn %{conversation: conversation} ->
-       {:ok, conversation}
+       {:ok, nil}
      end}
   end
 

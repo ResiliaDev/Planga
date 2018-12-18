@@ -30,7 +30,7 @@ defmodule Planga.EventReducer do
         meta: %{creator: conversation_user},
         data: data
       }) do
-    case Planga.Chat.Message.valid?(data.message) do
+    case Planga.Chat.Message.valid_message?(data.message) do
       false ->
         {:error, "Invalid Message"}
 

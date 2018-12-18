@@ -26,6 +26,7 @@ defmodule Planga.Chat.Message do
         false -> [content: :invalid_message]
       end
     end)
+    |> Ecto.Changeset.apply_changes
   end
 
   @doc """
