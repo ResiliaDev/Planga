@@ -82,7 +82,6 @@ defmodule Planga.EventReducer do
             {:ok, Planga.Chat.Message.unban(subject)}
         end
     end
-
   end
 
   def reducer(input, %Event{name: :noop}) do
