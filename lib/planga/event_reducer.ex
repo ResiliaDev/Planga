@@ -1,11 +1,11 @@
 defmodule Planga.EventReducer do
   alias TeaVent.Event
 
-  def dispatch(topic, name, data \\ %{}, meta \\ %{}, options \\ []) do
-    dispatch_event(TeaVent.Event.new(topic, name, data, meta), options)
+  def dispatch(topic, name, data \\ %{}, meta \\ %{}, remote_user_id \\ nil, options \\ []) do
+    dispatch_event(TeaVent.Event.new(topic, name, data, meta), remote_user_id, options)
   end
 
-  def dispatch_event(event, options \\ []) do
+  def dispatch_event(event, remote_user_id \\ nil, options \\ []) do
     options =
       options ++
         [
@@ -14,6 +14,9 @@ defmodule Planga.EventReducer do
           middleware: [&Planga.EventMiddleware.repo_transaction/1]
         ]
 
+    meta = Map.put(event.meta, :remote_user_id, remote_user_id)
+
+    event = %Event{event | meta: meta}
     TeaVent.dispatch_event(event, options)
   end
 
