@@ -1,4 +1,4 @@
-defmodule Planga.EventMiddleware do
+defmodule Planga.Event.Middleware do
   alias TeaVent.Event
   alias Planga.Repo
 
