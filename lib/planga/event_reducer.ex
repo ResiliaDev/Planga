@@ -42,7 +42,7 @@ defmodule Planga.EventReducer do
     end
   end
 
-  def reducer(message, %Event{
+  def reducer(message = %Planga.Chat.Message{}, %Event{
         topic: [:apps, app_id, :conversations, conversation_id, :messages, _message_id],
         name: name,
         meta: %{creator: conversation_user}
@@ -59,6 +59,27 @@ defmodule Planga.EventReducer do
 
           :show ->
             {:ok, Planga.Chat.Message.show_message(message)}
+        end
+    end
+  end
+
+  def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
+        topic: [:apps, app_id, :conversations, conversation_id, :users, _remote_user_id],
+        name: name,
+        meta: %{creator: conversation_user}
+      })
+      when name in [:ban, :unban] do
+    case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
+      false ->
+        {:error, "You are not allowed to perform this action"}
+
+      true ->
+        case name do
+          :ban ->
+            {:ok, Planga.Chat.ConversationUser.ban(subject)}
+
+          :unban ->
+            {:ok, Planga.Chat.Message.unban(subject)}
         end
     end
   end
