@@ -6,7 +6,14 @@ defmodule Planga.EventReducer do
   end
 
   def dispatch_event(event, options \\ []) do
-    options = options ++ [context_provider: &Planga.EventContextProvider.run/2, reducer: &Planga.EventReducer.reducer/2, middleware: [&Planga.EventMiddleware.repo_transaction/1]]
+    options =
+      options ++
+        [
+          context_provider: &Planga.EventContextProvider.run/2,
+          reducer: &Planga.EventReducer.reducer/2,
+          middleware: [&Planga.EventMiddleware.repo_transaction/1]
+        ]
+
     TeaVent.dispatch_event(event, options)
   end
 
