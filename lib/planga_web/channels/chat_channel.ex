@@ -56,9 +56,10 @@ defmodule PlangaWeb.ChatChannel do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
-      {:ok, event = %TeaVent.Event{changed_subject: message}} ->
-        IO.inspect(event, label: "ChatChannel event broadcast")
-        Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
+      {:ok, _} ->
+      # {:ok, event = %TeaVent.Event{changed_subject: message}} ->
+        # IO.inspect(event, label: "ChatChannel event broadcast")
+        # Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, message)
         {:noreply, socket}
     end
   end
@@ -88,17 +89,16 @@ defmodule PlangaWeb.ChatChannel do
     } = socket.assigns
 
     case Planga.EventReducer.dispatch([:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid], :hide_message, %{}, %{}, remote_user_id) do
-      # case Planga.Chat.Moderation.hide_message(message_uuid, socket.assigns) do
       {:error, error_message} ->
         {:reply, {:error, %{"data" => error_message}}, socket}
 
-      {:ok, %TeaVent.Event{changed_subject: updated_message}} ->
-        Planga.Connection.broadcast_changed_message!(
-          socket.assigns.app_id,
-          socket.assigns.config.conversation_id,
-          updated_message
-        )
-
+      {:ok, _} ->
+        # {:ok, %TeaVent.Event{changed_subject: updated_message}} ->
+        # Planga.Connection.broadcast_changed_message!(
+        #   app_id,
+        #   remote_conversation_id,
+        #   updated_message
+        # )
         {:noreply, socket}
     end
   end

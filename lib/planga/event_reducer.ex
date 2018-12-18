@@ -5,6 +5,7 @@ defmodule Planga.EventReducer do
     dispatch_event(TeaVent.Event.new(topic, name, data, meta), remote_user_id, options)
   end
 
+
   def dispatch_event(event, remote_user_id \\ nil, options \\ []) do
     options =
       options ++
@@ -17,7 +18,21 @@ defmodule Planga.EventReducer do
     meta = Map.put(event.meta, :remote_user_id, remote_user_id)
 
     event = %Event{event | meta: meta}
-    TeaVent.dispatch_event(event, options)
+    with {:ok, event} <- TeaVent.dispatch_event(event, options) do
+      broadcast_changes(event)
+    end
+  end
+
+
+  def broadcast_changes(event) do
+    case event.topic do
+      [:apps, app_id, :conversations, remote_conversation_id, :messages] ->
+        IO.inspect(event, label: "broadcast_changes")
+        Planga.Connection.broadcast_new_message!(app_id, remote_conversation_id, event.changed_subject)
+      [:apps, app_id, :conversations, remote_conversation_id, :messages, message_id] ->
+        Planga.Connection.broadcast_changed_message!(app_id, remote_conversation_id, event.changed_subject)
+    end
+    {:ok, event}
   end
 
   @spec reducer(structure, event :: TeaVent.Event.t()) :: {:ok, structure} | {:error, any}
@@ -38,7 +53,7 @@ defmodule Planga.EventReducer do
         {:ok,
          Planga.Chat.Message.new(
            content: data.message,
-           conversation_id: conversation_id,
+           conversation_id: conversation_user.conversation_id,
            sender_id: conversation_user.user_id,
            conversation_user_id: conversation_user.id
          )}
