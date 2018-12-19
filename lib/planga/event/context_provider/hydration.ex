@@ -16,8 +16,8 @@ defmodule Planga.Event.ContextProvider.Hydration do
         topic: [:apps, app_id, :conversations, remote_conversation_id | _],
         meta: %{remote_user_id: remote_user_id}
       }) do
-    ensure_user_partakes_in_conversation(
-      app_id,
+    app_id
+    |> ensure_user_partakes_in_conversation(
       remote_conversation_id,
       remote_user_id,
       "creator"

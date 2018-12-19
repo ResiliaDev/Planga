@@ -38,10 +38,7 @@ defmodule Planga.Event.ContextProvider do
     meta = Map.put(event.meta, :creator, creator)
     event = %Event{event | meta: meta}
 
-    IO.inspect(subject, label: :reducer)
-    IO.inspect(event, label: :event_before_calling_reducer)
-
-    case reducer.(subject, event) |> IO.inspect(label: :reducer_result) do
+    case reducer.(subject, event) do
       {:ok, res} -> {:ok, res}
       {:error, failure} -> {:error, failure}
     end

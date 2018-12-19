@@ -9,9 +9,9 @@ defmodule Planga.Event.Callbacks do
   we broadcast these changes so that they immediately see the changes in their view.
   """
   def broadcast_changes(event) do
+    require Logger
     case {event.topic, event.name} do
       {[:apps, app_id, :conversations, remote_conversation_id, :messages], :new_message} ->
-        IO.inspect(event, label: "broadcast_changes")
 
         Planga.Connection.broadcast_new_message!(
           app_id,
@@ -19,14 +19,14 @@ defmodule Planga.Event.Callbacks do
           event.changed_subject
         )
 
-      {[:apps, app_id, :conversations, remote_conversation_id, :messages, message_id], _} ->
+      {[:apps, app_id, :conversations, remote_conversation_id, :messages, _message_id], _} ->
         Planga.Connection.broadcast_changed_message!(
           app_id,
           remote_conversation_id,
           event.changed_subject
         )
 
-      {[:apps, app_id, :conversations, remote_conversation_id, :users, remote_user_id], _} ->
+      {[:apps, app_id, :conversations, remote_conversation_id, :users, _remote_user_id], _} ->
         Planga.Connection.broadcast_changed_conversation_user!(
           app_id,
           remote_conversation_id,
@@ -34,7 +34,7 @@ defmodule Planga.Event.Callbacks do
         )
 
       _ ->
-        IO.puts("Did not broadcast anything for event #{inspect(event)}")
+        Logger.info("Did not broadcast anything for event #{inspect(event)}")
     end
 
     {:ok, event}

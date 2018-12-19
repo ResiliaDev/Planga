@@ -14,7 +14,6 @@ defmodule Planga.Event.Middleware do
   def repo_transaction(next_stage) do
     fn event ->
       with {:ok, %Event{meta: meta = %{ecto_multi: ecto_multi}}} <- next_stage.(event),
-           IO.inspect(ecto_multi |> Ecto.Multi.to_list()),
            {:ok, ecto_multi_result} <- Repo.transaction(ecto_multi) do
         updated_meta = Map.put(meta, :ecto_multi, ecto_multi_result)
         updated_event = ecto_multi_result.reducer_result
@@ -47,6 +46,22 @@ defmodule Planga.Event.Middleware do
         result_event = %Event{result_event | meta: updated_meta}
         {:ok, result_event}
       end
+    end
+  end
+
+  def event_logger(next_stage) do
+    require Logger
+    fn event ->
+      Logger.info("-->Incoming event #{inspect(event)}")
+      with  {:ok, updated_event} <- next_stage.(event) do
+        Logger.info("<--Handled event #{inspect(updated_event)}")
+        {:ok, updated_event}
+      else
+        error ->
+          Logger.info("<--Failed Handling event #{inspect(error)}")
+          error
+      end
+
     end
   end
 end
