@@ -130,7 +130,7 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   defp ensure_user_partakes_in_conversation(conversation_id, user_id) do
     safe(fn ->
       Repo.transaction(fn ->
-        user = Repo.get_by!(ConversationUser, conversation_id: conversation_id, user_id: user_id)
+        user = Repo.get_by(ConversationUser, conversation_id: conversation_id, user_id: user_id)
 
         if user do
           user
@@ -161,12 +161,13 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
   end
 
   def fetch_conversation_user_info(conversation_id, user_id) do
-    safe(fn ->
-      Repo.transaction(fn ->
-        Planga.Chat.ConversationUser
-        |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
-      end)
-    end).()
-    |> to_tagged_status
+    ensure_user_partakes_in_conversation(conversation_id, user_id)
+    # safe(fn ->
+    #   Repo.transaction(fn ->
+    #     Planga.Chat.ConversationUser
+    #     |> Planga.Repo.get_by!(conversation_id: conversation_id, user_id: user_id)
+    #   end)
+    # end).()
+    # |> to_tagged_status
   end
 end

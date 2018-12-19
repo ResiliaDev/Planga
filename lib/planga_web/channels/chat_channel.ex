@@ -101,6 +101,26 @@ defmodule PlangaWeb.ChatChannel do
       socket
     )
   end
+  def handle_in("show_message", %{"message_uuid" => message_uuid}, socket) do
+    %{
+      app_id: app_id,
+      config: %Planga.Connection.Config{
+        current_user_id: remote_user_id,
+        conversation_id: remote_conversation_id
+      }
+    } = socket.assigns
+
+    handle_event_result(
+      Planga.Event.dispatch(
+        [:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid],
+        :show_message,
+        %{},
+        remote_user_id
+      ),
+      socket
+    )
+  end
+
 
   def handle_in(
         "ban_user",
@@ -125,6 +145,30 @@ defmodule PlangaWeb.ChatChannel do
       socket
     )
   end
+  def handle_in(
+    "unban_user",
+    %{"user_uuid" => user_to_ban_id},
+    socket
+  ) do
+    %{
+      app_id: app_id,
+      config: %Planga.Connection.Config{
+        current_user_id: remote_user_id,
+        conversation_id: remote_conversation_id
+      }
+    } = socket.assigns
+
+    handle_event_result(
+      Planga.Event.dispatch(
+        [:apps, app_id, :conversations, remote_conversation_id, :users, user_to_ban_id],
+        :unban,
+        %{},
+        remote_user_id
+      ),
+      socket
+    )
+  end
+
 
   @doc """
   Called immediately after joining to send latest messages to just-connected chatter.
