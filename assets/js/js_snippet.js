@@ -14545,7 +14545,7 @@ var _ResiliaDev$planga_chat_client$View$message = F3(
 				_elm_lang$core$Basics_ops['++'],
 				is_current_user ? ' planga--chat-current-user-message' : '',
 				is_deleted ? ' planga--chat-deleted-message' : ''));
-		return A2(
+		return (is_deleted && (!is_moderator)) ? _elm_lang$html$Html$text('') : A2(
 			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
