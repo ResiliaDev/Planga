@@ -35,6 +35,11 @@ defmodule PlangaWeb.ChatChannel do
     |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
   end
 
+  defp handle_event_result({:ok, _event_result}, socket), do: {:noreply, socket}
+
+  defp handle_event_result({:error, error_message}, socket),
+    do: {:reply, {:error, %{"data" => error_message}}, socket}
+
   @doc """
   Called whenever the chatter attempts to send a new message.
 
@@ -51,18 +56,15 @@ defmodule PlangaWeb.ChatChannel do
       }
     } = socket.assigns
 
-    case Planga.Event.dispatch(
-           [:apps, app_id, :conversations, remote_conversation_id, :messages],
-           :new_message,
-           %{message: message},
-           remote_user_id
-         ) do
-      {:error, error_message} ->
-        {:reply, {:error, %{"data" => error_message}}, socket}
-
-      {:ok, _} ->
-        {:noreply, socket}
-    end
+    handle_event_result(
+      Planga.Event.dispatch(
+        [:apps, app_id, :conversations, remote_conversation_id, :messages],
+        :new_message,
+        %{message: message},
+        remote_user_id
+      ),
+      socket
+    )
   end
 
   @doc """
@@ -89,18 +91,15 @@ defmodule PlangaWeb.ChatChannel do
       }
     } = socket.assigns
 
-    case Planga.Event.dispatch(
-           [:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid],
-           :hide_message,
-           %{},
-           remote_user_id
-         ) do
-      {:error, error_message} ->
-        {:reply, {:error, %{"data" => error_message}}, socket}
-
-      {:ok, _} ->
-        {:noreply, socket}
-    end
+    handle_event_result(
+      Planga.Event.dispatch(
+        [:apps, app_id, :conversations, remote_conversation_id, :messages, message_uuid],
+        :hide_message,
+        %{},
+        remote_user_id
+      ),
+      socket
+    )
   end
 
   def handle_in(
@@ -116,18 +115,15 @@ defmodule PlangaWeb.ChatChannel do
       }
     } = socket.assigns
 
-    case Planga.Event.dispatch(
-           [:apps, app_id, :conversations, remote_conversation_id, :users, user_to_ban_id],
-           :ban,
-           %{duration_minutes: duration_minutes},
-           remote_user_id
-         ) do
-      {:error, error_message} ->
-        {:reply, {:error, %{"data" => error_message}}, socket}
-
-      {:ok, _} ->
-        {:noreply, socket}
-    end
+    handle_event_result(
+      Planga.Event.dispatch(
+        [:apps, app_id, :conversations, remote_conversation_id, :users, user_to_ban_id],
+        :ban,
+        %{duration_minutes: duration_minutes},
+        remote_user_id
+      ),
+      socket
+    )
   end
 
   @doc """

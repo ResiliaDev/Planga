@@ -2,12 +2,10 @@ defmodule Planga.Event.ContextProvider.Hydration do
   alias Planga.Repo
   alias TeaVent.Event
 
-  def fetch_creator(
-        event = %Event{
-          topic: [:apps, app_id, :conversations, remote_conversation_id | _],
-          meta: %{remote_user_id: remote_user_id}
-        }
-      ) do
+  def fetch_creator(%Event{
+        topic: [:apps, app_id, :conversations, remote_conversation_id | _],
+        meta: %{remote_user_id: remote_user_id}
+      }) do
     ensure_user_partakes_in_conversation(
       app_id,
       remote_conversation_id,
@@ -17,13 +15,11 @@ defmodule Planga.Event.ContextProvider.Hydration do
     |> Ecto.Multi.run(:creator, &{:ok, Map.get(&1, :creator_conversation_user)})
   end
 
-  def fetch_creator(
-        event = %Event{topic: [:apps, app_id | _], meta: %{remote_user_id: remote_user_id}}
-      ) do
+  def fetch_creator(%Event{topic: [:apps, app_id | _], meta: %{remote_user_id: remote_user_id}}) do
     fetch_or_create_user(app_id, remote_user_id, "creator")
   end
 
-  def fetch_creator(event = %Event{}),
+  def fetch_creator(%Event{}),
     do: Ecto.Multi.new() |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end)
 
   def hydrate([:apps, app_id], _) do
@@ -129,7 +125,7 @@ defmodule Planga.Event.ContextProvider.Hydration do
         "" ->
           fn name -> :"#{name}" end
 
-        other ->
+        _other ->
           fn name -> :"#{field_name_prefix}_#{name}" end
       end
 

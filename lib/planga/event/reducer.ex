@@ -6,7 +6,7 @@ defmodule Planga.Event.Reducer do
   def reducer(structure, event)
 
   def reducer(_, %Event{
-        topic: [:apps, app_id, :conversations, conversation_id, :messages],
+        topic: [:apps, _app_id, :conversations, _conversation_id, :messages],
         name: :new_message,
         meta: %{creator: conversation_user},
         data: data
@@ -27,7 +27,7 @@ defmodule Planga.Event.Reducer do
   end
 
   def reducer(message = %Planga.Chat.Message{}, %Event{
-        topic: [:apps, app_id, :conversations, conversation_id, :messages, _message_id],
+        topic: [:apps, _app_id, :conversations, _conversation_id, :messages, _message_id],
         name: name,
         meta: %{creator: conversation_user, started_at: started_at}
       })
@@ -48,7 +48,7 @@ defmodule Planga.Event.Reducer do
   end
 
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
-        topic: [:apps, app_id, :conversations, conversation_id, :users, _remote_user_id],
+        topic: [:apps, _app_id, :conversations, _conversation_id, :users, _remote_user_id],
         name: name,
         meta: %{creator: conversation_user, started_at: started_at},
         data: data
@@ -64,7 +64,7 @@ defmodule Planga.Event.Reducer do
             {:ok, Planga.Chat.ConversationUser.ban(subject, data.duration_minutes, started_at)}
 
           :unban ->
-            {:ok, Planga.Chat.Message.unban(subject)}
+            {:ok, Planga.Chat.ConversationUser.unban(subject)}
         end
     end
   end
