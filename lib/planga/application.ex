@@ -20,10 +20,7 @@ defmodule Planga.Application do
       # Start your own worker by calling: Planga.Worker.start_link(arg1, arg2, arg3)
       # worker(Planga.Worker, [arg1, arg2, arg3]),
       worker(Planga.Scheduler, []),
-
-      # Connects to RabbitMQ and manages changes in app settings.
-      worker(Planga.AppSettingsListener, [])
-    ]
+    ] ++ env_specific_apps()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -36,5 +33,16 @@ defmodule Planga.Application do
   def config_change(changed, _new, removed) do
     PlangaWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  def env_specific_apps do
+    import Supervisor.Spec
+
+    if Application.get_env(:planga, :environment) == :test do
+      []
+    else
+      # Connects to RabbitMQ and manages changes in app settings.
+      [worker(Planga.AppSettingsListener, [])]
+    end
   end
 end

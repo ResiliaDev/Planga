@@ -5,6 +5,8 @@
 # is restricted to this project.
 use Mix.Config
 
+config :planga, environment: :"#{Mix.env()}"
+
 # General application configuration
 config :planga,
   ecto_repos: [Planga.Repo],
@@ -50,6 +52,8 @@ config :mnesia,
   dir: 'priv/'
 
 config :snowflakex, machine_id: 42
+
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
