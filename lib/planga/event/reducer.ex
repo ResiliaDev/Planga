@@ -1,6 +1,14 @@
 defmodule Planga.Event.Reducer do
+  @moduledoc """
+  This module knows/decides how to change the application state based on incooming events.
+  """
   alias TeaVent.Event
 
+  @doc """
+  Receives the current subject (the 'logical context') for this event as first  parameter, and the event itself as the second parameter.
+
+  Supposed to return `{:ok, updated_subject} | {:error, problem}`
+  """
   @spec reducer(structure, event :: TeaVent.Event.t()) :: {:ok, structure} | {:error, any}
         when structure: any
   def reducer(structure, event)

@@ -1,6 +1,14 @@
 defmodule Planga.Event.ContextProvider do
+  @moduledoc """
+  Responsible for giving an event its logical context
+  (this lookup- part is handled in more detail in the ContextProvider.Hydration module), and after it has been reduced with this logical context,
+  we update the application state as a whole with it.
+  """
   alias TeaVent.Event
 
+  @doc """
+  Runs the given event with the given wrapped-reducer. This is the function to use in the configuration of `TeaVent`.
+  """
   def run(event = %TeaVent.Event{topic: topic}, reducer) do
     {db_preparation, subject_fun} =
       Planga.Event.ContextProvider.Hydration.hydrate(topic, event.meta)

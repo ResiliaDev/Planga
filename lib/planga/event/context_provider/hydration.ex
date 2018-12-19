@@ -1,7 +1,17 @@
 defmodule Planga.Event.ContextProvider.Hydration do
+  @moduledoc """
+  Responsible for finding the 'logical context' of each incoming event.
+
+  Because the application state is too big to use at once, and there is no 'single truth' in a distributed system,
+  this 'logical context' can be consideed the _single state of truth for this given event call_.
+  """
   alias Planga.Repo
   alias TeaVent.Event
 
+  @doc """
+  Fills the `meta.ctreator` field of the event with something useful,
+  if applicable; either a User or a ConversationUser, depending on the Event's topic.
+  """
   def fetch_creator(%Event{
         topic: [:apps, app_id, :conversations, remote_conversation_id | _],
         meta: %{remote_user_id: remote_user_id}
@@ -22,6 +32,17 @@ defmodule Planga.Event.ContextProvider.Hydration do
   def fetch_creator(%Event{}),
     do: Ecto.Multi.new() |> Ecto.Multi.run(:creator, fn _ -> {:ok, nil} end)
 
+  @doc """
+  Fetches the subject (AKA 'logical context') for the given event, based on its topic (and potentially some other information like e.g. the event's meta-content).
+
+  In some cases the topic refers something that might not be persisted yet, in which case we add it to the DB firrst, before running the reducer (in a transaction, such that when the reducer fails, everything is removed from the DB again).
+
+  Returns `{Ecto.Multi.t, function_returning_structure_based_on_ecto_multi_map}`.
+
+  The `ecto_multi_map` is a map containing keys with the names of earlier Ecto.Multi stages; see the `Ecto.Multi` library module for more information.
+
+  In simple cases, a function clause will look like `{Ecto.Multi.new, fn _ -> Repo.fetch(something_or_other) end}`
+  """
   def hydrate([:apps, app_id], _) do
     {Ecto.Multi.new(),
      fn _ ->

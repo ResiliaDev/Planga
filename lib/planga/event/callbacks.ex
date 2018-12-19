@@ -1,4 +1,13 @@
 defmodule Planga.Event.Callbacks do
+  @moduledoc """
+  Callbacks to be run after an event has been handled.
+  The callback-functions itself are run synchroniously, but they might dispatch other, async events/messages/tasks..
+  """
+
+  @moduledoc """
+  Whenever a structure that people might be viewing live changes,
+  we broadcast these changes so that they immediately see the changes in their view.
+  """
   def broadcast_changes(event) do
     case {event.topic, event.name} do
       {[:apps, app_id, :conversations, remote_conversation_id, :messages], :new_message} ->
