@@ -28,6 +28,7 @@ defmodule Planga.Event.ContextProvider do
   defp fill_subject(subject_fun, multi_info) do
     # This pattern-match is here to make debugging of the subject function easier.
     # Without this check, error messages would complain at a much later `Ecto.Multi.merge`-step.
+    IO.inspect(multi_info, label: :multi_info)
     case subject_fun.(multi_info) do
       {:ok, res} -> {:ok, res}
       {:error, failure} -> {:error, failure}
