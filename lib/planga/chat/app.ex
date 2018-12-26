@@ -5,7 +5,7 @@ defmodule Planga.Chat.App do
   but all of these connect to the same application.
   """
   use Ecto.Schema
-  import Ecto.Changeset
+  # import Ecto.Changeset
 
   schema "apps" do
     field(:name, :string)
@@ -17,11 +17,26 @@ defmodule Planga.Chat.App do
     timestamps()
   end
 
+  def new(attrs) do
+    %__MODULE__{}
+    |> Ecto.Changeset.cast(Map.new(attrs), [:name])
+    |> Ecto.Changeset.validate_required([:name])
+    |> apply_changes
+  end
+
+  defp apply_changes(changeset) do
+    if changeset.valid? do
+      {:ok, Ecto.Changeset.apply_changes(changeset)}
+    else
+      {:error, changeset.errors}
+    end
+  end
+
   @doc false
   def changeset(app, attrs) do
     app
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> Ecto.Changeset.cast(attrs, [:name])
+    |> Ecto.Changeset.validate_required([:name])
   end
 
   @deprecated

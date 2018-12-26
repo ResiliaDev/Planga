@@ -55,6 +55,18 @@ defmodule Planga.Test.Support.Generators do
     end
   end
 
+  def app_generator do
+
+    ExUnitProperties.gen all  id <- num_id_generator,
+                            name <- StreamData.string(:printable, min_length: 1) do
+      {:ok, res} = Planga.Chat.App.new(name: name)
+
+      app = put_in res.id, id
+
+      app
+    end
+  end
+
   def conversation_generator do
     ExUnitProperties.gen all  id <- num_id_generator,
                                 remote_id <- remote_id_generator,
@@ -64,6 +76,17 @@ defmodule Planga.Test.Support.Generators do
             remote_id: remote_id
                                   })
       put_in res.id, id
+    end
+  end
+
+  def filled_conversation_generator do
+    ExUnitProperties.gen all  app <- app_generator,
+      conversation <- conversation_generator do
+
+      conversation = put_in conversation.app_id, app.id
+      conversation = put_in conversation.app, app
+
+      conversation
     end
   end
 
@@ -83,7 +106,7 @@ defmodule Planga.Test.Support.Generators do
   end
 
   def filled_conversation_user_generator do
-    ExUnitProperties.gen all  conversation <- conversation_generator,
+    ExUnitProperties.gen all  conversation <- filled_conversation_generator,
                               user <- user_generator,
                               conversation_user <- conversation_user_generator do
 
@@ -92,6 +115,9 @@ defmodule Planga.Test.Support.Generators do
 
       conversation_user = put_in conversation_user.conversation_id, conversation.id
       conversation_user = put_in conversation_user.conversation, conversation
+
+      conversation_user = put_in conversation_user.user.app_id, conversation.app.id
+      conversation_user = put_in conversation_user.user.app, conversation.app
     end
   end
 
