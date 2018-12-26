@@ -13,6 +13,7 @@ datetime_generator =
   StreamData.integer()
   |> StreamData.map(&DateTime.from_unix!/1)
 
+
 pos_integer_generator =
   StreamData.integer
   |> StreamData.map(&Kernel.abs/1)
@@ -21,7 +22,7 @@ num_id_generator  =
   pos_integer_generator
 
 remote_id_generator =
-  [num_id_generator, StreamData.string(:alphanumeric)]
+  [num_id_generator, StreamData.string(:alphanumeric, min_length: 1)]
   |> StreamData.one_of
   |> StreamData.map(&Kernel.to_string/1)
 
@@ -36,39 +37,42 @@ role_generator =
   StreamData.one_of [StreamData.constant(""), StreamData.constant("moderator")]
 
 user_generator =
-  ExUnitProperties.gen all  app_id <- StreamData.integer(),
-                            remote_user_id <- StreamData.string(:alphanumeric),
+  ExUnitProperties.gen all  id <- num_id_generator,
+                            app_id <- num_id_generator(),
+                            remote_id <- remote_id_generator,
                             app_id <- num_id_generator,
-                            name <- StreamData.string(:alphanumeric) do
+                            name <- StreamData.string(:alphanumeric, min_length: 1) do
   {:ok, res} = Planga.Chat.User.new(%{
         app_id: app_id,
-        remote_user_id: remote_user_id,
+        remote_id: remote_id,
         name: name
                                     })
-  res
+  put_in res.id, id
 end
 
 conversation_generator =
-  ExUnitProperties.gen all  remote_id <- remote_id_generator,
+  ExUnitProperties.gen all  id <- num_id_generator,
+                            remote_id <- remote_id_generator,
                             app_id <- num_id_generator do
   {:ok, res} = Planga.Chat.Conversation.new(%{
         app_id: app_id,
         remote_id: remote_id
                                })
-  res
+  put_in res.id, id
 end
 
 conversation_user_generator =
-  ExUnitProperties.gen all  conversation_id <- num_id_generator,
-  user_id <- num_id_generator,
-  role <- role_generator do
-  {:ok, res} = Planga.Chat.ConversationUser.new(%{
-        conversation_id: conversation_id,
-        user_id: user_id,
-        role: role,
-        banned_until: nil
-                                   })
-  res
+  ExUnitProperties.gen all  id <- num_id_generator,
+                            conversation_id <- num_id_generator,
+                            user_id <- num_id_generator,
+                            role <- role_generator do
+{:ok, res} = Planga.Chat.ConversationUser.new(%{
+      conversation_id: conversation_id,
+      user_id: user_id,
+      role: role,
+      banned_until: nil
+                                  })
+  put_in res.id, id
 end
 
 filled_conversation_user_generator =
@@ -105,7 +109,7 @@ filled_message_generator =
   ExUnitProperties.gen all  conversation_user <- conversation_user_generator,
                             conversation <- conversation_generator,
                             message <- message_generator do
-  message = put_in message.conversation_id, conversation_id
+  message = put_in message.conversation_id, conversation.id
   message = put_in message.conversation, conversation
 
   message = put_in message.conversation_user_id, conversation_user.id

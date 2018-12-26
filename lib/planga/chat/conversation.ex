@@ -16,9 +16,8 @@ defmodule Planga.Chat.Conversation do
 
   def new(attrs) do
     %__MODULE__{}
-    |> Ecto.Changeset.cast(Map.new(attrs))
-    |> Ecto.Changeset.cast(attrs, [:remote_id])
-    |> Ecto.Changeset.validate_required([:remote_id])
+    |> Ecto.Changeset.cast(Map.new(attrs), [:remote_id, :app_id])
+    |> Ecto.Changeset.validate_required([:remote_id, :app_id])
     |> apply_changes
   end
 

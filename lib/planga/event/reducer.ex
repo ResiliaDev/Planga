@@ -19,13 +19,12 @@ defmodule Planga.Event.Reducer do
         meta: %{creator: conversation_user},
         data: data
       }) do
-         Planga.Chat.Message.new(
+         Planga.Chat.Message.new(%{
            content: data.message,
            conversation_id: conversation_user.conversation_id,
            sender_id: conversation_user.user_id,
            conversation_user_id: conversation_user.id
-         )
-    end
+         })
   end
 
   def reducer(message = %Planga.Chat.Message{}, %Event{
