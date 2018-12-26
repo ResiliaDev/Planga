@@ -1,6 +1,7 @@
-defmodule Planga.Test.Generators do
+defmodule Planga.Test.Support.Generators do
+  require ExUnitProperties
 
-  domains = [
+  @email_domains [
     "gmail.com",
     "hotmail.com",
     "yahoo.com",
@@ -30,7 +31,7 @@ defmodule Planga.Test.Generators do
   def email_generator do
     ExUnitProperties.gen all  name <- StreamData.string(:alphanumeric),
                               name != "",
-                              domain <- StreamData.member_of(domains) do
+                              domain <- StreamData.member_of(@email_domains) do
       name <> "@" <> domain
     end
   end
@@ -114,14 +115,18 @@ defmodule Planga.Test.Generators do
   end
 
   def filled_message_generator do
-      ExUnitProperties.gen all  conversation_user <- conversation_user_generator,
+      ExUnitProperties.gen all  conversation_user <- filled_conversation_user_generator,
                                 conversation <- conversation_generator,
                                 message <- message_generator do
-        message = put_in message.conversation_id, conversation.id
-        message = put_in message.conversation, conversation
-
         message = put_in message.conversation_user_id, conversation_user.id
         message = put_in message.conversation_user, conversation_user
+
+        message = put_in message.conversation_id, conversation_user.conversation.id
+        message = put_in message.conversation, conversation_user.conversation
+
+        message = put_in message.sender_id, conversation_user.user.id
+        message = put_in message.sender, conversation_user.user
+
     end
   end
 
