@@ -36,13 +36,27 @@ role_generator =
   StreamData.one_of [StreamData.constant(""), StreamData.constant("moderator")]
 
 user_generator =
-  ExUnitProperties.gen all app_id <- StreamData.integer(),
-  remote_user_id <- StreamData.string(:alphanumeric),
-  name <- StreamData.string(:alphanumeric) do
-  {:ok, res} = Planga.Chat.User.new(remote_user_id, name)
+  ExUnitProperties.gen all  app_id <- StreamData.integer(),
+                            remote_user_id <- StreamData.string(:alphanumeric),
+                            app_id <- num_id_generator,
+                            name <- StreamData.string(:alphanumeric) do
+  {:ok, res} = Planga.Chat.User.new(%{
+        app_id: app_id,
+        remote_user_id: remote_user_id,
+        name: name
+                                    })
   res
 end
 
+conversation_generator =
+  ExUnitProperties.gen all  remote_id <- remote_id_generator,
+                            app_id <- num_id_generator do
+  {:ok, res} = Planga.Chat.Conversation.new(%{
+        app_id: app_id,
+        remote_id: remote_id
+                               })
+  res
+end
 
 conversation_user_generator =
   ExUnitProperties.gen all  conversation_id <- num_id_generator,
@@ -55,6 +69,18 @@ conversation_user_generator =
         banned_until: nil
                                    })
   res
+end
+
+filled_conversation_user_generator =
+  ExUnitProperties.gen all  conversation <- conversation_generator,
+                            user <- user_generator,
+                            conversation_user <- conversation_user_generator do
+
+  conversation_user = put_in conversation_user.user_id, user.id
+  conversation_user = put_in conversation_user.user, user
+
+  conversation_user = put_in conversation_user.conversation_id, conversation.id
+  conversation_user = put_in conversation_user.conversation, conversation
 end
 
 message_generator =
@@ -74,6 +100,17 @@ message_generator =
                             })
     res
   end
+
+filled_message_generator =
+  ExUnitProperties.gen all  conversation_user <- conversation_user_generator,
+                            conversation <- conversation_generator,
+                            message <- message_generator do
+  message = put_in message.conversation_id, conversation_id
+  message = put_in message.conversation, conversation
+
+  message = put_in message.conversation_user_id, conversation_user.id
+  message = put_in message.conversation_user, conversation_user
+end
 
 deleted_message_generator =
   ExUnitProperties.gen all  message <- message_generator,
