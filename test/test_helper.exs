@@ -21,7 +21,7 @@ num_id_generator  =
   pos_integer_generator
 
 remote_id_generator =
-  [StreamData.integer, StreamData.string(:alphanumeric)]
+  [num_id_generator, StreamData.string(:alphanumeric)]
   |> StreamData.one_of
   |> StreamData.map(&Kernel.to_string/1)
 
@@ -32,23 +32,29 @@ email_generator =
   name <> "@" <> domain
 end
 
+role_generator =
+  StreamData.one_of [StreamData.constant(""), StreamData.constant("moderator")]
+
 user_generator =
   ExUnitProperties.gen all app_id <- StreamData.integer(),
   remote_user_id <- StreamData.string(:alphanumeric),
   name <- StreamData.string(:alphanumeric) do
-  Planga.Chat.User.new(remote_user_id, name)
+  {:ok, res} = Planga.Chat.User.new(remote_user_id, name)
+  res
 end
+
 
 conversation_user_generator =
   ExUnitProperties.gen all  conversation_id <- num_id_generator,
   user_id <- num_id_generator,
   role <- role_generator do
-  Planga.Chat.ConversationUser.new(%{
+  {:ok, res} = Planga.Chat.ConversationUser.new(%{
         conversation_id: conversation_id,
         user_id: user_id,
         role: role,
         banned_until: nil
                                    })
+  res
 end
 
 message_generator =
@@ -59,13 +65,14 @@ message_generator =
                             conversation_id <- num_id_generator,
                             conversation_user_id <- num_id_generator,
                             inserted_at <- datetime_generator do
-    Planga.Chat.Message.new(%{
+    {:ok, res} = Planga.Chat.Message.new(%{
           content: content,
           sender_id: sender_id,
           conversation_id: conversation_id,
           conversation_user_id: conversation_user_id,
           inserted_at: inserted_at,
                             })
+    res
   end
 
 deleted_message_generator =

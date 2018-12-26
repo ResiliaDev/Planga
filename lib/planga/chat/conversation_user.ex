@@ -7,8 +7,10 @@ defmodule Planga.Chat.ConversationUser do
   # import Ecto.Changeset
 
   schema "conversations_users" do
-    field(:conversation_id, :integer)
-    field(:user_id, :integer)
+    # field(:conversation_id, :integer)
+    belongs_to(:conversation, Planga.Chat.Conversation)
+    # field(:user_id, :integer)
+    belongs_to(:user, Planga.Chat.User)
     field(:role, :string, default: "")
     field(:banned_until, :utc_datetime)
 
@@ -19,6 +21,7 @@ defmodule Planga.Chat.ConversationUser do
     %__MODULE__{}
     |> Ecto.Changeset.cast(Map.new(attrs), [:conversation_id, :user_id, :role, :banned_until])
     |> Ecto.Changeset.validate_required([:conversation_id, :user_id])
+    |> apply_changes
   end
 
   defp apply_changes(changeset) do
@@ -32,8 +35,8 @@ defmodule Planga.Chat.ConversationUser do
   @doc false
   def changeset(conversation_user, attrs) do
     conversation_user
-    |> cast(attrs, [:conversation_id, :user_id])
-    |> validate_required([:conversation_id, :user_id])
+    |> Ecto.Changeset.cast(attrs, [:conversation_id, :user_id])
+    |> Ecto.Changeset.validate_required([:conversation_id, :user_id])
   end
 
   def ban(
@@ -79,7 +82,7 @@ defmodule Planga.Chat.ConversationUser do
 
   def set_role(conversation_user = %__MODULE__{}, role) when role in [nil, "moderator"] do
     conversation_user
-    |> change(role: role)
+    |> Ecto.Changeset.change(role: role)
   end
 
   def is_moderator?(conversation_user = %__MODULE__{}) do
