@@ -4,7 +4,7 @@ defmodule Planga.Chat.ConversationUser do
   and a given conversation.
   """
   use Ecto.Schema
-  import Ecto.Changeset
+  # import Ecto.Changeset
 
   schema "conversations_users" do
     field(:conversation_id, :integer)
@@ -13,6 +13,20 @@ defmodule Planga.Chat.ConversationUser do
     field(:banned_until, :utc_datetime)
 
     timestamps()
+  end
+
+  def new(attrs) do
+    %__MODULE__{}
+    |> Ecto.Changeset.cast(Map.new(attrs), [:conversation_id, :user_id, :role, :banned_until])
+    |> Ecto.Changeset.validate_required([:conversation_id, :user_id])
+  end
+
+  defp apply_changes(changeset) do
+    if changeset.valid? do
+      {:ok, Ecto.Changeset.apply_changes(changeset)}
+    else
+      {:error, changeset.errors}
+    end
   end
 
   @doc false

@@ -19,18 +19,12 @@ defmodule Planga.Event.Reducer do
         meta: %{creator: conversation_user},
         data: data
       }) do
-    case Planga.Chat.Message.valid_message?(data.message) do
-      false ->
-        {:error, "Invalid Message"}
-
-      true ->
-        {:ok,
          Planga.Chat.Message.new(
            content: data.message,
            conversation_id: conversation_user.conversation_id,
            sender_id: conversation_user.user_id,
            conversation_user_id: conversation_user.id
-         )}
+         )
     end
   end
 

@@ -70,7 +70,10 @@ defmodule Planga.Mixfile do
       # {:planga_phoenix, git: "https://github.com/ResiliaDev/planga-phoenix.git"},
 
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
-      {:observer_cli, "~> 1.3"}
+      {:observer_cli, "~> 1.3"},
+
+      # Testing
+      {:stream_data, "~> 0.1"}
     ]
   end
 

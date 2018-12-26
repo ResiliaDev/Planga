@@ -108,7 +108,8 @@ defmodule Planga.Event.ContextProvider.Hydration do
     Ecto.Multi.new()
     |> Ecto.Multi.run(atomname, fn _ ->
       case Repo.get_by(schema, kvs) do
-        nil -> {:ok, struct(schema, kvs)}
+        # nil -> {:ok, struct(schema, kvs)}
+        schema.new(kvs)
         result -> {:ok, result}
       end
     end)
