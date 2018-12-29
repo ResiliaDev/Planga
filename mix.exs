@@ -73,7 +73,8 @@ defmodule Planga.Mixfile do
       {:observer_cli, "~> 1.3"},
 
       # Testing
-      {:stream_data, "~> 0.1"}
+      {:stream_data, "~> 0.1", only: [:dev, :test]},
+      {:hound, "~> 1.0", only: [:dev, :test]},
     ]
   end
 

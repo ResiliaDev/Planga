@@ -5,7 +5,7 @@ use Mix.Config
 # you can enable the server option below.
 config :planga, PlangaWeb.Endpoint,
   http: [port: 4001],
-  server: false
+  server: true
 
 # Print only warnings and errors during test
 config :logger, level: :warn
@@ -18,4 +18,6 @@ config :logger, level: :warn
 #   database: "planga_test",
 #   hostname: "localhost",
 #   pool: Ecto.Adapters.SQL.Sandbox
+
+config :hound, driver: "selenium", app_host: "http://localhost", app_port: 4001
 

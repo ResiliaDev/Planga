@@ -1,3 +1,4 @@
+Application.ensure_all_started(:hound) # Integration test library
 ExUnit.start()
 
 # require ExUnitProperties
