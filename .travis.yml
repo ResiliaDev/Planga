@@ -1,0 +1,21 @@
+language: elixir
+elixir:
+  - '1.6.1'
+otp_release:
+  - '20.1'
+
+addons:
+  chrome: stable
+
+before_install:
+ - sudo apt-get install chromium-chromedriver
+
+before_script:
+ - "export DISPLAY=:99.0"
+ - "sh -e /etc/init.d/xvfb start"
+ - sleep 3 # give xvfb some time to start
+ - "export PATH=$PATH:/usr/lib/chromium-browser/"
+ - nohup chromedriver & 
+
+script:
+  - mix test --include integration:true

@@ -7,6 +7,8 @@ defmodule Planga.Integration.ConversationTest do
   """
 
   use ExUnit.Case
+  @moduletag :integration
+
   use Hound.Helpers
   use ExUnitProperties
 

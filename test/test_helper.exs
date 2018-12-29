@@ -1,4 +1,5 @@
 Application.ensure_all_started(:hound) # Integration test library
+ExUnit.configure(exclude: [integration: true]) # Only run integraiton tests when explicitly asked
 ExUnit.start()
 
 # require ExUnitProperties
