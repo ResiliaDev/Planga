@@ -3,6 +3,7 @@ elixir:
   - '1.6.1'
 otp_release:
   - '20.1'
+nodejs:
 
 addons:
   chrome: stable
@@ -11,6 +12,10 @@ before_install:
  - sudo apt-get install chromium-chromedriver
 
 before_script:
+ - cd ./assets;
+ - yarn
+ - ./node_modules/brunch/bin/brunch b -p ;
+ - cd ../;
  - "export DISPLAY=:99.0"
  - "sh -e /etc/init.d/xvfb start"
  - sleep 3 # give xvfb some time to start
