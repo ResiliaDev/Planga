@@ -8,6 +8,7 @@ defmodule Planga.Integration.ConversationTest do
 
   use ExUnit.Case
   use Hound.Helpers
+  use ExUnitProperties
 
   defp fill_field_slow(element, text, timeout \\ 10) do
     click(element)
@@ -22,57 +23,67 @@ defmodule Planga.Integration.ConversationTest do
   hound_session()
 
   test "Example page does not raise an error on visitation" do
-    navigate_to("/example")
+      navigate_to("/example")
 
-    assert current_path() == "/example"
+      assert current_path() == "/example"
 
-    element = find_element(:class, "planga--new-message-field")
-    assert element_displayed?(element)
+      element = find_element(:class, "planga--new-message-field")
+      assert element_displayed?(element)
   end
 
-  test "Sending a message in the chat as normal user is allowed, and result visible." do
-    navigate_to("/example")
+  property "Sending a message in the chat as normal user is allowed, and result visible." do
+    check all text <- string(:alphanumeric, min_length: 1, max_length: 50),
+      max_run_time: 5_000, max_runs: 3, max_shrinking_steps: 5
+      do
+      navigate_to("/example")
 
-    element = find_element(:class, "planga--new-message-field")
-    assert element_enabled?(element)
-    text = "The quick brown fox jumps over the lazy dog!"
-    fill_field_slow(element, text)
-    submit_element(element)
+      element = find_element(:class, "planga--new-message-field")
+      # text = "The quick brown fox jumps over the lazy dog!"
+      fill_field_slow(element, text)
+      submit_element(element)
+      :timer.sleep(10)
 
-    assert String.contains?(visible_page_text(), text)
-  end
-
-  test "Other user connected at same time sees message you send to channel" do
-    navigate_to("/example")
-
-    in_browser_session(:other, fn ->
-      navigate_to("/example2")
-    end)
-
-    element = find_element(:class, "planga--new-message-field")
-    assert element_enabled?(element)
-    text = "The quick brown fox jumps over the lazy dog!"
-    fill_field_slow(element, text)
-    submit_element(element)
-
-    in_browser_session(:other, fn ->
       assert String.contains?(visible_page_text(), text)
-    end)
+    end
+  end
+
+  property "Other user connected at same time sees message you send to channel" do
+    check all text <- string(:alphanumeric, min_length: 1, max_length: 50),
+      max_run_time: 5_000, max_runs: 3, max_shrinking_steps: 5
+      do
+      navigate_to("/example")
+
+      in_browser_session(:other, fn ->
+        navigate_to("/example2")
+      end)
+
+      element = find_element(:class, "planga--new-message-field")
+      # text = "The quick brown fox jumps over the lazy dog!"
+      fill_field_slow(element, text)
+      submit_element(element)
+
+      in_browser_session(:other, fn ->
+        assert String.contains?(visible_page_text(), text)
+      end)
+    end
   end
 
 
-  test "Other user connecting later sees message you send to channel" do
-    navigate_to("/example")
+  property "Other user connecting later sees message you send to channel" do
+    check all text <- string(:alphanumeric, min_length: 1, max_length: 50),
+      max_run_time: 5_000, max_runs: 3, max_shrinking_steps: 5
+      do
+      navigate_to("/example")
 
-    element = find_element(:class, "planga--new-message-field")
-    assert element_enabled?(element)
-    text = "The quick brown fox jumps over the lazy dog!"
-    fill_field_slow(element, text)
-    submit_element(element)
+      element = find_element(:class, "planga--new-message-field")
+      # text = "The quick brown fox jumps over the lazy dog!"
+      fill_field_slow(element, text)
+      submit_element(element)
 
-    in_browser_session(:other, fn ->
-      navigate_to("/example2")
-      assert String.contains?(visible_page_text(), text)
-    end)
+      in_browser_session(:other, fn ->
+        navigate_to("/example2")
+        assert String.contains?(visible_page_text(), text)
+      end)
+    end
   end
 end
