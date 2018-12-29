@@ -54,6 +54,7 @@ config :mnesia,
 config :snowflakex, machine_id: 42
 
 
+config :hound, driver: "selenium", browser: "chrome", app_host: "http://localhost", app_port: 4001
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -19,5 +19,4 @@ config :logger, level: :warn
 #   hostname: "localhost",
 #   pool: Ecto.Adapters.SQL.Sandbox
 
-config :hound, driver: "selenium", app_host: "http://localhost", app_port: 4001
 
