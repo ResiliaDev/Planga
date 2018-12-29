@@ -1,4 +1,11 @@
 defmodule Planga.Integration.ConversationTest do
+  @moduledoc """
+  This module expects the testing environment to be set up such that
+
+  `/example` points to a page where one user, who is a moderator, is part of a conversation.
+  `/example2` points to a page where another user (who is not a moderator) is part of the same conversation.
+  """
+
   use ExUnit.Case
   use Hound.Helpers
 
@@ -39,7 +46,7 @@ defmodule Planga.Integration.ConversationTest do
     navigate_to("/example")
 
     in_browser_session(:other, fn ->
-      navigate_to("/example")
+      navigate_to("/example2")
     end)
 
     element = find_element(:class, "planga--new-message-field")
@@ -49,6 +56,22 @@ defmodule Planga.Integration.ConversationTest do
     submit_element(element)
 
     in_browser_session(:other, fn ->
+      assert String.contains?(visible_page_text(), text)
+    end)
+  end
+
+
+  test "Other user connecting later sees message you send to channel" do
+    navigate_to("/example")
+
+    element = find_element(:class, "planga--new-message-field")
+    assert element_enabled?(element)
+    text = "The quick brown fox jumps over the lazy dog!"
+    fill_field_slow(element, text)
+    submit_element(element)
+
+    in_browser_session(:other, fn ->
+      navigate_to("/example2")
       assert String.contains?(visible_page_text(), text)
     end)
   end
