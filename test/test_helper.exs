@@ -28,12 +28,12 @@ ExUnit.start()
 #   |> StreamData.one_of
 #   |> StreamData.map(&Kernel.to_string/1)
 
-# email_generator =
-#   ExUnitProperties.gen all name <- StreamData.string(:alphanumeric),
-#   name != "",
-#   domain <- StreamData.member_of(domains) do
-#   name <> "@" <> domain
-# end
+email_generator =
+  ExUnitProperties.gen all name <- StreamData.string(:alphanumeric),
+  name != "",
+  domain <- StreamData.member_of(domains) do
+  name <> "@" <> domain
+end
 
 # role_generator =
 #   StreamData.one_of [StreamData.constant(""), StreamData.constant("moderator")]

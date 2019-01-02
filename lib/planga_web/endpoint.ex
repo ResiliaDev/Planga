@@ -1,7 +1,7 @@
 defmodule PlangaWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :planga
 
-  socket("/socket", PlangaWeb.UserSocket)
+  socket("/socket", PlangaWeb.UserSocket, websocket: [], longpoll: [])
 
   # Serve at "/" the static files from "priv/static" directory.
   #

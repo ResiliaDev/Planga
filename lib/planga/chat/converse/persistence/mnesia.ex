@@ -9,7 +9,7 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
 
   import Ecto.Query, warn: false
   alias Planga.Repo
-  alias Planga.Chat.{User, Message, Conversation, App, ConversationUser}
+  alias Planga.Chat.{User, Message, Conversation, ConversationUser}
 
   def fetch_messages_by_conversation_id(conversation_id, sent_before_datetime) do
     query =

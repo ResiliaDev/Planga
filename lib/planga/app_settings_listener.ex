@@ -69,7 +69,7 @@ defmodule Planga.AppSettingsListener do
   end
 
   def handle_info(
-        {:basic_deliver, payload_binary, %{delivery_tag: tag, redelivered: redelivered}},
+        {:basic_deliver, payload_binary, %{delivery_tag: _tag, redelivered: _redelivered}},
         channel
       ) do
     payload = :erlang.binary_to_term(payload_binary, [:safe])

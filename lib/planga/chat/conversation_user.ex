@@ -47,8 +47,7 @@ defmodule Planga.Chat.ConversationUser do
       when is_integer(duration_minutes) and duration_minutes > 0 do
     require Logger
 
-    now = DateTime.utc_now()
-    ban_end = Timex.add(now, Timex.Duration.from_minutes(duration_minutes))
+    ban_end = Timex.add(ban_start_time, Timex.Duration.from_minutes(duration_minutes))
 
     case bannable?(conversation_user) do
       false ->
@@ -70,7 +69,7 @@ defmodule Planga.Chat.ConversationUser do
   def banned?(conversation_user = %__MODULE__{banned_until: nil}, current_datetime), do: false
 
   def banned?(
-        conversation_user = %__MODULE__{banned_until: banned_until = %DateTime{}},
+        _conversation_user = %__MODULE__{banned_until: banned_until = %DateTime{}},
         current_datetime
       ) do
     DateTime.compare(current_datetime, banned_until) == :lt

@@ -18,5 +18,13 @@ config :logger, level: :warn
 #   database: "planga_test",
 #   hostname: "localhost",
 #   pool: Ecto.Adapters.SQL.Sandbox
+config :planga, Planga.Repo,
+  adapter: EctoMnesia.Adapter,
+  host: :"planga-test@127.0.0.1",
+  storage_type: :ram_copies # No need to persist data in-between test runs
 
+config :ecto_mnesia,
+  host: :"planga-test@127.0.0.1",
+  storage_type: :ram_copies # No need to persist data in-between test runs
 
+config :hound, driver: "chrome_driver", browser: "chrome_headless", app_host: "http://localhost", app_port: 4001

@@ -4,7 +4,7 @@ defmodule Planga.Event.Callbacks do
   The callback-functions itself are run synchroniously, but they might dispatch other, async events/messages/tasks..
   """
 
-  @moduledoc """
+  @doc """
   Whenever a structure that people might be viewing live changes,
   we broadcast these changes so that they immediately see the changes in their view.
   """
