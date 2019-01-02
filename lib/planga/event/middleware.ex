@@ -51,9 +51,11 @@ defmodule Planga.Event.Middleware do
 
   def event_logger(next_stage) do
     require Logger
+
     fn event ->
       Logger.info("-->Incoming event #{inspect(event)}")
-      with  {:ok, updated_event} <- next_stage.(event) do
+
+      with {:ok, updated_event} <- next_stage.(event) do
         Logger.info("<--Handled event #{inspect(updated_event)}")
         {:ok, updated_event}
       else
@@ -61,7 +63,6 @@ defmodule Planga.Event.Middleware do
           Logger.info("<--Failed Handling event #{inspect(error)}")
           error
       end
-
     end
   end
 end

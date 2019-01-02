@@ -9,41 +9,59 @@ defmodule Planga.Integration.ConversationTest do
   use ExUnit.Case
   @moduletag :integration
 
+
   use Hound.Helpers
   use ExUnitProperties
 
+  setup_all do
+    Planga.ReleaseTasks.migrate
+
+    {:ok, _} = Planga.Repo.transaction(fn ->
+      Planga.Repo.insert!(%Planga.Chat.App{
+            name: "Planga Test",
+            api_key_pairs: [
+              %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: "iv3lCL2TgVG3skeVF4l5-Q", enabled: true}
+            ]
+})
+    end)
+    :ok
+  end
+
   defp fill_field_slow(element, text, timeout \\ 10) do
     click(element)
+
     text
-    |> String.graphemes
+    |> String.graphemes()
     |> Enum.each(fn grapheme ->
       send_text(grapheme)
       :timer.sleep(timeout)
     end)
+    :timer.sleep(timeout)
   end
 
   hound_session()
 
   test "Example page does not raise an error on visitation" do
-      navigate_to("/example")
+    navigate_to("/example")
 
-      assert current_path() == "/example"
+    assert current_path() == "/example"
 
-      element = find_element(:class, "planga--new-message-field")
-      assert element_displayed?(element)
+    element = find_element(:class, "planga--new-message-field")
+    assert element_displayed?(element)
   end
 
   property "Sending a message in the chat as normal user is allowed, and result visible." do
     check all text <- string(:alphanumeric, min_length: 1, max_length: 50),
-      max_run_time: 5_000, max_runs: 3, max_shrinking_steps: 5
-      do
+              max_run_time: 5_000,
+              max_runs: 3,
+              max_shrinking_steps: 5 do
       navigate_to("/example")
 
       element = find_element(:class, "planga--new-message-field")
       # text = "The quick brown fox jumps over the lazy dog!"
       fill_field_slow(element, text)
       submit_element(element)
-      :timer.sleep(10)
+      :timer.sleep(50)
 
       assert String.contains?(visible_page_text(), text)
     end
@@ -51,8 +69,9 @@ defmodule Planga.Integration.ConversationTest do
 
   property "Other user connected at same time sees message you send to channel" do
     check all text <- string(:alphanumeric, min_length: 1, max_length: 50),
-      max_run_time: 5_000, max_runs: 3, max_shrinking_steps: 5
-      do
+              max_run_time: 5_000,
+              max_runs: 3,
+              max_shrinking_steps: 5 do
       navigate_to("/example")
 
       in_browser_session(:other, fn ->
@@ -63,6 +82,7 @@ defmodule Planga.Integration.ConversationTest do
       # text = "The quick brown fox jumps over the lazy dog!"
       fill_field_slow(element, text)
       submit_element(element)
+      :timer.sleep(50)
 
       in_browser_session(:other, fn ->
         assert String.contains?(visible_page_text(), text)
@@ -70,17 +90,18 @@ defmodule Planga.Integration.ConversationTest do
     end
   end
 
-
   property "Other user connecting later sees message you send to channel" do
     check all text <- string(:alphanumeric, min_length: 1, max_length: 50),
-      max_run_time: 5_000, max_runs: 3, max_shrinking_steps: 5
-      do
+              max_run_time: 5_000,
+              max_runs: 3,
+              max_shrinking_steps: 5 do
       navigate_to("/example")
 
       element = find_element(:class, "planga--new-message-field")
       # text = "The quick brown fox jumps over the lazy dog!"
       fill_field_slow(element, text)
       submit_element(element)
+      :timer.sleep(50)
 
       in_browser_session(:other, fn ->
         navigate_to("/example2")

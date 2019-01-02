@@ -10,9 +10,9 @@ defmodule Planga.Event.Callbacks do
   """
   def broadcast_changes(event) do
     require Logger
+
     case {event.topic, event.name} do
       {[:apps, app_id, :conversations, remote_conversation_id, :messages], :new_message} ->
-
         Planga.Connection.broadcast_new_message!(
           app_id,
           remote_conversation_id,

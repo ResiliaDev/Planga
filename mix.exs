@@ -74,7 +74,7 @@ defmodule Planga.Mixfile do
 
       # Testing
       {:stream_data, "~> 0.1", only: [:dev, :test]},
-      {:hound, "~> 1.0", only: [:dev, :test]},
+      {:hound, "~> 1.0", only: [:dev, :test]}
     ]
   end
 
@@ -87,7 +87,7 @@ defmodule Planga.Mixfile do
   defp aliases do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"]
       # test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end

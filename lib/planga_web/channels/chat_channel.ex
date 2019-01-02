@@ -101,6 +101,7 @@ defmodule PlangaWeb.ChatChannel do
       socket
     )
   end
+
   def handle_in("show_message", %{"message_uuid" => message_uuid}, socket) do
     %{
       app_id: app_id,
@@ -121,7 +122,6 @@ defmodule PlangaWeb.ChatChannel do
     )
   end
 
-
   def handle_in(
         "ban_user",
         %{"user_uuid" => user_to_ban_id, "duration_minutes" => duration_minutes},
@@ -135,7 +135,7 @@ defmodule PlangaWeb.ChatChannel do
       }
     } = socket.assigns
 
-    user_to_ban_id = user_to_ban_id |> String.to_integer
+    user_to_ban_id = user_to_ban_id |> String.to_integer()
 
     handle_event_result(
       Planga.Event.dispatch(
@@ -147,11 +147,12 @@ defmodule PlangaWeb.ChatChannel do
       socket
     )
   end
+
   def handle_in(
-    "unban_user",
-    %{"user_uuid" => user_to_unban_id},
-    socket
-  ) do
+        "unban_user",
+        %{"user_uuid" => user_to_unban_id},
+        socket
+      ) do
     %{
       app_id: app_id,
       config: %Planga.Connection.Config{
@@ -160,7 +161,7 @@ defmodule PlangaWeb.ChatChannel do
       }
     } = socket.assigns
 
-    user_to_unban_id = user_to_unban_id |> String.to_integer
+    user_to_unban_id = user_to_unban_id |> String.to_integer()
 
     handle_event_result(
       Planga.Event.dispatch(
@@ -172,7 +173,6 @@ defmodule PlangaWeb.ChatChannel do
       socket
     )
   end
-
 
   @doc """
   Called immediately after joining to send latest messages to just-connected chatter.

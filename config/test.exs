@@ -18,13 +18,25 @@ config :logger, level: :warn
 #   database: "planga_test",
 #   hostname: "localhost",
 #   pool: Ecto.Adapters.SQL.Sandbox
+
+config :hound,
+  driver: "chrome_driver",
+  browser: "chrome_headless",
+  app_host: "http://localhost",
+  app_port: 4001
+
+
 config :planga, Planga.Repo,
   adapter: EctoMnesia.Adapter,
-  host: :"planga-test@127.0.0.1",
-  storage_type: :ram_copies # No need to persist data in-between test runs
+  # priv: "priv/ecto_mnesia_repo",
+  # host: {:system, :atom, "MNESIA_HOST", Kernel.node()},
+  host: node(),
+  storage_type: :ram_copies
 
 config :ecto_mnesia,
-  host: :"planga-test@127.0.0.1",
-  storage_type: :ram_copies # No need to persist data in-between test runs
+  host: node(),
+  storage_type: :ram_copies
 
-config :hound, driver: "chrome_driver", browser: "chrome_headless", app_host: "http://localhost", app_port: 4001
+config :mnesia,
+  # Make sure this directory exists
+  dir: 'test/'

@@ -81,5 +81,4 @@ config :planga, :amqp_settings,
   port: 5672,
   ssl_options: :none
 
-
 config :hound, driver: "chrome_driver", app_host: "http://localhost", app_port: 4000

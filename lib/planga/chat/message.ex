@@ -18,8 +18,19 @@ defmodule Planga.Chat.Message do
   @doc false
   def new(attrs \\ %{}) do
     %__MODULE__{id: Snowflakex.new!(), uuid: Ecto.UUID.autogenerate()}
-    |> Ecto.Changeset.cast(Map.new(attrs), [:content, :conversation_id, :sender_id, :conversation_user_id])
-    |> Ecto.Changeset.validate_required([:id, :content, :conversation_id, :sender_id, :conversation_user_id])
+    |> Ecto.Changeset.cast(Map.new(attrs), [
+      :content,
+      :conversation_id,
+      :sender_id,
+      :conversation_user_id
+    ])
+    |> Ecto.Changeset.validate_required([
+      :id,
+      :content,
+      :conversation_id,
+      :sender_id,
+      :conversation_user_id
+    ])
     |> Ecto.Changeset.validate_change(:content, fn :content, content ->
       case valid_message?(content) do
         true -> []
@@ -36,7 +47,6 @@ defmodule Planga.Chat.Message do
       {:error, changeset.errors}
     end
   end
-
 
   @doc """
   False if message is invalid and should not be sent.

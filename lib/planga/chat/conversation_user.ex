@@ -62,7 +62,7 @@ defmodule Planga.Chat.ConversationUser do
 
   def bannable?(conversation_user = %__MODULE__{}) do
     # conversation_user.role == nil
-        true
+    true
   end
 
   def banned?(conversation_user, current_datetime \\ DateTime.utc_now())

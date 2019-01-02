@@ -12,15 +12,16 @@ defmodule Planga.Application do
     import Supervisor.Spec
 
     # Define workers and child supervisors to be supervised
-    children = [
-      # Start the Ecto repository
-      supervisor(Planga.Repo, []),
-      # Start the endpoint when the application starts
-      supervisor(PlangaWeb.Endpoint, []),
-      # Start your own worker by calling: Planga.Worker.start_link(arg1, arg2, arg3)
-      # worker(Planga.Worker, [arg1, arg2, arg3]),
-      worker(Planga.Scheduler, []),
-    ] ++ env_specific_apps()
+    children =
+      [
+        # Start the Ecto repository
+        supervisor(Planga.Repo, []),
+        # Start the endpoint when the application starts
+        supervisor(PlangaWeb.Endpoint, []),
+        # Start your own worker by calling: Planga.Worker.start_link(arg1, arg2, arg3)
+        # worker(Planga.Worker, [arg1, arg2, arg3]),
+        worker(Planga.Scheduler, [])
+      ] ++ env_specific_apps()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

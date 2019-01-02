@@ -1,9 +1,15 @@
-Application.ensure_all_started(:hound) # Integration test library
-ExUnit.configure(exclude: [integration: true]) # Only run integraiton tests when explicitly asked
+# Integration test library
+Application.ensure_all_started(:hound)
+
+
+
+# Only run integration tests when explicitly asked
+ExUnit.configure(exclude: [integration: true])
 ExUnit.start()
 
-# require ExUnitProperties
 
+
+# require ExUnitProperties
 
 # domains = [
 #   "gmail.com",
@@ -14,7 +20,6 @@ ExUnit.start()
 # datetime_generator =
 #   StreamData.integer()
 #   |> StreamData.map(&DateTime.from_unix!/1)
-
 
 # pos_integer_generator =
 #   StreamData.integer
@@ -28,12 +33,12 @@ ExUnit.start()
 #   |> StreamData.one_of
 #   |> StreamData.map(&Kernel.to_string/1)
 
-email_generator =
-  ExUnitProperties.gen all name <- StreamData.string(:alphanumeric),
-  name != "",
-  domain <- StreamData.member_of(domains) do
-  name <> "@" <> domain
-end
+# email_generator =
+#   ExUnitProperties.gen all name <- StreamData.string(:alphanumeric),
+#   name != "",
+#   domain <- StreamData.member_of(domains) do
+#   name <> "@" <> domain
+# end
 
 # role_generator =
 #   StreamData.one_of [StreamData.constant(""), StreamData.constant("moderator")]
