@@ -53,10 +53,16 @@ defmodule Planga.Event.Middleware do
     require Logger
 
     fn event ->
-      Logger.info("-->Incoming event #{inspect(event)}")
+      Logger.info("-->[#{DateTime.utc_now()}] Incoming event #{inspect(event)}")
 
       with {:ok, updated_event} <- next_stage.(event) do
-        Logger.info("<--Handled event #{inspect(updated_event)}")
+
+        if updated_event.meta[:started_at] && updated_event.meta[:finished_at] do
+          duration = Timex.diff(updated_event.meta[:finished_at], updated_event.meta[:started_at])
+          Logger.info("<--[#{updated_event.meta[:finished_at]}] (#{duration}µs) Handled event #{inspect(updated_event)}")
+        else
+          Logger.info("<--Handled event #{inspect(updated_event)}")
+        end
         {:ok, updated_event}
       else
         error ->

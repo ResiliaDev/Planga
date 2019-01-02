@@ -101,7 +101,7 @@ defmodule Planga.Connection do
   end
 
   defp static_topic(app_id, remote_conversation_id) do
-    "chat:#{app_id}#{remote_conversation_id}"
+    "chat:#{app_id}:#{remote_conversation_id}"
   end
 
   defdelegate public_info(secret_info), to: Planga.Connection.Config
