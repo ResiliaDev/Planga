@@ -27,7 +27,7 @@ defmodule Planga.Integration.ConversationTest do
 #     :ok
 #   end
 
-  defp fill_field_slow(element, text, timeout \\ 10) do
+  defp fill_field_slow(element, text, timeout \\ 50) do
     click(element)
 
     text
