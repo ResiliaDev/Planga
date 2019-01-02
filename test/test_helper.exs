@@ -1,11 +1,21 @@
 # Integration test library
 Application.ensure_all_started(:hound)
 
+Planga.ReleaseTasks.migrate
 
+{:ok, _} = Planga.Repo.transaction(fn ->
+  Planga.Repo.insert!(%Planga.Chat.App{
+        name: "Planga Test",
+        api_key_pairs: [
+          %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: "iv3lCL2TgVG3skeVF4l5-Q", enabled: true}
+        ]
+})
+end)
 
 # Only run integration tests when explicitly asked
 ExUnit.configure(exclude: [integration: true])
 ExUnit.start()
+
 
 
 

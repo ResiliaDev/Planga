@@ -13,19 +13,19 @@ defmodule Planga.Integration.ConversationTest do
   use Hound.Helpers
   use ExUnitProperties
 
-  setup_all do
-    Planga.ReleaseTasks.migrate
+#   setup_all do
+#     Planga.ReleaseTasks.migrate
 
-    {:ok, _} = Planga.Repo.transaction(fn ->
-      Planga.Repo.insert!(%Planga.Chat.App{
-            name: "Planga Test",
-            api_key_pairs: [
-              %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: "iv3lCL2TgVG3skeVF4l5-Q", enabled: true}
-            ]
-})
-    end)
-    :ok
-  end
+#     {:ok, _} = Planga.Repo.transaction(fn ->
+#       Planga.Repo.insert!(%Planga.Chat.App{
+#             name: "Planga Test",
+#             api_key_pairs: [
+#               %Planga.Chat.APIKeyPair{public_id: "foobar", secret_key: "iv3lCL2TgVG3skeVF4l5-Q", enabled: true}
+#             ]
+# })
+#     end)
+#     :ok
+#   end
 
   defp fill_field_slow(element, text, timeout \\ 10) do
     click(element)
@@ -36,7 +36,7 @@ defmodule Planga.Integration.ConversationTest do
       send_text(grapheme)
       :timer.sleep(timeout)
     end)
-    :timer.sleep(timeout)
+    :timer.sleep(timeout * 10)
   end
 
   hound_session()
@@ -61,7 +61,7 @@ defmodule Planga.Integration.ConversationTest do
       # text = "The quick brown fox jumps over the lazy dog!"
       fill_field_slow(element, text)
       submit_element(element)
-      :timer.sleep(50)
+      :timer.sleep(500)
 
       assert String.contains?(visible_page_text(), text)
     end
@@ -82,7 +82,7 @@ defmodule Planga.Integration.ConversationTest do
       # text = "The quick brown fox jumps over the lazy dog!"
       fill_field_slow(element, text)
       submit_element(element)
-      :timer.sleep(50)
+      :timer.sleep(500)
 
       in_browser_session(:other, fn ->
         assert String.contains?(visible_page_text(), text)
@@ -101,7 +101,7 @@ defmodule Planga.Integration.ConversationTest do
       # text = "The quick brown fox jumps over the lazy dog!"
       fill_field_slow(element, text)
       submit_element(element)
-      :timer.sleep(50)
+      :timer.sleep(500)
 
       in_browser_session(:other, fn ->
         navigate_to("/example2")
