@@ -26,7 +26,7 @@ before_script:
 # but also run integration tests.
 env:
   - TEST_SUITE = ""
-  - TEST_SUITE = "--include integration:true"
+  - TEST_SUITE = "--only integration:true"
 
 script:
   - mix test $TEST_SUITE
