@@ -21,6 +21,7 @@ before_script:
  - sleep 3 # give xvfb some time to start
  - "export PATH=$PATH:/usr/lib/chromium-browser/"
  - nohup chromedriver &
+ - mix compile
 
 # Travis build matrix; run these two in parallel, so that we have early feedback on normal tests,
 # but also run integration tests.

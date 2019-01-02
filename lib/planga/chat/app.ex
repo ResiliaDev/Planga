@@ -39,7 +39,6 @@ defmodule Planga.Chat.App do
     |> Ecto.Changeset.validate_required([:name])
   end
 
-  @deprecated "use from_hash instead?"
   def from_json(app \\ %__MODULE__{}, json) do
     app
     |> changeset(%{name: to_string(json["public_id"])})

@@ -3,7 +3,7 @@ defmodule Planga.Connection.Persistence.Mnesia do
 
   import Ecto.Query, warn: false
   alias Planga.Repo
-  alias Planga.Chat.{User, App}
+  alias Planga.Chat.{User}
 
   @doc """
   Given a user's `remote_id`, returns the User struct.
