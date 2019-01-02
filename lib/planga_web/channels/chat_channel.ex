@@ -10,20 +10,25 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, _payload, socket) do
-    with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}} <-
-           Planga.Connection.connect(qualified_conversation_info) do
-      send(self(), :after_join)
-      socket = fill_socket(socket, socket_assigns)
+    IO.inspect("JOINING!")
 
-      {:ok, Planga.Connection.public_info(secret_info), socket}
-    else
-      # NOTE This is a prime location to log in a way visible to the App Developer.
-      {:error, reason} ->
-        {:error, %{reason: reason}}
+    Planga.Connection.subscribe_to_conversation(socket.assigns.app_id, socket.assigns.config.conversation_id)
 
-      _ ->
-        {:error, %{reason: "Unable to connect. Improper connection details?"}}
-    end
+    send(self(), :after_join)
+    # with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}} <-
+    #        Planga.Connection.connect(qualified_conversation_info) do
+    #   send(self(), :after_join)
+    #   socket = fill_socket(socket, socket_assigns)
+
+    {:ok, Planga.Connection.public_info(socket.assigns.config), socket}
+    # else
+    #   # NOTE This is a prime location to log in a way visible to the App Developer.
+    #   {:error, reason} ->
+    #     {:error, %{reason: reason}}
+
+    #   _ ->
+    #     {:error, %{reason: "Unable to connect. Improper connection details?"}}
+    # end
   end
 
   def join(_channel_name, _payload, _socket) do
