@@ -22,6 +22,12 @@ before_script:
  - "export PATH=$PATH:/usr/lib/chromium-browser/"
  - nohup chromedriver &
 
+# Travis build matrix; run these two in parallel, so that we have early feedback on normal tests,
+# but also run integration tests.
+env:
+  - TEST_SUITE = ""
+  - TEST_SUITE = "--include integration:true"
+
 script:
-  - mix test --include integration:true
+  - mix test $TEST_SUITE
 
