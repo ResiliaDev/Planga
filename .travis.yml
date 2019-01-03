@@ -18,7 +18,7 @@ before_install:
  - sudo apt-get install chromium-chromedriver
 
 before_script:
- - mix compile
+ - MIX_ENV=test mix compile
  - cd ./assets;
  - yarn
  - ./node_modules/brunch/bin/brunch b -p ;
@@ -29,10 +29,9 @@ before_script:
  - "export PATH=$PATH:/usr/lib/chromium-browser/"
  - nohup chromedriver &
 
+# Travis build matrix; run these two in parallel, so that we have early feedback on normal tests,
+# but also run integration tests.
 env:
-  - MIX_ENV="test"
-  # Travis build matrix; run these two in parallel, so that we have early feedback on normal tests,
-  # but also run integration tests.
   - TEST_SUITE=""
   - TEST_SUITE="--only integration:true"
 
