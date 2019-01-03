@@ -5,8 +5,8 @@ defmodule Planga.Connection do
   """
   def connect(encoded_public_api_id, encoded_encrypted_conversation_info) do
     # {public_api_id, encrypted_conversation_info} =
-    public_api_id = Base.decode64! encoded_public_api_id
-    encrypted_conversation_info = Base.decode64! encoded_encrypted_conversation_info
+    public_api_id = Base.decode64!(encoded_public_api_id)
+    encrypted_conversation_info = Base.decode64!(encoded_encrypted_conversation_info)
     #   Planga.Connection.decode_conversation_info(encoded_qualified_conversation_info)
 
     api_key_pair = Planga.Connection.Persistence.fetch_api_key_pair_by_public_id!(public_api_id)

@@ -19,14 +19,16 @@ defmodule PlangaWeb.UserSocket do
   # performing token verification on connect.
   def connect(params, socket, connect_info) do
     IO.inspect({"CONNECTING!", socket, params, connect_info})
+
     case params do
       %{"config" => connection_config, "public_api_id" => public_api_id} ->
-        with {:ok, %{socket_assigns: socket_assigns}} <- Planga.Connection.connect(public_api_id, connection_config),
+        with {:ok, %{socket_assigns: socket_assigns}} <-
+               Planga.Connection.connect(public_api_id, connection_config),
              socket = fill_socket(socket, socket_assigns) do
           {:ok, socket}
         else
-            # NOTE This is a prime location to log in a way visible to the App Developer.
-            {:error, reason} ->
+          # NOTE This is a prime location to log in a way visible to the App Developer.
+          {:error, reason} ->
             # {:error, %{reason: reason}}
             IO.inspect(reason, label: "socket connection error with reason")
             :error
@@ -36,6 +38,7 @@ defmodule PlangaWeb.UserSocket do
             # {:error, %{reason: "Unable to connect. Improper connection details?"}}
             :error
         end
+
       # _ -> {:error, %{reason: "Invalid parameters"}}
       other ->
         IO.inspect(other, label: "socket connection params matching error")

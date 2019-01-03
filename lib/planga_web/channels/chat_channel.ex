@@ -12,7 +12,10 @@ defmodule PlangaWeb.ChatChannel do
   def join("encrypted_chat:" <> qualified_conversation_info, _payload, socket) do
     IO.inspect("JOINING!")
 
-    Planga.Connection.subscribe_to_conversation(socket.assigns.app_id, socket.assigns.config.conversation_id)
+    Planga.Connection.subscribe_to_conversation(
+      socket.assigns.app_id,
+      socket.assigns.config.conversation_id
+    )
 
     send(self(), :after_join)
     # with {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}} <-

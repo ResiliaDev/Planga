@@ -9,6 +9,7 @@ cache:
   directories:
     - ~/.mix
     - ~/.hex
+    - ~/assets/node_modules
 
 addons:
   chrome: stable
@@ -17,6 +18,7 @@ before_install:
  - sudo apt-get install chromium-chromedriver
 
 before_script:
+ - mix compile
  - cd ./assets;
  - yarn
  - ./node_modules/brunch/bin/brunch b -p ;
@@ -26,13 +28,19 @@ before_script:
  - sleep 3 # give xvfb some time to start
  - "export PATH=$PATH:/usr/lib/chromium-browser/"
  - nohup chromedriver &
- - mix compile
 
-# Travis build matrix; run these two in parallel, so that we have early feedback on normal tests,
-# but also run integration tests.
 env:
+  - MIX_ENV="test"
+  # Travis build matrix; run these two in parallel, so that we have early feedback on normal tests,
+  # but also run integration tests.
   - TEST_SUITE=""
   - TEST_SUITE="--only integration:true"
 
 script: "mix test $TEST_SUITE"
 
+jobs:
+  include:
+    - stage: format
+      env:
+        - MIX_ENV=dev
+script: mix format --check-formatted
