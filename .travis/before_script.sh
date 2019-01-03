@@ -12,7 +12,7 @@ MIX_ENV=test mix compile
 - cd ../;
 
 # Start webdriven browser (only when required)
-if [ "${TEST_SUITE}" = "--only integration:true"] then
+if [ "${TEST_SUITE}" = "--only integration:true" ]; then
     export DISPLAY=:99.0
     sh -e /etc/init.d/xvfb start
     sleep 3 # give xvfb some time to start
