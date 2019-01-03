@@ -18,7 +18,6 @@ defmodule PlangaWeb.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(params, socket, connect_info) do
-
     case params do
       %{"config" => connection_config, "public_api_id" => public_api_id} ->
         with {:ok, %{socket_assigns: socket_assigns}} <-

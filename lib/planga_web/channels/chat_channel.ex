@@ -10,7 +10,6 @@ defmodule PlangaWeb.ChatChannel do
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
   def join("encrypted_chat:" <> qualified_conversation_info, _payload, socket) do
-
     Planga.Connection.subscribe_to_conversation(
       socket.assigns.app_id,
       socket.assigns.config.conversation_id
