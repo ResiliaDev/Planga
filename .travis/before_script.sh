@@ -6,10 +6,10 @@ MIX_ENV=test mix compile
 
 
 # build front-end assets
-- cd ./assets;
-- yarn
-- ./node_modules/brunch/bin/brunch b -p ;
-- cd ../;
+cd ./assets
+yarn
+./node_modules/brunch/bin/brunch b -p
+cd ../
 
 # Start webdriven browser (only when required)
 if [ "${TEST_SUITE}" = "--only integration:true" ]; then
