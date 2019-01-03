@@ -9,8 +9,8 @@ cache:
   directories:
     - ~/.mix
     - ~/.hex
-    - ~/assets/node_modules
-    - ~/_build
+    - _build
+    - ~/.cache/yarn
 
 addons:
   chrome: stable
