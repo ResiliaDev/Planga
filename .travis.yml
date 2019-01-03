@@ -42,4 +42,4 @@ jobs:
     - stage: format
       env:
         - MIX_ENV=dev
-script: mix format --check-formatted
+      script: mix format --check-formatted
