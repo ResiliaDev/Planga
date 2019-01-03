@@ -13,8 +13,8 @@ cache:
     - _build
     - ~/.cache/yarn
 
-# addons:
-#   chrome: stable
+addons:
+  chrome: stable
 
 before_install:
  # - sudo apt-get install chromium-chromedriver
