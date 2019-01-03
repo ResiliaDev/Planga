@@ -18,7 +18,6 @@ defmodule PlangaWeb.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(params, socket, connect_info) do
-    IO.inspect({"CONNECTING!", socket, params, connect_info})
 
     case params do
       %{"config" => connection_config, "public_api_id" => public_api_id} ->
@@ -29,19 +28,13 @@ defmodule PlangaWeb.UserSocket do
         else
           # NOTE This is a prime location to log in a way visible to the App Developer.
           {:error, reason} ->
-            # {:error, %{reason: reason}}
-            IO.inspect(reason, label: "socket connection error with reason")
             :error
 
           other ->
-            IO.inspect(other, label: "socket connection other error")
-            # {:error, %{reason: "Unable to connect. Improper connection details?"}}
             :error
         end
 
-      # _ -> {:error, %{reason: "Invalid parameters"}}
       other ->
-        IO.inspect(other, label: "socket connection params matching error")
         :error
     end
   end
