@@ -9,6 +9,7 @@ cache:
   directories:
     - ~/.mix
     - ~/.hex
+    - deps
     - _build
     - ~/.cache/yarn
 
