@@ -10,6 +10,7 @@ cache:
     - ~/.mix
     - ~/.hex
     - ~/assets/node_modules
+    - ~/_build
 
 addons:
   chrome: stable
