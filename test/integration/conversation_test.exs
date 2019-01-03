@@ -12,7 +12,7 @@ defmodule Planga.Integration.ConversationTest do
   use Hound.Helpers
   use ExUnitProperties
 
-  defp fill_field_slow(element, text, timeout \\ 50) do
+  defp fill_field_slow(element, text, timeout \\ 100) do
     click(element)
 
     text
@@ -71,6 +71,7 @@ defmodule Planga.Integration.ConversationTest do
       :timer.sleep(500)
 
       in_browser_session(:other, fn ->
+        :timer.sleep(500)
         assert String.contains?(visible_page_text(), text)
       end)
     end
@@ -91,6 +92,7 @@ defmodule Planga.Integration.ConversationTest do
 
       in_browser_session(:other, fn ->
         navigate_to("/example2")
+        :timer.sleep(500)
         assert String.contains?(visible_page_text(), text)
       end)
     end
