@@ -12,13 +12,9 @@ defmodule Planga.Test.Support.Generators do
     |> StreamData.map(&DateTime.from_unix!/1)
   end
 
-  def pos_integer_generator do
-    StreamData.integer()
-    |> StreamData.map(&Kernel.abs/1)
-  end
 
   def num_id_generator do
-    pos_integer_generator
+    positive_integer()
   end
 
   def remote_id_generator do

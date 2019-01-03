@@ -5,6 +5,11 @@ otp_release:
   - '20.1'
 nodejs:
 
+cache:
+  directories:
+    - ~/.mix
+    - ~/.hex
+
 addons:
   chrome: stable
 
