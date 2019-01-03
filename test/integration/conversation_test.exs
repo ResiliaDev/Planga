@@ -12,7 +12,7 @@ defmodule Planga.Integration.ConversationTest do
   use Hound.Helpers
   use ExUnitProperties
 
-  defp fill_field_slow(element, text, timeout \\ 100) do
+  defp fill_field_slow(element, text, timeout \\ 101) do
     click(element)
 
     text
