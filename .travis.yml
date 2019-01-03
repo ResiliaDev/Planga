@@ -17,8 +17,8 @@ addons:
   chrome: stable
 
 before_install:
- # - sudo apt-get install chromium-chromedriver
- - .travis/before_install.sh
+ - sudo apt-get install chromium-chromedriver
+ # - .travis/before_install.sh
 
 before_script:
   - .travis/before_script.sh
