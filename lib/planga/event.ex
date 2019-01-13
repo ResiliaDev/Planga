@@ -23,7 +23,7 @@ defmodule Planga.Event do
           ]
         ]
 
-    meta = Map.put(event.meta, :remote_user_id, remote_user_id)
+    meta = Map.put(event.meta, :creator, remote_user_id)
 
     event = %Event{event | meta: meta}
 

@@ -33,7 +33,7 @@ defmodule Planga.Event.Reducer do
   meta: %{creator: conversation_user, started_at: started_at}
 })
   when name in [:hide_message, :show_message] do
-    case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
+    case is_nil(conversation_user) || Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
       false ->
         {:error, "You are not allowed to perform this action"}
 
@@ -55,7 +55,7 @@ defmodule Planga.Event.Reducer do
   data: data
 })
   when name in [:ban, :unban] do
-    case Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
+    case is_nil(conversation_user) || Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
       false ->
         {:error, "You are not allowed to perform this action"}
 
