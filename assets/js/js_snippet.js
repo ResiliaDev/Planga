@@ -14208,31 +14208,35 @@ var _ResiliaDev$planga_chat_client$View$moderationWindow = function (model) {
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('planga--moderation-window-content'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$class('planga--moderation-window-close'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_ResiliaDev$planga_chat_client$Msgs$CloseModerationWindow),
+							_1: {ctor: '[]'}
+						}
 					},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$h1,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Moderation'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
+						_0: _elm_lang$html$Html$text('🗙'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('planga--moderation-window-content'),
+							_1: {ctor: '[]'}
+						},
+						{
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$div,
+								_elm_lang$html$Html$h1,
+								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_ResiliaDev$planga_chat_client$Msgs$CloseModerationWindow),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Close'),
+									_0: _elm_lang$html$Html$text('Moderation'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -14416,9 +14420,9 @@ var _ResiliaDev$planga_chat_client$View$moderationWindow = function (model) {
 									_1: {ctor: '[]'}
 								}
 							}
-						}
-					}),
-				_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			});
 	}
 };

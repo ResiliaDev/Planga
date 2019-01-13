@@ -121,6 +121,8 @@ defmodule Planga.Connection.Config do
     with {:ok, {json_str, _jwk_decryption_details}} =
            do_jose_decrypt(encrypted_conversation_info, secret_key),
          {:ok, json_hash} <- Poison.decode(json_str) do
+
+      IO.inspect(json_hash, label: :secret_info)
       {:ok, json_hash}
     else
       {:error, :invalid, _} ->
