@@ -5,7 +5,7 @@ defmodule Planga.Connection.Config do
   """
 
   # @enforce_keys [:conversation_id, :current_user_id, :current_user_name]
-  defstruct [:conversation_id, :current_user_id, :current_user_name, other_users: []]
+  defstruct [:conversation_id, :current_user_id, :current_user_name, other_users: [], current_user_role: nil]
 
   defmodule OtherUserInfo do
     @moduledoc """
@@ -62,13 +62,14 @@ defmodule Planga.Connection.Config do
       conversation_id: :any,
       current_user_id: :any,
       current_user_name: :string,
-      other_users: :any
+      other_users: :any,
+      current_user_role: :string
     }
 
     changeset =
       {%__MODULE__{}, types}
       |> Ecto.Changeset.cast(json_hash, Map.keys(types))
-      |> Ecto.Changeset.validate_required(Map.keys(types) -- [:other_users])
+      |> Ecto.Changeset.validate_required(Map.keys(types) -- [:other_users, :current_user_role])
 
     if changeset.valid? do
       result =

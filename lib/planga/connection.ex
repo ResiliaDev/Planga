@@ -20,11 +20,31 @@ defmodule Planga.Connection do
       Planga.Connection.subscribe_to_conversation(app_id, remote_conversation_id)
 
       Planga.Connection.Persistence.update_username(user.id, secret_info.current_user_name)
+      Planga.Connection.maybe_update_user_role(current_user_id, remote_conversation_id, secret_info.config.current_user_role)
 
       socket_assigns =
         Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)
 
       {:ok, %{secret_info: secret_info, socket_assigns: socket_assigns}}
+    end
+  end
+
+  @doc """
+  Updates the given conversation_user's role iff it was passed as option in the config.
+  If "" was passed, role is reset to empty.
+
+  If "moderator" was passed, user becomes a moderator.
+
+  If it was not set (or `nil` (`null` in JSON) was passed, no changes
+  are made to the current value.
+  """
+  def maybe_update_user_role(remote_user_id, remote_conversation_id, role) do
+    if role != nil do
+      Planga.Event.dispatch(
+        [:apps, user.app_id, :conversations, remote_conversation_id, :users, remote_user_id],
+        :set_role,
+        %{role: role}
+      )
     end
   end
 
