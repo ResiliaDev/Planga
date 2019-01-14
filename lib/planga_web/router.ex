@@ -19,6 +19,16 @@ defmodule PlangaWeb.Router do
   #   resources("/conversations_users", ConversationUsersController, except: [:new, :edit])
   # end
 
+  pipeline :api do
+    plug(:accepts, ["json"])
+  end
+
+  scope "/api", PlangaWeb do
+    pipe_through :api
+
+    post("/v1", ApiController, :call)
+  end
+
   scope "/", PlangaWeb do
     # Use the default browser stack
     pipe_through(:browser)
@@ -30,7 +40,4 @@ defmodule PlangaWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PlangaWeb do
-  #   pipe_through :api
-  # end
 end

@@ -4,11 +4,6 @@ defmodule Planga.Chat.Events.ReducerTest do
 
   import Planga.Test.Support.Generators
 
-  # The "test" macro is imported by ExUnit.Case
-  test "always pass" do
-    assert true
-  end
-
   describe ":new_message reducer" do
     defp send_chat_message_event(content, creator) do
       result =

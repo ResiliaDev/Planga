@@ -7,6 +7,6 @@ defmodule Planga.Connection.Persistence.Behaviour do
 
   @callback update_username(user_id :: integer, remote_user_name :: String.t()) :: :ok
 
-  @callback fetch_api_key_pair_by_public_id!(pub_api_id :: String.t()) ::
-              %Planga.Chat.APIKeyPair{} | no_return()
+  @callback fetch_api_key_pair_by_public_id(pub_api_id :: String.t()) ::
+              {:ok, %Planga.Chat.APIKeyPair{}} | {:error, any()}
 end
