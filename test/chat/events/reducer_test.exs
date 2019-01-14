@@ -20,7 +20,7 @@ defmodule Planga.Chat.Events.ReducerTest do
         })
 
       expected_result = %Planga.Chat.Message{
-        sender_id: creator.id,
+        sender_id: creator.user.id,
         conversation_id: creator.conversation_id,
         conversation_user_id: creator.id,
         content: content
@@ -33,7 +33,12 @@ defmodule Planga.Chat.Events.ReducerTest do
       check all content <- string(:printable, min_length: 1, max_length: 1000),
                 conversation_user <- filled_conversation_user_generator() do
         {result, expected} = send_chat_message_event(content, conversation_user)
-        assert {:ok, ^expected} = result
+        assert {:ok, success} = result
+        assert %Planga.Chat.Message{} = success
+        assert success.sender_id == expected.sender_id
+        assert success.conversation_id == expected.conversation_id
+        assert success.conversation_user_id == expected.conversation_user_id
+        assert success.content == expected.content
       end
     end
 
