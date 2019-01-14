@@ -64,7 +64,9 @@ defmodule PlangaWeb.ApiController do
            ) do
         {:error, error, _} ->
           {:error, 400, %{"data" => "Invalid arguments"}}
-        {:ok, result} -> {:ok, %{"data" => "success"}}
+
+        {:ok, result} ->
+          {:ok, %{"data" => "success"}}
       end
     end
   end
