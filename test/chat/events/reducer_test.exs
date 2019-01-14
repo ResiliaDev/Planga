@@ -31,15 +31,15 @@ defmodule Planga.Chat.Events.ReducerTest do
 
     property "New message creation depends on message content length" do
       check all content <- string(:printable, min_length: 1, max_length: 1000),
-                conversation_user <- filled_conversation_user_generator do
+                conversation_user <- filled_conversation_user_generator() do
         {result, expected} = send_chat_message_event(content, conversation_user)
-        assert {:ok, expected} = result
+        assert {:ok, ^expected} = result
       end
     end
 
     property "New message creation fails on empty messages" do
       check all content <- string(:printable, max_length: 0),
-                conversation_user <- filled_conversation_user_generator do
+                conversation_user <- filled_conversation_user_generator() do
         {result, _expected} = send_chat_message_event(content, conversation_user)
         assert {:error, [content: _]} = result
       end
@@ -47,7 +47,7 @@ defmodule Planga.Chat.Events.ReducerTest do
 
     property "New message creation fails on too long messages" do
       check all content <- string(:printable, min_length: 10_000),
-                conversation_user <- filled_conversation_user_generator do
+                conversation_user <- filled_conversation_user_generator() do
         {result, _expected} = send_chat_message_event(content, conversation_user)
         assert {:error, [content: _]} = result
       end

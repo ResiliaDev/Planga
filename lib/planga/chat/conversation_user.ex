@@ -61,8 +61,8 @@ defmodule Planga.Chat.ConversationUser do
   end
 
   def bannable?(conversation_user = %__MODULE__{}) do
-    # conversation_user.role == nil
-    true
+    conversation_user.role == nil || conversation_user.role == ""
+    # true
   end
 
   def banned?(conversation_user, current_datetime \\ DateTime.utc_now())
@@ -85,7 +85,7 @@ defmodule Planga.Chat.ConversationUser do
     |> apply_changes
   end
 
-  def set_role(conversation_user = %__MODULE__{}, role), do: {:error, :invalid_role}
+  def set_role(_conversation_user = %__MODULE__{}, _role), do: {:error, :invalid_role}
 
   def is_moderator?(conversation_user = %__MODULE__{}) do
     conversation_user.role == "moderator"

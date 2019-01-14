@@ -24,7 +24,6 @@ defmodule Planga.Event.ContextProvider do
     event = put_in(event.meta[:ecto_multi], ecto_multi)
 
     {:ok, event}
-    |> IO.inspect()
   end
 
   defp fill_subject(subject_fun, multi_info) do

@@ -9,7 +9,7 @@ defmodule PlangaWeb.ChatChannel do
   @doc """
   Implementation of Channel behaviour: Called when front-end attempts to join this conversation.
   """
-  def join("encrypted_chat:" <> qualified_conversation_info, _payload, socket) do
+  def join("encrypted_chat:" <> _qualified_conversation_info, _payload, socket) do
     Planga.Connection.subscribe_to_conversation(
       socket.assigns.app_id,
       socket.assigns.config.conversation_id
@@ -36,10 +36,10 @@ defmodule PlangaWeb.ChatChannel do
     {:error, %{reason: "Improper channel format"}}
   end
 
-  defp fill_socket(socket, socket_assigns) do
-    socket_assigns
-    |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
-  end
+  # defp fill_socket(socket, socket_assigns) do
+  #   socket_assigns
+  #   |> Enum.reduce(socket, fn {key, value}, socket -> assign(socket, key, value) end)
+  # end
 
   defp handle_event_result({:ok, _event_result}, socket), do: {:noreply, socket}
 
