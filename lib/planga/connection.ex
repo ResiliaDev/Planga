@@ -20,7 +20,13 @@ defmodule Planga.Connection do
       Planga.Connection.subscribe_to_conversation(app_id, remote_conversation_id)
 
       Planga.Connection.Persistence.update_username(user.id, secret_info.current_user_name)
-      Planga.Connection.maybe_update_user_role(app_id, current_user_id, remote_conversation_id, secret_info.current_user_role)
+
+      Planga.Connection.maybe_update_user_role(
+        app_id,
+        current_user_id,
+        remote_conversation_id,
+        secret_info.current_user_role
+      )
 
       socket_assigns =
         Planga.Connection.socket_info(user: user, api_key_pair: api_key_pair, config: secret_info)

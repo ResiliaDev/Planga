@@ -68,7 +68,6 @@ defmodule Planga.Mixfile do
       {:distillery, "~> 1.5.4", runtime: false},
       # {:planga_phoenix, "~> 1.0.0"},
       {:planga_phoenix, git: "https://github.com/ResiliaDev/planga-phoenix.git"},
-
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
       {:observer_cli, "~> 1.3"},
 

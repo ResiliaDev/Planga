@@ -84,6 +84,7 @@ defmodule Planga.Chat.ConversationUser do
     |> Ecto.Changeset.change(role: role)
     |> apply_changes
   end
+
   def set_role(conversation_user = %__MODULE__{}, role), do: {:error, :invalid_role}
 
   def is_moderator?(conversation_user = %__MODULE__{}) do

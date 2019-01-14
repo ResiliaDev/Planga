@@ -15,7 +15,8 @@ defmodule Planga.Event.ContextProvider.Hydration do
   def fetch_creator(%Event{
         topic: [:apps, app_id, :conversations, remote_conversation_id | _],
         meta: %{creator: remote_user_id}
-                    })  when remote_user_id != nil do
+      })
+      when remote_user_id != nil do
     app_id
     |> ensure_user_partakes_in_conversation(
       remote_conversation_id,
@@ -25,7 +26,8 @@ defmodule Planga.Event.ContextProvider.Hydration do
     |> Ecto.Multi.run(:creator, &{:ok, Map.get(&1, :creator_conversation_user)})
   end
 
-  def fetch_creator(%Event{topic: [:apps, app_id | _], meta: %{creator: remote_user_id}}) when remote_user_id != nil do
+  def fetch_creator(%Event{topic: [:apps, app_id | _], meta: %{creator: remote_user_id}})
+      when remote_user_id != nil do
     fetch_or_create_user(app_id, remote_user_id, "creator")
   end
 
@@ -67,8 +69,9 @@ defmodule Planga.Event.ContextProvider.Hydration do
   def hydrate([:apps, app_id, :conversations, rcid, :users, remote_user_id], _) do
     # {fetch_or_create_conversation_by_remote_id(app_id, rcid),
     {ensure_user_partakes_in_conversation(app_id, rcid, remote_user_id),
-     fn  %{conversation_user: conversation_user} ->
+     fn %{conversation_user: conversation_user} ->
        {:ok, conversation_user}
+
        # Repo.fetch_by(Planga.Chat.ConversationUser, conversation_id: conversation.id, user_id: user_id)
      end}
   end

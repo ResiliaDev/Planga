@@ -5,7 +5,13 @@ defmodule Planga.Connection.Config do
   """
 
   # @enforce_keys [:conversation_id, :current_user_id, :current_user_name]
-  defstruct [:conversation_id, :current_user_id, :current_user_name, other_users: [], current_user_role: nil]
+  defstruct [
+    :conversation_id,
+    :current_user_id,
+    :current_user_name,
+    other_users: [],
+    current_user_role: nil
+  ]
 
   defmodule OtherUserInfo do
     @moduledoc """
@@ -121,7 +127,6 @@ defmodule Planga.Connection.Config do
     with {:ok, {json_str, _jwk_decryption_details}} =
            do_jose_decrypt(encrypted_conversation_info, secret_key),
          {:ok, json_hash} <- Poison.decode(json_str) do
-
       {:ok, json_hash}
     else
       {:error, :invalid, _} ->

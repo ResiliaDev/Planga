@@ -10,7 +10,7 @@ defmodule Planga.Event.Reducer do
   Supposed to return `{:ok, updated_subject} | {:error, problem}`
   """
   @spec reducer(structure, event :: TeaVent.Event.t()) :: {:ok, structure} | {:error, any}
-  when structure: any
+        when structure: any
   def reducer(structure, event)
 
   def reducer(_, %Event{
@@ -18,22 +18,23 @@ defmodule Planga.Event.Reducer do
         name: :new_message,
         meta: %{creator: conversation_user},
         data: data
-              }) do
+      }) do
     Planga.Chat.Message.new(%{
-          content: data.message,
-          conversation_id: conversation_user.conversation_id,
-          sender_id: conversation_user.user_id,
-          conversation_user_id: conversation_user.id
-                            })
+      content: data.message,
+      conversation_id: conversation_user.conversation_id,
+      sender_id: conversation_user.user_id,
+      conversation_user_id: conversation_user.id
+    })
   end
 
   def reducer(message = %Planga.Chat.Message{}, %Event{
-  topic: [:apps, _app_id, :conversations, _conversation_id, :messages, _message_id],
-  name: name,
-  meta: %{creator: conversation_user, started_at: started_at}
-})
-  when name in [:hide_message, :show_message] do
-    case is_nil(conversation_user) || Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
+        topic: [:apps, _app_id, :conversations, _conversation_id, :messages, _message_id],
+        name: name,
+        meta: %{creator: conversation_user, started_at: started_at}
+      })
+      when name in [:hide_message, :show_message] do
+    case is_nil(conversation_user) ||
+           Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
       false ->
         {:error, "You are not allowed to perform this action"}
 
@@ -49,13 +50,14 @@ defmodule Planga.Event.Reducer do
   end
 
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
-  topic: [:apps, _app_id, :conversations, _conversation_id, :users, _remote_user_id],
-  name: name,
-  meta: %{creator: conversation_user, started_at: started_at},
-  data: data
-})
-  when name in [:ban, :unban] do
-    case is_nil(conversation_user) || Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
+        topic: [:apps, _app_id, :conversations, _conversation_id, :users, _remote_user_id],
+        name: name,
+        meta: %{creator: conversation_user, started_at: started_at},
+        data: data
+      })
+      when name in [:ban, :unban] do
+    case is_nil(conversation_user) ||
+           Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
       false ->
         {:error, "You are not allowed to perform this action"}
 
@@ -71,11 +73,11 @@ defmodule Planga.Event.Reducer do
   end
 
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
-  topic: [:apps, _app_id, :conversations, _conversation_id, :users, _remote_user_id],
-  name: :set_role,
-  meta: %{creator: creator},
-  data: data
-}) do
+        topic: [:apps, _app_id, :conversations, _conversation_id, :users, _remote_user_id],
+        name: :set_role,
+        meta: %{creator: creator},
+        data: data
+      }) do
     case creator == nil || Planga.Chat.ConversationUser.is_moderator?(creator) do
       false ->
         {:error, "You are not allowed to perform this action"}

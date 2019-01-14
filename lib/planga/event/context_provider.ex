@@ -22,8 +22,9 @@ defmodule Planga.Event.ContextProvider do
       |> Ecto.Multi.merge(&persist_reducer_result/1)
 
     event = put_in(event.meta[:ecto_multi], ecto_multi)
+
     {:ok, event}
-    |> IO.inspect
+    |> IO.inspect()
   end
 
   defp fill_subject(subject_fun, multi_info) do

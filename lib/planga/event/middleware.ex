@@ -23,6 +23,7 @@ defmodule Planga.Event.Middleware do
           | meta: updated_meta,
             changed_subject: ecto_multi_result.changed_subject
         }
+
         {:ok, updated_event}
       end
     end
