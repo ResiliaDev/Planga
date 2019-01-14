@@ -37,6 +37,13 @@ defmodule PlangaWeb.ApiControllerTest do
       |> elem(1)
 
     %{"public_api_id" => api_key_pair.public_id, "encrypted_request" => encrypted_request}
+    |> Poison.encode!()
+  end
+
+  defp build_json_conn() do
+    build_conn()
+    |> Plug.Conn.put_req_header("accept", "application/json")
+    |> Plug.Conn.put_req_header("content-type", "application/json")
   end
 
   describe "set_role" do
@@ -47,7 +54,11 @@ defmodule PlangaWeb.ApiControllerTest do
     end
     test "With missing parameters 2", context do
       request = build_encrypted_request("set_role", %{}, context[:api_key_pair])
-      conn = post(build_conn(), "/api/v1", request)
+      IO.inspect(request, label: :request)
+      conn =
+        build_json_conn()
+        |> post("/api/v1", request)
+
       assert conn.status == 400
       assert conn.resp_body == Poison.encode!(%{"status" => 400, "data" => "Missing parameters"})
     end
