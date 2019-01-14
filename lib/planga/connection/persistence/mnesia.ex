@@ -38,6 +38,6 @@ defmodule Planga.Connection.Persistence.Mnesia do
   end
 
   def fetch_api_key_pair_by_public_id(pub_api_id) do
-    Planga.Repo.get_by(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
+    Planga.Repo.fetch_by(Planga.Chat.APIKeyPair, public_id: pub_api_id, enabled: true)
   end
 end

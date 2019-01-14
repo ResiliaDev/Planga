@@ -1,9 +1,9 @@
 defmodule PlangaWeb.ApiController do
   use PlangaWeb, :controller
 
-  def call(conn, %{"public_api_id" => public_api_id, "encrypted_request" => encrypted_request}) do
+  def dispatch(conn, %{"public_api_id" => public_api_id, "encrypted_request" => encrypted_request}) do
     with                       {:ok, api_key_pair} = Planga.Connection.Persistence.fetch_api_key_pair_by_public_id(public_api_id),
-         %{"action" => action, "params" => params} = jose_decrypt(encrypted_request, api_key_pair.secret_key)
+         {:ok, %{"action" => action, "params" => params}} = jose_decrypt(encrypted_request, api_key_pair.secret_key)
       do
       call_decrypted(conn, action, params, api_key_pair)
       else
