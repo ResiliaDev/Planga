@@ -43,7 +43,7 @@ defmodule Planga.Chat.Converse.Persistence.Mnesia do
 
   defp put_conversation_user(message) do
     if message.conversation_user_id == nil do
-      conversation_user = fetch_conversation_user_info(message.conversation_id, message.sender_id)
+      {:ok, conversation_user} = fetch_conversation_user_info(message.conversation_id, message.sender_id)
       message
       |> Ecto.Changeset.change(conversation_user_id: conversation_user.id)
       |> Repo.update!
