@@ -25,6 +25,9 @@ defmodule Planga.Event.Middleware do
         }
 
         {:ok, updated_event}
+      else
+        {:error, _, error, event_before_error} ->
+          {:error, error, event_before_error}
       end
     end
   end
@@ -41,13 +44,22 @@ defmodule Planga.Event.Middleware do
       updated_meta = Map.put(event.meta, :started_at, DateTime.utc_now())
       event = %Event{event | meta: updated_meta}
 
-      with {:ok, result_event} = next_stage.(event) do
-        updated_meta = Map.put(event.meta, :finished_at, DateTime.utc_now())
+
+      with {:ok, result_event} <- next_stage.(event) do
+        updated_meta = Map.put(result_event.meta, :finished_at, DateTime.utc_now())
         result_event = %Event{result_event | meta: updated_meta}
         {:ok, result_event}
+      else
+        {:error, error, result_event = %Event{}} ->
+          updated_meta = Map.put(result_event.meta, :finished_at, DateTime.utc_now())
+          result_event = %Event{result_event | meta: updated_meta}
+        {:error, error, result_event}
+        result ->
+          result
       end
     end
   end
+
 
   def event_logger(next_stage) do
     require Logger
@@ -70,8 +82,8 @@ defmodule Planga.Event.Middleware do
 
         {:ok, updated_event}
       else
-        error ->
-          Logger.info("<--Failed Handling event #{inspect(error)}")
+        error = {:error, reason, error_event} ->
+          Logger.info("<--Failed Handling event. Reason: #{inspect(reason)}. Event at time of error:\n #{inspect(error_event)}")
           error
       end
     end

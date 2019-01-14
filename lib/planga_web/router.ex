@@ -24,7 +24,7 @@ defmodule PlangaWeb.Router do
   end
 
   scope "/api", PlangaWeb do
-    pipe_through :api
+    pipe_through(:api)
 
     post("/v1", ApiController, :dispatch)
   end

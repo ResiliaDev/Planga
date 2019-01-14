@@ -46,7 +46,7 @@ defmodule Planga.Mixfile do
       # {:ecto_mnesia, "~> 0.9.0"},
       # {:ecto_mnesia, "~> 0.9.1"},
       # {:ecto_mnesia, git: "git@github.com:Nebo15/ecto_mnesia.git"},
-      {:ecto_mnesia, git: "https://github.com/Qqwy/ecto_mnesia.git", branch: "match_spec_tuples"},
+      {:ecto_mnesia, git: "https://github.com/Qqwy/ecto_mnesia.git", branch: "master"},
       {:corsica, "~> 1.0"},
       {:snowflakex, "~> 1.1"},
       {:jose, "~> 1.8.4"},
