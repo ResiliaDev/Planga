@@ -14586,7 +14586,7 @@ var _ResiliaDev$planga_chat_client$View$data = F2(
 	});
 var _ResiliaDev$planga_chat_client$View$message = F3(
 	function (current_user_name, is_moderator, message) {
-		var options_button = A2(
+		var options_button = is_moderator ? A2(
 			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
@@ -14609,7 +14609,10 @@ var _ResiliaDev$planga_chat_client$View$message = F3(
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
-			});
+			}) : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'});
 		var is_deleted = !_elm_lang$core$Native_Utils.eq(message.deleted_at, _elm_lang$core$Maybe$Nothing);
 		var message_content = is_deleted ? A2(
 			_elm_lang$html$Html$span,

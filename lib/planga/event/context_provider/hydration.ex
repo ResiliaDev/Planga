@@ -64,10 +64,12 @@ defmodule Planga.Event.ContextProvider.Hydration do
      end}
   end
 
-  def hydrate([:apps, app_id, :conversations, rcid, :users, user_id], _) do
-    {fetch_or_create_conversation_by_remote_id(app_id, rcid),
-     fn  %{conversation: conversation} ->
-       Repo.fetch_by(Planga.Chat.ConversationUser, conversation_id: conversation.id, user_id: user_id)
+  def hydrate([:apps, app_id, :conversations, rcid, :users, remote_user_id], _) do
+    # {fetch_or_create_conversation_by_remote_id(app_id, rcid),
+    {ensure_user_partakes_in_conversation(app_id, rcid, remote_user_id),
+     fn  %{conversation_user: conversation_user} ->
+       {:ok, conversation_user}
+       # Repo.fetch_by(Planga.Chat.ConversationUser, conversation_id: conversation.id, user_id: user_id)
      end}
   end
 
