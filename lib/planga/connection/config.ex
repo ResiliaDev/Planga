@@ -101,7 +101,7 @@ defmodule Planga.Connection.Config do
   to a hash with string keys.
   """
   def decrypt(encrypted_info, api_key_pair) do
-    with {:ok, json_hash} <- jose_decrypt(encrypted_info, api_key_pair.secret_key),
+    with {:ok, json_hash} <- Planga.Crypto.JOSE.decrypt(encrypted_info, api_key_pair.secret_key),
          {:ok, config} <- from_json_hash(json_hash) do
       {:ok, config}
     end
@@ -116,56 +116,5 @@ defmodule Planga.Connection.Config do
   """
   def public_info(secret_info) do
     %{"current_user_name" => secret_info.current_user_name}
-  end
-
-  defp jose_decrypt(encrypted_conversation_info, secret_key) do
-    # res
-    # |> elem(0)
-    # |> Poison.decode!()
-    # |> from_json_hash
-    # |> IO.inspect(label: "TODO: conversion into module")
-    with {:ok, {json_str, _jwk_decryption_details}} =
-           do_jose_decrypt(encrypted_conversation_info, secret_key),
-         {:ok, json_hash} <- Poison.decode(json_str) do
-      {:ok, json_hash}
-    else
-      {:error, :invalid, _} ->
-        {:error, "Could not parse JSON in encrypted configuration."}
-
-      {:error, error} ->
-        {:error, "Invalid Planga configuration: #{to_string(error)}"}
-    end
-
-    # res =
-    #   |> IO.inspect(label: "The decrypted strigifiedJSON Planga will deserialize: ")
-    #   |> Poison.decode()
-    #   |> from_json_hash
-    #   |> IO.inspect(label: "TODO: conversion into module")
-    # case res do
-    #   {:ok, res} -> {:ok, res}
-    #   _ -> {:error, "Could not parse JSON in encrypted configuration."}
-    # end
-  end
-
-  defp do_jose_decrypt(encrypted_conversation_info, encoded_secret_key) do
-    with {:ok, secret_key} <- do_jose_decode_api_key(encoded_secret_key) do
-      try do
-        res = JOSE.JWE.block_decrypt(secret_key, encrypted_conversation_info)
-        {:ok, res}
-      rescue
-        FunctionClauseError ->
-          {:error,
-           "Cannot decrypt `encrypted_conversation_info`. Either the provided public key does not match the used secret key, or the ciphertext is malformed."}
-      end
-    end
-  end
-
-  defp do_jose_decode_api_key(encoded_secret_key) do
-    try do
-      secret_key = JOSE.JWK.from_map(%{"k" => encoded_secret_key, "kty" => "oct"})
-      {:ok, secret_key}
-    rescue
-      FunctionClauseError -> {:error, "invalid secret API key format!"}
-    end
   end
 end
