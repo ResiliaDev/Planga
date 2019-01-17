@@ -29,7 +29,8 @@ defmodule Planga.Event do
 
     with {:ok, event} <- TeaVent.dispatch_event(event, options) do
       # Not a TeaVent `sync_callback` because we want to run it _after_ the middleware.
-      Planga.Event.Callbacks.broadcast_changes(event)
+      event
+      |> Planga.Event.Callbacks.broadcast_changes()
     end
   end
 end

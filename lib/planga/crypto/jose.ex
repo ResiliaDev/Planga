@@ -6,7 +6,6 @@ defmodule Planga.Crypto.JOSE do
   - encrypted with a JOSE.JWK oct-encoded key
   """
 
-
   def decrypt(encrypted_request, secret_key) do
     with {:ok, {json_str, _jwk_decryption_details}} =
            do_jose_decrypt(encrypted_request, secret_key),
@@ -42,5 +41,4 @@ defmodule Planga.Crypto.JOSE do
       FunctionClauseError -> {:error, "invalid secret API key format!"}
     end
   end
-
 end

@@ -130,7 +130,7 @@ defmodule PlangaWeb.ChatChannel do
 
   def handle_in(
         "ban_user",
-        %{"user_uuid" => user_to_ban_id, "duration_minutes" => duration_minutes},
+        %{"user_uuid" => user_to_ban_uuid, "duration_minutes" => duration_minutes},
         socket
       ) do
     %{
@@ -141,11 +141,11 @@ defmodule PlangaWeb.ChatChannel do
       }
     } = socket.assigns
 
-    user_to_ban_id = user_to_ban_id |> String.to_integer()
+    user_to_ban_uuid = user_to_ban_uuid |> String.to_integer()
 
     handle_event_result(
       Planga.Event.dispatch(
-        [:apps, app_id, :conversations, remote_conversation_id, :users, user_to_ban_id],
+        [:apps, app_id, :conversations, remote_conversation_id, :conversation_users, user_to_ban_uuid],
         :ban,
         %{duration_minutes: duration_minutes},
         remote_user_id
@@ -171,7 +171,7 @@ defmodule PlangaWeb.ChatChannel do
 
     handle_event_result(
       Planga.Event.dispatch(
-        [:apps, app_id, :conversations, remote_conversation_id, :users, user_to_unban_id],
+        [:apps, app_id, :conversations, remote_conversation_id, :conversation_users, user_to_unban_id],
         :unban,
         %{},
         remote_user_id

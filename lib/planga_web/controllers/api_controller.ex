@@ -24,7 +24,7 @@ defmodule PlangaWeb.ApiController do
   end
 
   def call_decrypted(conn, action, params, api_key_pair) do
-    case Planga.SettingsApi.handle_request(conn, action, params, api_key_pair) do
+    case Planga.SettingsApi.handle_request(action, params, api_key_pair) do
       {:ok, response_map} ->
         json(conn, Map.merge(%{"status" => 200}, response_map))
 
