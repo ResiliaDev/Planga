@@ -18,7 +18,7 @@ defmodule Planga.Chat.ConversationUser do
   end
 
   def new(attrs) do
-    %__MODULE__{}
+    %__MODULE__{id: Snowflakex.new!()}
     |> Ecto.Changeset.cast(Map.new(attrs), [:conversation_id, :user_id, :role, :banned_until])
     |> Ecto.Changeset.validate_required([:conversation_id, :user_id])
     |> apply_changes
@@ -32,12 +32,12 @@ defmodule Planga.Chat.ConversationUser do
     end
   end
 
-  @doc false
-  def changeset(conversation_user, attrs) do
-    conversation_user
-    |> Ecto.Changeset.cast(attrs, [:conversation_id, :user_id])
-    |> Ecto.Changeset.validate_required([:conversation_id, :user_id])
-  end
+  # @doc false
+  # def changeset(conversation_user, attrs) do
+  #   conversation_user
+  #   |> Ecto.Changeset.cast(attrs, [:conversation_id, :user_id])
+  #   |> Ecto.Changeset.validate_required([:conversation_id, :user_id])
+  # end
 
   def ban(
         conversation_user = %__MODULE__{},
