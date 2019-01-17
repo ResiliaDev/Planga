@@ -10,6 +10,7 @@ defmodule Planga.SettingsApi do
       case unquote(params) do
         unquote(match) ->
           unquote(body)
+
         _ ->
           {:error, "Missing parameters"}
       end
@@ -30,14 +31,14 @@ defmodule Planga.SettingsApi do
   end
 
   @doc """
-  
+
   """
   def set_role(params, api_key_pair) do
-    with_parameters(params, %{
+    with_parameters params, %{
       "role" => role,
       "conversation_id" => remote_conversation_id,
       "user_id" => remote_user_id
-    }) do
+    } do
       case Planga.Event.dispatch(
              [
                :apps,

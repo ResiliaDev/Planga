@@ -33,7 +33,14 @@ defmodule Planga.Event.Callbacks do
           event.changed_subject
         )
 
-      {[:apps, app_id, :conversations, remote_conversation_id, :conversation_users, _conversation_user_id], _} ->
+      {[
+         :apps,
+         app_id,
+         :conversations,
+         remote_conversation_id,
+         :conversation_users,
+         _conversation_user_id
+       ], _} ->
         Planga.Connection.broadcast_changed_conversation_user!(
           app_id,
           remote_conversation_id,

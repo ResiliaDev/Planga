@@ -22,12 +22,12 @@ defmodule Planga.Event.Reducer do
     if Planga.Chat.ConversationUser.banned?(conversation_user) do
       {:error, "You are not allowed to perform this action"}
     else
-    Planga.Chat.Message.new(%{
-      content: data.message,
-      conversation_id: conversation_user.conversation_id,
-      sender_id: conversation_user.user_id,
-      conversation_user_id: conversation_user.id
-    })
+      Planga.Chat.Message.new(%{
+        content: data.message,
+        conversation_id: conversation_user.conversation_id,
+        sender_id: conversation_user.user_id,
+        conversation_user_id: conversation_user.id
+      })
     end
   end
 
@@ -54,7 +54,14 @@ defmodule Planga.Event.Reducer do
   end
 
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
-        topic: [:apps, _app_id, :conversations, _conversation_id, :conversation_users, _remote_user_id],
+        topic: [
+          :apps,
+          _app_id,
+          :conversations,
+          _conversation_id,
+          :conversation_users,
+          _remote_user_id
+        ],
         name: name,
         meta: %{creator: conversation_user, started_at: started_at},
         data: data

@@ -145,7 +145,14 @@ defmodule PlangaWeb.ChatChannel do
 
     handle_event_result(
       Planga.Event.dispatch(
-        [:apps, app_id, :conversations, remote_conversation_id, :conversation_users, user_to_ban_uuid],
+        [
+          :apps,
+          app_id,
+          :conversations,
+          remote_conversation_id,
+          :conversation_users,
+          user_to_ban_uuid
+        ],
         :ban,
         %{duration_minutes: duration_minutes},
         remote_user_id
@@ -171,7 +178,14 @@ defmodule PlangaWeb.ChatChannel do
 
     handle_event_result(
       Planga.Event.dispatch(
-        [:apps, app_id, :conversations, remote_conversation_id, :conversation_users, user_to_unban_id],
+        [
+          :apps,
+          app_id,
+          :conversations,
+          remote_conversation_id,
+          :conversation_users,
+          user_to_unban_id
+        ],
         :unban,
         %{},
         remote_user_id
