@@ -56,6 +56,8 @@ defmodule Planga.Mixfile do
       {:httpoison, "~> 1.0"},
       {:exceptional, "~> 2.1"},
       {:tea_vent, git: "https://github.com/Qqwy/elixir-tea_vent.git", branch: "master"},
+      # Distributed Database:
+      {:riak, "~> 1.1.6"},
 
       # Communication with Ruby:
       {:amqp, "~> 1.0.3"},
