@@ -83,7 +83,8 @@ defmodule Planga.Chat.Message do
         "author_uuid" => "#{message.conversation_user.id}",
         "content" => message.content |> html_escape,
         "sent_at" => message.inserted_at,
-        "deleted_at" => message.deleted_at
+        "deleted_at" => message.deleted_at,
+        "hidden" => message.conversation_user.hide_all_messages
       }
     end
 
