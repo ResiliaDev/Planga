@@ -13,6 +13,7 @@ defmodule Planga.Chat.ConversationUser do
     belongs_to(:user, Planga.Chat.User)
     field(:role, :string, default: "")
     field(:banned_until, :utc_datetime)
+    field(:hide_all_messages, :boolean, default: false)
 
     timestamps()
   end
@@ -58,6 +59,14 @@ defmodule Planga.Chat.ConversationUser do
       true ->
         %__MODULE__{conversation_user | banned_until: ban_end}
     end
+  end
+
+  def hide_all_messages(conversation_user = %__MODULE__{}) do
+    %__MODULE__{conversation_user | hide_alll_messages: true}
+  end
+
+  def show_all_messages(conversation_user = %__MODULE__{}) do
+    %__MODULE__{conversation_user | hide_alll_messages: false}
   end
 
   def bannable?(conversation_user = %__MODULE__{}) do
