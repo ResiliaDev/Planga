@@ -109,7 +109,8 @@ defmodule Planga.Chat.ConversationUser do
           case conversation_user.banned_until do
             nil -> nil
             datetime -> DateTime.to_unix(datetime)
-          end
+          end,
+        "hide_all_messages" => conversation_user.hide_all_messages,
       }
     end
   end
