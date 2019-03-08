@@ -105,7 +105,7 @@ defmodule Planga.Event.Reducer do
         true ->
           case name do
             :hide_all_messages ->
-              {:ok, Planga.Chat.ConversationUser.hide_all_messages(subject, data.duration_minutes, started_at)}
+              {:ok, Planga.Chat.ConversationUser.hide_all_messages(subject)}
 
             :show_all_messages ->
               {:ok, Planga.Chat.ConversationUser.show_all_messages(subject)}

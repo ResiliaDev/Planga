@@ -62,11 +62,11 @@ defmodule Planga.Chat.ConversationUser do
   end
 
   def hide_all_messages(conversation_user = %__MODULE__{}) do
-    %__MODULE__{conversation_user | hide_alll_messages: true}
+    %__MODULE__{conversation_user | hide_all_messages: true}
   end
 
   def show_all_messages(conversation_user = %__MODULE__{}) do
-    %__MODULE__{conversation_user | hide_alll_messages: false}
+    %__MODULE__{conversation_user | hide_all_messages: false}
   end
 
   def bannable?(conversation_user = %__MODULE__{}) do
