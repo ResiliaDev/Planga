@@ -195,10 +195,10 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def handle_in(
-    "hide_all_messages",
-    %{"user_uuid" => user_to_unban_id},
-    socket
-  ) do
+        "hide_all_messages",
+        %{"user_uuid" => user_to_unban_id},
+        socket
+      ) do
     %{
       app_id: app_id,
       config: %Planga.Connection.Config{
@@ -228,10 +228,10 @@ defmodule PlangaWeb.ChatChannel do
   end
 
   def handle_in(
-    "show_all_messages",
-    %{"user_uuid" => user_to_unban_id},
-    socket
-  ) do
+        "show_all_messages",
+        %{"user_uuid" => user_to_unban_id},
+        socket
+      ) do
     %{
       app_id: app_id,
       config: %Planga.Connection.Config{

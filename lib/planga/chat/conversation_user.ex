@@ -110,7 +110,7 @@ defmodule Planga.Chat.ConversationUser do
             nil -> nil
             datetime -> DateTime.to_unix(datetime)
           end,
-        "hide_all_messages" => conversation_user.hide_all_messages,
+        "hide_all_messages" => conversation_user.hide_all_messages
       }
     end
   end

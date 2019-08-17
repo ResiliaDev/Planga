@@ -84,35 +84,34 @@ defmodule Planga.Event.Reducer do
   end
 
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
-    topic: [
-      :apps,
-      _app_id,
-      :conversations,
-      _conversation_id,
-      :conversation_users,
-      _remote_user_id
-    ],
-    name: name,
-    meta: %{creator: conversation_user, started_at: started_at},
-    data: data
-  })
-    when name in [:hide_all_messages, :show_all_messages] do
-      case is_nil(conversation_user) ||
-        Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
-        false ->
-          {:error, "You are not allowed to perform this action"}
+        topic: [
+          :apps,
+          _app_id,
+          :conversations,
+          _conversation_id,
+          :conversation_users,
+          _remote_user_id
+        ],
+        name: name,
+        meta: %{creator: conversation_user, started_at: started_at},
+        data: data
+      })
+      when name in [:hide_all_messages, :show_all_messages] do
+    case is_nil(conversation_user) ||
+           Planga.Chat.ConversationUser.is_moderator?(conversation_user) do
+      false ->
+        {:error, "You are not allowed to perform this action"}
 
-        true ->
-          case name do
-            :hide_all_messages ->
-              {:ok, Planga.Chat.ConversationUser.hide_all_messages(subject)}
+      true ->
+        case name do
+          :hide_all_messages ->
+            {:ok, Planga.Chat.ConversationUser.hide_all_messages(subject)}
 
-            :show_all_messages ->
-              {:ok, Planga.Chat.ConversationUser.show_all_messages(subject)}
-          end
-      end
+          :show_all_messages ->
+            {:ok, Planga.Chat.ConversationUser.show_all_messages(subject)}
+        end
     end
-
+  end
 
   def reducer(subject = %Planga.Chat.ConversationUser{}, %Event{
         topic: [:apps, _app_id, :conversations, _conversation_id, :users, _remote_user_id],
